@@ -2,7 +2,7 @@
 <Defs>
   <MainButtonDef>
     <defName>DMMB_MainButtonsMenu</defName>
-    <label>main menu</label>
+    <label>Menus</label>
     <description>Open a searchable list of all main buttons.</description>
     <tabWindowClass>Declutter_Main_Buttons_Bar.MainTabWindow_MainButtonsMenu</tabWindowClass>
     <order>0</order>

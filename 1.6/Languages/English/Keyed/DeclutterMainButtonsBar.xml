@@ -4,5 +4,10 @@
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
   <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
+  <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
+  <DMMB.SettingsGizmoBottom>Draw gizmos when a pawn is selected at the bottom of the screen</DMMB.SettingsGizmoBottom>
+  <DMMB.SettingsGizmoOffsetLabel>Gizmo bottom offset: {0}</DMMB.SettingsGizmoOffsetLabel>
+  <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
+  <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
 </LanguageData>

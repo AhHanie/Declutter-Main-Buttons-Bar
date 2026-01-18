@@ -13,8 +13,12 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static List<MainButtonDef> hiddenFromBarDefs = new List<MainButtonDef>();
         public static List<MainButtonDef> favoriteDefs = new List<MainButtonDef>();
+        public static List<MainButtonDef> blacklistedFromMenuDefs = new List<MainButtonDef>();
         public static bool useFixedWidthMode = false;
         public static float fixedButtonWidth = 120f;
+        public static bool pinMenuButtonRight = false;
+        public static bool drawGizmosAtBottom = false;
+        public static float gizmoBottomOffset = 35f;
 
         public override void ExposeData()
         {
@@ -30,9 +34,19 @@ namespace Declutter_Main_Buttons_Bar
                 favoriteDefs = new List<MainButtonDef>();
             }
 
+            Scribe_Collections.Look(ref blacklistedFromMenuDefs, "blacklistedFromMenuDefs", LookMode.Def);
+            if (blacklistedFromMenuDefs == null)
+            {
+                blacklistedFromMenuDefs = new List<MainButtonDef>();
+            }
+
             Scribe_Values.Look(ref useFixedWidthMode, "useFixedWidthMode", false);
             Scribe_Values.Look(ref fixedButtonWidth, "fixedButtonWidth", 120f);
+            Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
+            Scribe_Values.Look(ref drawGizmosAtBottom, "drawGizmosAtBottom", false);
+            Scribe_Values.Look(ref gizmoBottomOffset, "gizmoBottomOffset", 35f);
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
+            gizmoBottomOffset = Mathf.Clamp(gizmoBottomOffset, 0f, 120f);
         }
 
         public static bool IsHiddenFromBar(MainButtonDef def)
@@ -72,6 +86,26 @@ namespace Declutter_Main_Buttons_Bar
             else
             {
                 favoriteDefs.Remove(def);
+            }
+        }
+
+        public static bool IsBlacklistedFromMenu(MainButtonDef def)
+        {
+            return blacklistedFromMenuDefs.Contains(def);
+        }
+
+        public static void SetBlacklistedFromMenu(MainButtonDef def, bool blacklisted)
+        {
+            if (blacklisted)
+            {
+                if (!blacklistedFromMenuDefs.Contains(def))
+                {
+                    blacklistedFromMenuDefs.Add(def);
+                }
+            }
+            else
+            {
+                blacklistedFromMenuDefs.Remove(def);
             }
         }
     }

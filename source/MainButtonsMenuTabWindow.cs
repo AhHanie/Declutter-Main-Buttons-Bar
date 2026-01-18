@@ -21,6 +21,9 @@ namespace Declutter_Main_Buttons_Bar
         private readonly QuickSearchWidget quickSearchWidget = new QuickSearchWidget();
         private Vector2 scrollPosition = Vector2.zero;
         private List<MainButtonDef> cachedDefs;
+        private List<MainButtonDef> cachedMenuDefs;
+        private bool triedToFocus;
+        private int openFrames;
 
         public override Vector2 RequestedTabSize
         {
@@ -42,15 +45,22 @@ namespace Declutter_Main_Buttons_Bar
         public override void PreOpen()
         {
             base.PreOpen();
-            cachedDefs = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton;
+            RebuildMenuCache();
             quickSearchWidget.Reset();
-            quickSearchWidget.Unfocus();
             CacheSearchState();
+            triedToFocus = false;
+            openFrames = 0;
         }
 
         public override void DoWindowContents(Rect inRect)
         {
             Text.Font = GameFont.Small;
+
+            if (!triedToFocus && openFrames == 2)
+            {
+                quickSearchWidget.Focus();
+                triedToFocus = true;
+            }
 
             Rect topBarRect = new Rect(0f, 0f, inRect.width, SearchHeight + 4f);
             Widgets.DrawBoxSolid(topBarRect, PanelBg);
@@ -137,6 +147,12 @@ namespace Declutter_Main_Buttons_Bar
             Widgets.EndScrollView();
         }
 
+        public override void WindowUpdate()
+        {
+            base.WindowUpdate();
+            openFrames++;
+        }
+
         public override void Notify_ClickOutsideWindow()
         {
             base.Notify_ClickOutsideWindow();
@@ -148,7 +164,7 @@ namespace Declutter_Main_Buttons_Bar
             List<MainButtonDef> source;
             if (!quickSearchWidget.filter.Active)
             {
-                source = cachedDefs;
+                source = cachedMenuDefs;
                 return source
                     .OrderByDescending(def => ModSettings.IsFavorite(def))
                     .ThenBy(def => def.order)
@@ -156,9 +172,9 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             List<MainButtonDef> filtered = new List<MainButtonDef>();
-            for (int i = 0; i < cachedDefs.Count; i++)
+            for (int i = 0; i < cachedMenuDefs.Count; i++)
             {
-                MainButtonDef def = cachedDefs[i];
+                MainButtonDef def = cachedMenuDefs[i];
                 if (quickSearchWidget.filter.Matches(def.LabelCap.ToString()))
                 {
                     filtered.Add(def);
@@ -180,9 +196,9 @@ namespace Declutter_Main_Buttons_Bar
             }
             else
             {
-                for (int i = 0; i < cachedDefs.Count; i++)
+                for (int i = 0; i < cachedMenuDefs.Count; i++)
                 {
-                    if (quickSearchWidget.filter.Matches(cachedDefs[i].LabelCap.ToString()))
+                    if (quickSearchWidget.filter.Matches(cachedMenuDefs[i].LabelCap.ToString()))
                     {
                         anyMatch = true;
                         break;
@@ -191,6 +207,14 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             quickSearchWidget.noResultsMatched = !anyMatch;
+        }
+
+        private void RebuildMenuCache()
+        {
+            cachedDefs = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton;
+            cachedMenuDefs = cachedDefs
+                .Where(def => !ModSettings.IsBlacklistedFromMenu(def))
+                .ToList();
         }
     }
 }

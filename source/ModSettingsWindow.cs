@@ -16,7 +16,9 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 140f + MainButtonsCache.AllButtonsInOrderNoDMMBButton.Count * 28f;
+            float viewHeight = 256f
+                + (MainButtonsCache.AllButtonsInOrderNoDMMBButton.Count * 28f)
+                + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
@@ -28,18 +30,36 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.Label("DMMB.SettingsFixedWidthLabel".Translate(Mathf.RoundToInt(ModSettings.fixedButtonWidth)));
             ModSettings.fixedButtonWidth = listing.Slider(ModSettings.fixedButtonWidth, 50f, 200f);
-            listing.GapLine();
 
-            if (listing.ButtonText("DMMB.SettingsReset".Translate()))
+            listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
+            listing.CheckboxLabeled("DMMB.SettingsGizmoBottom".Translate(), ref ModSettings.drawGizmosAtBottom);
+            listing.Label("DMMB.SettingsGizmoOffsetLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoBottomOffset)));
+            ModSettings.gizmoBottomOffset = listing.Slider(ModSettings.gizmoBottomOffset, 0f, 120f);
+
+            Rect resetRow = listing.GetRect(Text.LineHeight);
+            Rect resetLabelRect = resetRow;
+            resetLabelRect.width *= 0.6f;
+            Rect resetButtonRect = resetRow;
+            resetButtonRect.xMin = resetLabelRect.xMax;
+            resetButtonRect.width = Mathf.Min(140f, resetButtonRect.width);
+            resetButtonRect.x = resetRow.xMax - resetButtonRect.width;
+
+            Widgets.Label(resetLabelRect, "DMMB.SettingsResetLabel".Translate());
+            if (Widgets.ButtonText(resetButtonRect, "DMMB.SettingsReset".Translate()))
             {
                 ModSettings.hiddenFromBarDefs.Clear();
                 ModSettings.favoriteDefs.Clear();
+                ModSettings.blacklistedFromMenuDefs.Clear();
                 ModSettings.useFixedWidthMode = false;
                 ModSettings.fixedButtonWidth = 120f;
+                ModSettings.pinMenuButtonRight = false;
+                ModSettings.drawGizmosAtBottom = false;
+                ModSettings.gizmoBottomOffset = 35f;
             }
 
             listing.GapLine();
 
+            listing.Gap(20f);
             listing.Label("DMMB.SettingsDesc".Translate());
             listing.GapLine();
 
@@ -52,6 +72,23 @@ namespace Declutter_Main_Buttons_Bar
                 if (newValue != showOnBar)
                 {
                     ModSettings.SetHiddenFromBar(def, !newValue);
+                }
+            }
+
+            listing.GapLine();
+            listing.Gap(20f);
+            listing.Label("DMMB.SettingsMenuBlacklistDesc".Translate());
+            listing.GapLine();
+
+            for (int i = 0; i < MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count; i++)
+            {
+                MainButtonDef def = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton[i];
+                bool showInMenu = !ModSettings.IsBlacklistedFromMenu(def);
+                bool newValue = showInMenu;
+                listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
+                if (newValue != showInMenu)
+                {
+                    ModSettings.SetBlacklistedFromMenu(def, !newValue);
                 }
             }
 
