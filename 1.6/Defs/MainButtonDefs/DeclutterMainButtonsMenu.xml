@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <MainButtonDef>
+    <defName>DMMB_MainButtonsMenu</defName>
+    <label>main menu</label>
+    <description>Open a searchable list of all main buttons.</description>
+    <tabWindowClass>Declutter_Main_Buttons_Bar.MainTabWindow_MainButtonsMenu</tabWindowClass>
+    <order>0</order>
+    <iconPath>DMMB/UI/Hamburger</iconPath>
+  </MainButtonDef>
+</Defs>

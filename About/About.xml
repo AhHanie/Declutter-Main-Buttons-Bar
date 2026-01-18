@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+    <name>Declutter Main Buttons Bar</name>
+    <author>Sk</author>
+    <packageId>sk.dmbb</packageId>
+    <supportedVersions>
+        <li>1.6</li>
+    </supportedVersions>
+    <description>Adds a configurable side panel to RimWorld's bottom toolbar, letting you manually organize main buttons into a searchable, scrollable menu.</description>
+    <modVersion>1.0.0</modVersion>
+    <url>https://github.com/AhHanie/Declutter-Main-Buttons-Bar</url>
+</ModMetaData>

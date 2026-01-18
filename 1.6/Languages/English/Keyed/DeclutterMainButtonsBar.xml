@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <DMMB.SettingsTitle>Declutter Main Buttons Bar</DMMB.SettingsTitle>
+  <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
+  <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
+  <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
+  <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
+</LanguageData>
