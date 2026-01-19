@@ -16,6 +16,7 @@ namespace Declutter_Main_Buttons_Bar
         public static List<MainButtonDef> blacklistedFromMenuDefs = new List<MainButtonDef>();
         public static bool useFixedWidthMode = false;
         public static float fixedButtonWidth = 120f;
+        public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
         public static bool drawGizmosAtBottom = false;
         public static float gizmoBottomOffset = 35f;
@@ -42,6 +43,7 @@ namespace Declutter_Main_Buttons_Bar
 
             Scribe_Values.Look(ref useFixedWidthMode, "useFixedWidthMode", false);
             Scribe_Values.Look(ref fixedButtonWidth, "fixedButtonWidth", 120f);
+            Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref drawGizmosAtBottom, "drawGizmosAtBottom", false);
             Scribe_Values.Look(ref gizmoBottomOffset, "gizmoBottomOffset", 35f);

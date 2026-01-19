@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-    <name>Declutter Main Buttons Bar</name>
+    <name>Declutter UI</name>
     <author>Sk</author>
     <packageId>sk.dmbb</packageId>
     <supportedVersions>
         <li>1.6</li>
     </supportedVersions>
     <description>Puts all main buttons into a side panel, with a config menu to choose which ones stay on the main bar.</description>
-    <modVersion>1.1.1</modVersion>
+    <modVersion>1.2.0</modVersion>
     <url>https://github.com/AhHanie/Declutter-Main-Buttons-Bar</url>
     <modDependencies>
         <li>

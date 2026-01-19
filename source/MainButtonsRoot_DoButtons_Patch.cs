@@ -90,32 +90,58 @@ namespace Declutter_Main_Buttons_Bar
         private static void DrawFixedWidthButtons(List<MainButtonDef> allButtonsInOrder)
         {
             float width = Mathf.Clamp(ModSettings.fixedButtonWidth, 50f, 200f);
-            int maxButtons = Mathf.Max(1, Mathf.FloorToInt(UI.screenWidth / width));
-            int drawn = 0;
-            int curX = 0;
             MainButtonDef vanillaMenuDef = MainButtonDefOf.Menu;
             bool menuVisible = vanillaMenuDef != null && vanillaMenuDef.Worker.Visible;
             bool pinMenuRight = ModSettings.pinMenuButtonRight && menuVisible;
-
             MainButtonDef menuDef = MainButtonsMenuDefOf.DMMB_MainButtonsMenu;
-            if (pinMenuRight)
-            {
-                int remainingSlots = Mathf.Max(0, maxButtons - 1);
-                int maxWidth = Mathf.FloorToInt(UI.screenWidth - width);
-                maxButtons = Mathf.Max(1, remainingSlots + 1);
+            float availableWidth = UI.screenWidth - (pinMenuRight ? width : 0f);
+            int maxLeftButtons = Mathf.Max(1, Mathf.FloorToInt(availableWidth / width));
 
-                int maxDrawWidth = Mathf.Max(0, maxWidth);
-                int maxDrawn = Mathf.Max(0, Mathf.FloorToInt(maxDrawWidth / width));
-                maxDrawn = Mathf.Min(maxDrawn, remainingSlots);
-                maxButtons = maxDrawn + 1;
+            int visibleLeftButtons = 1;
+            for (int i = 0; i < allButtonsInOrder.Count; i++)
+            {
+                MainButtonDef def = allButtonsInOrder[i];
+                if (def == menuDef || (pinMenuRight && def == vanillaMenuDef))
+                {
+                    continue;
+                }
+
+                if (!def.Worker.Visible || !ShouldShowOnBar(def))
+                {
+                    continue;
+                }
+
+                visibleLeftButtons++;
             }
 
+            int drawnLeftTarget = Mathf.Min(visibleLeftButtons, maxLeftButtons);
+            int curX = 0;
+            if (ModSettings.centerFixedWidthButtons)
+            {
+                float totalWidth = drawnLeftTarget * width;
+                if (pinMenuRight)
+                {
+                    if (totalWidth < availableWidth)
+                    {
+                        curX = Mathf.FloorToInt((availableWidth - totalWidth) / 2f);
+                    }
+                }
+                else
+                {
+                    if (totalWidth < UI.screenWidth)
+                    {
+                        curX = Mathf.FloorToInt((UI.screenWidth - totalWidth) / 2f);
+                    }
+                }
+            }
+
+            int drawn = 0;
             Rect menuRect = new Rect(curX, UI.screenHeight - 35, width, 36f);
             menuDef.Worker.DoButton(menuRect);
             curX += (int)width;
             drawn++;
 
-            for (int i = 0; i < allButtonsInOrder.Count && drawn < maxButtons; i++)
+            for (int i = 0; i < allButtonsInOrder.Count && drawn < maxLeftButtons; i++)
             {
                 MainButtonDef def = allButtonsInOrder[i];
                 if (def == menuDef || (pinMenuRight && def == vanillaMenuDef))

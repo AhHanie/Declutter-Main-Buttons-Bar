@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <DMMB.SettingsTitle>Declutter Main Buttons Bar</DMMB.SettingsTitle>
+  <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
   <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
+  <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
-  <DMMB.SettingsGizmoBottom>Draw gizmos when a pawn is selected at the bottom of the screen</DMMB.SettingsGizmoBottom>
+  <DMMB.SettingsGizmoBottom>Draw gizmos the bottom of the screen</DMMB.SettingsGizmoBottom>
   <DMMB.SettingsGizmoOffsetLabel>Gizmo bottom offset: {0}</DMMB.SettingsGizmoOffsetLabel>
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>

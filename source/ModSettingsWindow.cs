@@ -31,6 +31,11 @@ namespace Declutter_Main_Buttons_Bar
             listing.Label("DMMB.SettingsFixedWidthLabel".Translate(Mathf.RoundToInt(ModSettings.fixedButtonWidth)));
             ModSettings.fixedButtonWidth = listing.Slider(ModSettings.fixedButtonWidth, 50f, 200f);
 
+            if (ModSettings.useFixedWidthMode)
+            {
+                listing.CheckboxLabeled("DMMB.SettingsFixedWidthCenter".Translate(), ref ModSettings.centerFixedWidthButtons);
+            }
+
             listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
             listing.CheckboxLabeled("DMMB.SettingsGizmoBottom".Translate(), ref ModSettings.drawGizmosAtBottom);
             listing.Label("DMMB.SettingsGizmoOffsetLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoBottomOffset)));
@@ -52,6 +57,7 @@ namespace Declutter_Main_Buttons_Bar
                 ModSettings.blacklistedFromMenuDefs.Clear();
                 ModSettings.useFixedWidthMode = false;
                 ModSettings.fixedButtonWidth = 120f;
+                ModSettings.centerFixedWidthButtons = false;
                 ModSettings.pinMenuButtonRight = false;
                 ModSettings.drawGizmosAtBottom = false;
                 ModSettings.gizmoBottomOffset = 35f;
