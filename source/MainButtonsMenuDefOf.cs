@@ -6,6 +6,7 @@ namespace Declutter_Main_Buttons_Bar
     public static class MainButtonsMenuDefOf
     {
         public static MainButtonDef DMMB_MainButtonsMenu;
+        public static MainButtonDef DMMB_PlaySettingsMenu;
 
         static MainButtonsMenuDefOf()
         {

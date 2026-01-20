@@ -377,5 +377,27 @@ namespace Declutter_Main_Buttons_Bar
         {
             GizmoGridDrawer.DrawGizmoGrid(gizmos, startX, out mouseover);
         }
+
+        private static void DrawExitEditModeButton()
+        {
+            if (!ModSettings.editDropdownsMode)
+            {
+                return;
+            }
+
+            const float buttonWidth = 260f;
+            const float buttonHeight = 36f;
+            const float gap = 8f;
+            float x = Mathf.Round((UI.screenWidth - buttonWidth) * 0.5f);
+            float y = UI.screenHeight - BarBottomOffset - BarHeight - buttonHeight - gap;
+            Rect rect = new Rect(x, y, buttonWidth, buttonHeight);
+
+            if (Widgets.ButtonText(rect, "DMMB.ExitEditMode".Translate()))
+            {
+                ModSettings.editDropdownsMode = false;
+                MainButtonsRoot_DoButtons_Patch.ClearDropdownState();
+                Mod.Settings.Write();
+            }
+        }
     }
 }

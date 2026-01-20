@@ -20,6 +20,7 @@
   <DMMB.PlaySettingsMenuCollecting>Collecting play settings...</DMMB.PlaySettingsMenuCollecting>
   <DMMB.PlaySettingsMenuUnknown>Unknown</DMMB.PlaySettingsMenuUnknown>
   <DMMB.DropdownEditButton>Edit dropdown</DMMB.DropdownEditButton>
+  <DMMB.ExitEditMode>Exit UI edit mode</DMMB.ExitEditMode>
   <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
   <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>
   <DMMB.DropdownEditorDesc>Select which buttons should appear when you hover a main button.</DMMB.DropdownEditorDesc>

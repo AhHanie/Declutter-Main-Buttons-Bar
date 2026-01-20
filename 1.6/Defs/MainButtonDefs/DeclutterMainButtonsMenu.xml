@@ -8,4 +8,11 @@
     <order>0</order>
     <iconPath>DMMB/UI/Hamburger</iconPath>
   </MainButtonDef>
+  <MainButtonDef>
+    <defName>DMMB_PlaySettingsMenu</defName>
+    <label>Play Settings</label>
+    <description>Open a searchable list of play settings.</description>
+    <workerClass>Declutter_Main_Buttons_Bar.MainButtonWorker_PlaySettingsMenu</workerClass>
+    <order>499</order>
+  </MainButtonDef>
 </Defs>

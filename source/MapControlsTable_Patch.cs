@@ -163,12 +163,7 @@ namespace Declutter_Main_Buttons_Bar
         {
             if (!MapControlsTableContext.Active)
             {
-                if (MapControlsTableContext.SuppressExternal)
-                {
-                    return MapControlsTableHelpers.IsMenuButton(tex, tooltip);
-                }
-
-                return true;
+                return !MapControlsTableContext.SuppressExternal;
             }
 
             if (!MapControlsTableContext.MatchesFilter(tooltip))
@@ -210,14 +205,6 @@ namespace Declutter_Main_Buttons_Bar
         }
     }
 
-    public static class MapControlsTableHelpers
-    {
-        public static bool IsMenuButton(Texture2D tex, string tooltip)
-        {
-            return tex == DMMBTextures.PlaySettingsTable.Texture;
-        }
-    }
-
     public static class MapControlsTableRenderer
     {
         private const float IconSize = 24f;
@@ -244,6 +231,50 @@ namespace Declutter_Main_Buttons_Bar
         }
 
         public static void DrawToggleRow(ref bool toggleable, Texture2D icon, string tooltip)
+        {
+            Rect rowRect = MapControlsTableContext.NextRowRect();
+            MapControlsTableContext.LastRowRect = rowRect;
+
+            Widgets.DrawHighlightIfMouseover(rowRect);
+            Color prev = GUI.color;
+            GUI.color = RowLine;
+            Widgets.DrawLineHorizontal(rowRect.x + RowPadding, rowRect.yMax - 1f, rowRect.width - RowPadding * 2f);
+            GUI.color = prev;
+
+            Rect contentRect = rowRect.ContractedBy(RowPadding);
+            Rect toggleRect = new Rect(contentRect.xMax - ToggleSize, contentRect.y + (contentRect.height - ToggleSize) / 2f, ToggleSize, ToggleSize);
+            Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
+            Rect textRect = contentRect;
+            textRect.xMax = toggleRect.xMin - RowPadding;
+
+            if (icon != null)
+            {
+                Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                textRect.xMin = iconRect.xMax + RowPadding;
+            }
+
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(textRect, MapControlsTableWindow.GetDisplayLabel(tooltip));
+            Text.Anchor = prevAnchor;
+
+            bool value = toggleable;
+            bool newValue = value;
+            Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ToggleSize, paintable: false);
+            if (newValue != value)
+            {
+                toggleable = newValue;
+            }
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(rowRect, tooltip);
+            }
+
+            MapControlsTableContext.AdvanceRow();
+        }
+
+        public static void DrawCustomToggleRow(ref bool toggleable, Texture2D icon, string tooltip)
         {
             Rect rowRect = MapControlsTableContext.NextRowRect();
             MapControlsTableContext.LastRowRect = rowRect;

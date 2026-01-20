@@ -82,6 +82,7 @@
     <Compile Include="MainButtonsDropdownEditorWindow.cs" />
     <Compile Include="MainButtonsMenuDefOf.cs" />
     <Compile Include="MainButtonsMenuTabWindow.cs" />
+    <Compile Include="MainButtonWorker_PlaySettingsMenu.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Dropdown.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Input.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Layout.cs" />

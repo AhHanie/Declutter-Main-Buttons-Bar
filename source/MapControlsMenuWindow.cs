@@ -71,6 +71,7 @@ namespace Declutter_Main_Buttons_Bar
 
             MapControlsTableContext.BeginMeasure(searchText, RowHeight, listRect.width - 16f);
             DrawMapControls();
+            AddEditToggleRow(measureOnly: true);
             int totalRows = MapControlsTableContext.TotalRows;
             float measuredRowHeight = MapControlsTableContext.MaxRowHeight;
             MapControlsTableContext.End();
@@ -82,6 +83,7 @@ namespace Declutter_Main_Buttons_Bar
 
             MapControlsTableContext.BeginRender(searchText, measuredRowHeight, viewRect.width);
             DrawMapControls();
+            AddEditToggleRow(measureOnly: false);
             MapControlsTableContext.End();
 
             Widgets.EndScrollView();
@@ -108,6 +110,34 @@ namespace Declutter_Main_Buttons_Bar
 
             var row = new WidgetRow(0f, 0f, UIDirection.RightThenDown, 9999f);
             settings.DoPlaySettingsGlobalControls(row, worldView: false);
+        }
+
+        private static void AddEditToggleRow(bool measureOnly)
+        {
+            string tooltip = "DMMB.PlaySettingsEditDropdowns".Translate();
+            if (!MapControlsTableContext.MatchesFilter(tooltip))
+            {
+                return;
+            }
+
+            if (measureOnly)
+            {
+                MapControlsTableRenderer.MeasureRowHeight(tooltip, true);
+                MapControlsTableContext.TotalRows++;
+                return;
+            }
+
+            bool editMode = ModSettings.editDropdownsMode;
+            MapControlsTableRenderer.DrawCustomToggleRow(ref editMode, DMMBTextures.UiToggle.Texture, tooltip);
+            if (editMode != ModSettings.editDropdownsMode)
+            {
+                ModSettings.editDropdownsMode = editMode;
+                if (!editMode)
+                {
+                    MainButtonsRoot_DoButtons_Patch.ClearDropdownState();
+                    Mod.Settings.Write();
+                }
+            }
         }
 
         public static string GetDisplayLabel(string tooltip)

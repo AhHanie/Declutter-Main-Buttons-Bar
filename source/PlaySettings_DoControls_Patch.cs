@@ -10,12 +10,12 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static void Postfix(WidgetRow row)
         {
-            PlaySettingsToggleDrawer.DrawMapControlsMenuButton(row);
             PlaySettingsToggleDrawer.DrawDropdownEditToggle(row);
         }
     }
 
     [HarmonyPatch(typeof(PlaySettings), "DoWorldViewControls")]
+    [HarmonyPriority(Priority.Last)]
     public static class PlaySettings_DoWorldViewControls_Patch
     {
         public static void Postfix(WidgetRow row)
@@ -26,32 +26,9 @@ namespace Declutter_Main_Buttons_Bar
 
     public static class PlaySettingsToggleDrawer
     {
-        public static void DrawMapControlsMenuButton(WidgetRow row)
-        {
-            if (!ModSettings.useSearchablePlaySettingsMenu)
-            {
-                return;
-            }
-
-            if (MapControlsTableContext.Active)
-            {
-                return;
-            }
-
-            string tooltip = "DMMB.PlaySettingsMenuButton".Translate();
-            bool previousSuppress = MapControlsTableContext.SuppressExternal;
-            MapControlsTableContext.SuppressExternal = false;
-            bool clicked = row.ButtonIcon(DMMBTextures.PlaySettingsTable.Texture, tooltip);
-            MapControlsTableContext.SuppressExternal = previousSuppress;
-            if (clicked)
-            {
-                Find.WindowStack.Add(new MapControlsTableWindow());
-            }
-        }
-
         public static void DrawDropdownEditToggle(WidgetRow row)
         {
-            if (ModSettings.useSearchablePlaySettingsMenu && !MapControlsTableContext.Active)
+            if (ModSettings.useSearchablePlaySettingsMenu)
             {
                 return;
             }

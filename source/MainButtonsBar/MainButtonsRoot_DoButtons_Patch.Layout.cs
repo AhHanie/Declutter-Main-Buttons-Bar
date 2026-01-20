@@ -23,6 +23,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             DrawEditGizmoPreview();
+            DrawExitEditModeButton();
         }
 
         private static void DrawDynamicWidthButtons(List<MainButtonDef> allButtons)
