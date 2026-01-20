@@ -14,12 +14,23 @@ namespace Declutter_Main_Buttons_Bar
         public static List<MainButtonDef> hiddenFromBarDefs = new List<MainButtonDef>();
         public static List<MainButtonDef> favoriteDefs = new List<MainButtonDef>();
         public static List<MainButtonDef> blacklistedFromMenuDefs = new List<MainButtonDef>();
+        public static List<MainButtonDropdownConfig> dropdownConfigs = new List<MainButtonDropdownConfig>();
+        public static List<MainButtonDef> customOrderDefs = new List<MainButtonDef>();
+        public static Dictionary<MainButtonDef, float> freeSizeWidths = new Dictionary<MainButtonDef, float>();
+        public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+        public static float snapThreshold = 8f;
+        public static bool editDropdownsMode = false;
+        public static bool useFreeSizeMode = false;
         public static bool useFixedWidthMode = false;
         public static float fixedButtonWidth = 120f;
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
-        public static bool drawGizmosAtBottom = false;
-        public static float gizmoBottomOffset = 35f;
+        public static float gizmoDrawerOffsetX = 0f;
+        public static float gizmoDrawerOffsetY = 0f;
+
+        private static HashSet<MainButtonDef> hiddenFromBarSet;
+        private static Dictionary<MainButtonDef, List<MainButtonDef>> dropdownEntriesCache;
+        private static bool dropdownCacheDirty = true;
 
         public override void ExposeData()
         {
@@ -41,19 +52,87 @@ namespace Declutter_Main_Buttons_Bar
                 blacklistedFromMenuDefs = new List<MainButtonDef>();
             }
 
+            Scribe_Collections.Look(ref dropdownConfigs, "dropdownConfigs", LookMode.Deep);
+            if (dropdownConfigs == null)
+            {
+                dropdownConfigs = new List<MainButtonDropdownConfig>();
+            }
+
+            Scribe_Collections.Look(ref customOrderDefs, "customOrderDefs", LookMode.Def);
+            if (customOrderDefs == null)
+            {
+                customOrderDefs = new List<MainButtonDef>();
+            }
+
+            Scribe_Collections.Look(ref freeSizeWidths, "freeSizeWidths", LookMode.Def, LookMode.Value);
+            if (freeSizeWidths == null)
+            {
+                freeSizeWidths = new Dictionary<MainButtonDef, float>();
+            }
+
+            Scribe_Collections.Look(ref freeSizeXPositions, "freeSizeXPositions", LookMode.Def, LookMode.Value);
+            if (freeSizeXPositions == null)
+            {
+                freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+            }
+
+            Scribe_Values.Look(ref useFreeSizeMode, "useFreeSizeMode", false);
             Scribe_Values.Look(ref useFixedWidthMode, "useFixedWidthMode", false);
             Scribe_Values.Look(ref fixedButtonWidth, "fixedButtonWidth", 120f);
+            Scribe_Values.Look(ref snapThreshold, "snapThreshold", 8f);
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
-            Scribe_Values.Look(ref drawGizmosAtBottom, "drawGizmosAtBottom", false);
-            Scribe_Values.Look(ref gizmoBottomOffset, "gizmoBottomOffset", 35f);
+            Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
+            Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
-            gizmoBottomOffset = Mathf.Clamp(gizmoBottomOffset, 0f, 120f);
+            
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                NormalizeDropdownConfigs();
+                RebuildCaches();
+            }
+        }
+
+        private static void RebuildCaches()
+        {
+            // Rebuild hidden set
+            hiddenFromBarSet = new HashSet<MainButtonDef>(hiddenFromBarDefs);
+
+            // Mark dropdown cache as dirty so it rebuilds on next access
+            dropdownCacheDirty = true;
+        }
+
+        private static void RebuildDropdownCache()
+        {
+            dropdownEntriesCache = new Dictionary<MainButtonDef, List<MainButtonDef>>();
+
+            for (int i = 0; i < dropdownConfigs.Count; i++)
+            {
+                MainButtonDropdownConfig config = dropdownConfigs[i];
+                if (config == null || config.parent == null)
+                {
+                    continue;
+                }
+
+                List<MainButtonDef> entries = config.entries
+                    .Where(entry => entry != config.parent && !IsHiddenFromBar(entry) && entry.Worker.Visible)
+                    .Distinct()
+                    .OrderBy(entry => entry.order)
+                    .ToList();
+
+                dropdownEntriesCache[config.parent] = entries;
+            }
+
+            dropdownCacheDirty = false;
         }
 
         public static bool IsHiddenFromBar(MainButtonDef def)
         {
-            return hiddenFromBarDefs.Contains(def);
+            if (hiddenFromBarSet == null)
+            {
+                hiddenFromBarSet = new HashSet<MainButtonDef>(hiddenFromBarDefs);
+            }
+            return hiddenFromBarSet.Contains(def);
         }
 
         public static void SetHiddenFromBar(MainButtonDef def, bool hidden)
@@ -63,11 +142,27 @@ namespace Declutter_Main_Buttons_Bar
                 if (!hiddenFromBarDefs.Contains(def))
                 {
                     hiddenFromBarDefs.Add(def);
+                    if (hiddenFromBarSet != null)
+                    {
+                        hiddenFromBarSet.Add(def);
+                    }
                 }
             }
             else
             {
                 hiddenFromBarDefs.Remove(def);
+                if (hiddenFromBarSet != null)
+                {
+                    hiddenFromBarSet.Remove(def);
+                }
+            }
+
+            dropdownCacheDirty = true;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+
+            if (useFreeSizeMode && !hidden)
+            {
+                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterVisibilityChange();
             }
         }
 
@@ -108,6 +203,135 @@ namespace Declutter_Main_Buttons_Bar
             else
             {
                 blacklistedFromMenuDefs.Remove(def);
+            }
+        }
+
+        public static void ResetToDefaults()
+        {
+            hiddenFromBarDefs.Clear();
+            favoriteDefs.Clear();
+            blacklistedFromMenuDefs.Clear();
+            dropdownConfigs.Clear();
+            customOrderDefs.Clear();
+            freeSizeWidths.Clear();
+            freeSizeXPositions.Clear();
+            editDropdownsMode = false;
+            useFreeSizeMode = false;
+            useFixedWidthMode = false;
+            fixedButtonWidth = 120f;
+            snapThreshold = 8f;
+            centerFixedWidthButtons = false;
+            pinMenuButtonRight = false;
+            gizmoDrawerOffsetX = 0f;
+            gizmoDrawerOffsetY = 0f;
+            RebuildCaches();
+        }
+
+        public static bool HasDropdown(MainButtonDef def)
+        {
+            return GetDropdownEntries(def).Count > 0;
+        }
+
+        public static List<MainButtonDef> GetDropdownEntries(MainButtonDef def)
+        {
+            if (dropdownCacheDirty || dropdownEntriesCache == null)
+            {
+                RebuildDropdownCache();
+            }
+
+            if (dropdownEntriesCache.TryGetValue(def, out List<MainButtonDef> cached))
+            {
+                return cached;
+            }
+
+            return new List<MainButtonDef>();
+        }
+
+        public static bool IsInDropdown(MainButtonDef parent, MainButtonDef entry)
+        {
+            MainButtonDropdownConfig config = dropdownConfigs.Find(item => item.parent == parent);
+
+            if (config == null)
+            {
+                return false;
+            }
+
+            return config.entries.Contains(entry);
+        }
+
+        public static void SetDropdownEntry(MainButtonDef parent, MainButtonDef entry, bool enabled)
+        {
+            if (entry == parent)
+            {
+                return;
+            }
+
+            MainButtonDropdownConfig config = GetOrCreateDropdownConfig(parent);
+            if (enabled)
+            {
+                if (!config.entries.Contains(entry))
+                {
+                    config.entries.Add(entry);
+                }
+            }
+            else
+            {
+                config.entries.Remove(entry);
+                if (config.entries.Count == 0)
+                {
+                    dropdownConfigs.Remove(config);
+                }
+            }
+
+            dropdownCacheDirty = true;
+        }
+
+        private static MainButtonDropdownConfig GetOrCreateDropdownConfig(MainButtonDef parent)
+        {
+            MainButtonDropdownConfig config = dropdownConfigs.Find(item => item.parent == parent);
+            if (config == null)
+            {
+                config = new MainButtonDropdownConfig
+                {
+                    parent = parent,
+                    entries = new List<MainButtonDef>()
+                };
+                dropdownConfigs.Add(config);
+            }
+
+            return config;
+        }
+
+        private static void NormalizeDropdownConfigs()
+        {
+            if (dropdownConfigs == null)
+            {
+                dropdownConfigs = new List<MainButtonDropdownConfig>();
+            }
+
+            for (int i = dropdownConfigs.Count - 1; i >= 0; i--)
+            {
+                MainButtonDropdownConfig config = dropdownConfigs[i];
+                if (config == null || config.parent == null)
+                {
+                    dropdownConfigs.RemoveAt(i);
+                    continue;
+                }
+
+                if (config.entries == null)
+                {
+                    config.entries = new List<MainButtonDef>();
+                }
+
+                config.entries = config.entries
+                    .Where(entry => entry != null && entry != config.parent)
+                    .Distinct()
+                    .ToList();
+
+                if (config.entries.Count == 0)
+                {
+                    dropdownConfigs.RemoveAt(i);
+                }
             }
         }
     }

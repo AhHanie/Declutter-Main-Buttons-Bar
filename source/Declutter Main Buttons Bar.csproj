@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props" Condition="Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,8 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -65,19 +68,45 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Publicize Include="Assembly-CSharp:Verse.GizmoGridDrawer.GizmoSpacing" />
+    <Publicize Include="Assembly-CSharp:Verse.GizmoGridDrawer.GizmoStartX" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
+    <Compile Include="DMMBTextures.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MainButtonDropdownConfig.cs" />
     <Compile Include="MainButtonsCache.cs" />
+    <Compile Include="MainButtonsDropdownEditorWindow.cs" />
     <Compile Include="MainButtonsMenuDefOf.cs" />
     <Compile Include="MainButtonsMenuTabWindow.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Dropdown.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Input.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Layout.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Rects.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Render.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.State.cs" />
     <Compile Include="MainButtonsRoot_DoButtons_Patch.cs" />
+    <Compile Include="MapGizmoUtility_MapUIOnGUI_Patch.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="ModSettings.cs" />
     <Compile Include="ModSettingsWindow.cs" />
+    <Compile Include="PlaySettings_DoControls_Patch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)Declutter UI.dll" "C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Declutter Main Buttons Bar\1.6\Assemblies" /D /Y</PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props'))" />
+    <Error Condition="!Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets'))" />
+  </Target>
+  <Import Project="packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets" Condition="Exists('packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" />
 </Project>

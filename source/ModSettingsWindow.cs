@@ -26,20 +26,32 @@ namespace Declutter_Main_Buttons_Bar
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(viewRect);
 
-            listing.CheckboxLabeled("DMMB.SettingsFixedWidthToggle".Translate(), ref ModSettings.useFixedWidthMode);
+            listing.CheckboxLabeled("DMMB.SettingsFreeSizeToggle".Translate(), ref ModSettings.useFreeSizeMode);
+            if (ModSettings.useFreeSizeMode)
+            {
+                ModSettings.useFixedWidthMode = false;
+            }
 
-            listing.Label("DMMB.SettingsFixedWidthLabel".Translate(Mathf.RoundToInt(ModSettings.fixedButtonWidth)));
-            ModSettings.fixedButtonWidth = listing.Slider(ModSettings.fixedButtonWidth, 50f, 200f);
+            if (ModSettings.useFreeSizeMode)
+            {
+                listing.Label("DMMB.SettingsSnapThresholdLabel".Translate(Mathf.RoundToInt(ModSettings.snapThreshold)));
+                ModSettings.snapThreshold = listing.Slider(ModSettings.snapThreshold, 0f, 30f);
+            }
+
+            listing.CheckboxLabeled("DMMB.SettingsFixedWidthToggle".Translate(), ref ModSettings.useFixedWidthMode);
+            if (ModSettings.useFixedWidthMode)
+            {
+                ModSettings.useFreeSizeMode = false;
+            }
 
             if (ModSettings.useFixedWidthMode)
             {
+                listing.Label("DMMB.SettingsFixedWidthLabel".Translate(Mathf.RoundToInt(ModSettings.fixedButtonWidth)));
+                ModSettings.fixedButtonWidth = listing.Slider(ModSettings.fixedButtonWidth, 50f, 200f);
                 listing.CheckboxLabeled("DMMB.SettingsFixedWidthCenter".Translate(), ref ModSettings.centerFixedWidthButtons);
             }
 
             listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
-            listing.CheckboxLabeled("DMMB.SettingsGizmoBottom".Translate(), ref ModSettings.drawGizmosAtBottom);
-            listing.Label("DMMB.SettingsGizmoOffsetLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoBottomOffset)));
-            ModSettings.gizmoBottomOffset = listing.Slider(ModSettings.gizmoBottomOffset, 0f, 120f);
 
             Rect resetRow = listing.GetRect(Text.LineHeight);
             Rect resetLabelRect = resetRow;
@@ -52,15 +64,7 @@ namespace Declutter_Main_Buttons_Bar
             Widgets.Label(resetLabelRect, "DMMB.SettingsResetLabel".Translate());
             if (Widgets.ButtonText(resetButtonRect, "DMMB.SettingsReset".Translate()))
             {
-                ModSettings.hiddenFromBarDefs.Clear();
-                ModSettings.favoriteDefs.Clear();
-                ModSettings.blacklistedFromMenuDefs.Clear();
-                ModSettings.useFixedWidthMode = false;
-                ModSettings.fixedButtonWidth = 120f;
-                ModSettings.centerFixedWidthButtons = false;
-                ModSettings.pinMenuButtonRight = false;
-                ModSettings.drawGizmosAtBottom = false;
-                ModSettings.gizmoBottomOffset = 35f;
+                ModSettings.ResetToDefaults();
             }
 
             listing.GapLine();

@@ -2,6 +2,8 @@
 <LanguageData>
   <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
+  <DMMB.SettingsFreeSizeToggle>Enable free-size main buttons (drag to resize)</DMMB.SettingsFreeSizeToggle>
+  <DMMB.SettingsSnapThresholdLabel>Snap threshold: {0}px</DMMB.SettingsSnapThresholdLabel>
   <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
   <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
@@ -11,4 +13,9 @@
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
+  <DMMB.PlaySettingsEditDropdowns>Edit main buttons</DMMB.PlaySettingsEditDropdowns>
+  <DMMB.DropdownEditButton>Edit dropdown</DMMB.DropdownEditButton>
+  <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
+  <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>
+  <DMMB.DropdownEditorDesc>Select which buttons should appear when you hover a main button.</DMMB.DropdownEditorDesc>
 </LanguageData>

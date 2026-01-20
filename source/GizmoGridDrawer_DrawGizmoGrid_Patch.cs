@@ -10,9 +10,14 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GizmoGridDrawer), "DrawGizmoGrid")]
     public static class GizmoGridDrawer_DrawGizmoGrid_Patch
     {
+        private static bool previewDrawActive;
+        private static Vector2? lastPreviewPosition;
+        private static bool previewPrevApplyOffset;
+        public static bool ApplyOffset;
+
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            MethodInfo adjustMethod = AccessTools.Method(typeof(GizmoGridDrawer_DrawGizmoGrid_Patch), nameof(AdjustVectorY));
+            MethodInfo adjustMethod = AccessTools.Method(typeof(GizmoGridDrawer_DrawGizmoGrid_Patch), nameof(AdjustVector));
             ConstructorInfo vectorCtor = AccessTools.Constructor(typeof(Vector2), new[] { typeof(float), typeof(float) });
             var codes = new List<CodeInstruction>(instructions);
             bool patched = false;
@@ -66,14 +71,44 @@ namespace Declutter_Main_Buttons_Bar
             return codes;
         }
 
-        private static void AdjustVectorY(ref Vector2 value)
+        public static void BeginPreviewDraw()
         {
-            if (!ModSettings.drawGizmosAtBottom)
+            previewDrawActive = true;
+            lastPreviewPosition = null;
+            previewPrevApplyOffset = ApplyOffset;
+            ApplyOffset = true;
+        }
+
+        public static void EndPreviewDraw()
+        {
+            previewDrawActive = false;
+            ApplyOffset = previewPrevApplyOffset;
+        }
+
+        public static bool TryGetLastPreviewPosition(out Vector2 position)
+        {
+            if (lastPreviewPosition.HasValue)
             {
-                return;
+                position = lastPreviewPosition.Value;
+                return true;
             }
 
-            value.y += ModSettings.gizmoBottomOffset;
+            position = default;
+            return false;
+        }
+
+        private static void AdjustVector(ref Vector2 value)
+        {
+            if (ApplyOffset)
+            {
+                value.x += ModSettings.gizmoDrawerOffsetX;
+                value.y += ModSettings.gizmoDrawerOffsetY;
+            }
+
+            if (previewDrawActive)
+            {
+                lastPreviewPosition = value;
+            }
         }
     }
 }

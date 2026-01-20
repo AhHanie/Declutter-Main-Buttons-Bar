@@ -15,8 +15,6 @@ namespace Declutter_Main_Buttons_Bar
         private const float StarSize = 22f;
         private static readonly Color PanelBg = new Color(0.11f, 0.11f, 0.11f, 1f);
         private static readonly Color RowLine = new Color(1f, 1f, 1f, 0.08f);
-        private static readonly CachedTexture StarOutline = new CachedTexture("DMMB/UI/GoldStarOutline");
-        private static readonly CachedTexture StarFilled = new CachedTexture("DMMB/UI/GoldStarFilled");
 
         private readonly QuickSearchWidget quickSearchWidget = new QuickSearchWidget();
         private Vector2 scrollPosition = Vector2.zero;
@@ -127,7 +125,7 @@ namespace Declutter_Main_Buttons_Bar
                 Text.Font = GameFont.Small;
 
                 bool favorite = ModSettings.IsFavorite(def);
-                Texture2D starTex = favorite ? StarFilled.Texture : StarOutline.Texture;
+                Texture2D starTex = favorite ? DMMBTextures.StarFilled.Texture : DMMBTextures.StarOutline.Texture;
                 bool starClicked = Widgets.ButtonImage(starRect, starTex);
                 if (starClicked)
                 {
@@ -161,10 +159,11 @@ namespace Declutter_Main_Buttons_Bar
 
         private List<MainButtonDef> GetFilteredDefs()
         {
+            List<MainButtonDef> visibleDefs = GetVisibleMenuDefs();
             List<MainButtonDef> source;
             if (!quickSearchWidget.filter.Active)
             {
-                source = cachedMenuDefs;
+                source = visibleDefs;
                 return source
                     .OrderByDescending(def => ModSettings.IsFavorite(def))
                     .ThenBy(def => def.order)
@@ -172,9 +171,9 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             List<MainButtonDef> filtered = new List<MainButtonDef>();
-            for (int i = 0; i < cachedMenuDefs.Count; i++)
+            for (int i = 0; i < visibleDefs.Count; i++)
             {
-                MainButtonDef def = cachedMenuDefs[i];
+                MainButtonDef def = visibleDefs[i];
                 if (quickSearchWidget.filter.Matches(def.LabelCap.ToString()))
                 {
                     filtered.Add(def);
@@ -190,15 +189,16 @@ namespace Declutter_Main_Buttons_Bar
         private void CacheSearchState()
         {
             bool anyMatch = false;
+            List<MainButtonDef> visibleDefs = GetVisibleMenuDefs();
             if (!quickSearchWidget.filter.Active)
             {
-                anyMatch = true;
+                anyMatch = visibleDefs.Count > 0;
             }
             else
             {
-                for (int i = 0; i < cachedMenuDefs.Count; i++)
+                for (int i = 0; i < visibleDefs.Count; i++)
                 {
-                    if (quickSearchWidget.filter.Matches(cachedMenuDefs[i].LabelCap.ToString()))
+                    if (quickSearchWidget.filter.Matches(visibleDefs[i].LabelCap.ToString()))
                     {
                         anyMatch = true;
                         break;
@@ -215,6 +215,28 @@ namespace Declutter_Main_Buttons_Bar
             cachedMenuDefs = cachedDefs
                 .Where(def => !ModSettings.IsBlacklistedFromMenu(def))
                 .ToList();
+        }
+
+        private List<MainButtonDef> GetVisibleMenuDefs()
+        {
+            List<MainButtonDef> visible = new List<MainButtonDef>();
+            for (int i = 0; i < cachedMenuDefs.Count; i++)
+            {
+                MainButtonDef def = cachedMenuDefs[i];
+                if (def == null)
+                {
+                    continue;
+                }
+
+                if (!def.Worker.Visible || def.Worker.Disabled)
+                {
+                    continue;
+                }
+
+                visible.Add(def);
+            }
+
+            return visible;
         }
     }
 }
