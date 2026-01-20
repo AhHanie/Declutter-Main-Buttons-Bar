@@ -8,12 +8,17 @@
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
   <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
+  <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsGizmoBottom>Draw gizmos the bottom of the screen</DMMB.SettingsGizmoBottom>
   <DMMB.SettingsGizmoOffsetLabel>Gizmo bottom offset: {0}</DMMB.SettingsGizmoOffsetLabel>
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
-  <DMMB.PlaySettingsEditDropdowns>Edit main buttons</DMMB.PlaySettingsEditDropdowns>
+  <DMMB.PlaySettingsEditDropdowns>Edit main buttons (move, resize, and set dropdowns)</DMMB.PlaySettingsEditDropdowns>
+  <DMMB.PlaySettingsMenuButton>Open play settings</DMMB.PlaySettingsMenuButton>
+  <DMMB.PlaySettingsMenuTitle>Play settings</DMMB.PlaySettingsMenuTitle>
+  <DMMB.PlaySettingsMenuCollecting>Collecting play settings...</DMMB.PlaySettingsMenuCollecting>
+  <DMMB.PlaySettingsMenuUnknown>Unknown</DMMB.PlaySettingsMenuUnknown>
   <DMMB.DropdownEditButton>Edit dropdown</DMMB.DropdownEditButton>
   <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
   <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>

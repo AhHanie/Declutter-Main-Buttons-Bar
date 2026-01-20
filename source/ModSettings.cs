@@ -25,6 +25,7 @@ namespace Declutter_Main_Buttons_Bar
         public static float fixedButtonWidth = 120f;
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
+        public static bool useSearchablePlaySettingsMenu = true;
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
 
@@ -82,6 +83,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref snapThreshold, "snapThreshold", 8f);
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
+            Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
@@ -222,6 +224,7 @@ namespace Declutter_Main_Buttons_Bar
             snapThreshold = 8f;
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
+            useSearchablePlaySettingsMenu = true;
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
             RebuildCaches();

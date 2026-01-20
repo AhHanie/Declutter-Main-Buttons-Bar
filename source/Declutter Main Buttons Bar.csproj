@@ -70,6 +70,8 @@
   <ItemGroup>
     <Publicize Include="Assembly-CSharp:Verse.GizmoGridDrawer.GizmoSpacing" />
     <Publicize Include="Assembly-CSharp:Verse.GizmoGridDrawer.GizmoStartX" />
+    <Publicize Include="Assembly-CSharp:RimWorld.PlaySettings.DoMapControls" />
+    <Publicize Include="Assembly-CSharp:RimWorld.PlaySettings.DoPlaySettingsGlobalControls" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
@@ -87,6 +89,8 @@
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Render.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.State.cs" />
     <Compile Include="MainButtonsRoot_DoButtons_Patch.cs" />
+    <Compile Include="MapControlsTable_Patch.cs" />
+    <Compile Include="MapControlsMenuWindow.cs" />
     <Compile Include="MapGizmoUtility_MapUIOnGUI_Patch.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="ModSettings.cs" />
