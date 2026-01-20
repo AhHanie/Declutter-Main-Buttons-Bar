@@ -43,12 +43,16 @@ namespace Declutter_Main_Buttons_Bar
             Dictionary<MainButtonDef, float> xPositions)
         {
             List<Rect> rects = new List<Rect>(defs.Count);
+            float y = UI.screenHeight - BarBottomOffset;
             for (int i = 0; i < defs.Count; i++)
             {
                 MainButtonDef def = defs[i];
-                float x = xPositions.ContainsKey(def) ? xPositions[def] : 0f;
+                if (!xPositions.TryGetValue(def, out float x))
+                {
+                    x = 0f;
+                }
                 float width = widths[def];
-                Rect rect = new Rect(x, UI.screenHeight - BarBottomOffset, width, BarHeight);
+                Rect rect = new Rect(x, y, width, BarHeight);
                 rects.Add(rect);
             }
 

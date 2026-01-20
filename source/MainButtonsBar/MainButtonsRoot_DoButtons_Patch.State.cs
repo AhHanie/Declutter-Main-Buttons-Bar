@@ -35,6 +35,8 @@ namespace Declutter_Main_Buttons_Bar
         private static List<MainButtonDef> cachedOrderedVisible;
         private static List<MainButtonDef> cachedOrderedVisibleNoPinnedMenu;
         private static int lastVisibleCheckFrame = -1;
+        private static readonly Dictionary<MainButtonDef, float> scratchFreeSizeWidths = new Dictionary<MainButtonDef, float>();
+        private static readonly Dictionary<MainButtonDef, float> scratchFreeSizeXPositions = new Dictionary<MainButtonDef, float>();
 
         public static void ClearDropdownState()
         {

@@ -288,64 +288,63 @@ namespace Declutter_Main_Buttons_Bar
 
         private static Dictionary<MainButtonDef, float> BuildWidthsFromStored(List<MainButtonDef> defs, float baseWidth, float miniWidth)
         {
-            Dictionary<MainButtonDef, float> widths = new Dictionary<MainButtonDef, float>();
+            Dictionary<MainButtonDef, float> widths = scratchFreeSizeWidths;
+            widths.Clear();
+            Dictionary<MainButtonDef, float> stored = ModSettings.freeSizeWidths;
             for (int i = 0; i < defs.Count; i++)
             {
                 MainButtonDef def = defs[i];
-                float defaultWidth = def.minimized ? miniWidth : baseWidth;
-                widths[def] = GetStoredWidth(def, defaultWidth);
+                float defaultWidth = def != null && def.minimized ? miniWidth : baseWidth;
+                if (def != null && stored.TryGetValue(def, out float value))
+                {
+                    widths[def] = value;
+                }
+                else
+                {
+                    widths[def] = defaultWidth;
+                }
             }
 
             return widths;
-        }
-
-        private static float GetStoredWidth(MainButtonDef def, float defaultWidth)
-        {
-            if (def == null)
-            {
-                return defaultWidth;
-            }
-
-            if (ModSettings.freeSizeWidths.TryGetValue(def, out float value))
-            {
-                return value;
-            }
-
-            return defaultWidth;
         }
 
         private static Dictionary<MainButtonDef, float> BuildXPositionsFromStored(
             List<MainButtonDef> defs,
             Dictionary<MainButtonDef, float> widths)
         {
-            Dictionary<MainButtonDef, float> positions = new Dictionary<MainButtonDef, float>();
+            Dictionary<MainButtonDef, float> positions = scratchFreeSizeXPositions;
+            positions.Clear();
+            Dictionary<MainButtonDef, float> stored = ModSettings.freeSizeXPositions;
+
+            if (stored.Count == 0)
+            {
+                float curX = 0f;
+                for (int i = 0; i < defs.Count; i++)
+                {
+                    MainButtonDef def = defs[i];
+                    positions[def] = curX;
+                    curX += widths[def];
+                }
+
+                return positions;
+            }
 
             bool hasStoredPositions = false;
             for (int i = 0; i < defs.Count; i++)
             {
-                if (ModSettings.freeSizeXPositions.ContainsKey(defs[i]))
+                MainButtonDef def = defs[i];
+                if (stored.TryGetValue(def, out float storedX))
                 {
+                    positions[def] = storedX;
                     hasStoredPositions = true;
-                    break;
+                }
+                else
+                {
+                    positions[def] = 0f;
                 }
             }
 
-            if (hasStoredPositions)
-            {
-                for (int i = 0; i < defs.Count; i++)
-                {
-                    MainButtonDef def = defs[i];
-                    if (ModSettings.freeSizeXPositions.TryGetValue(def, out float storedX))
-                    {
-                        positions[def] = storedX;
-                    }
-                    else
-                    {
-                        positions[def] = 0f;
-                    }
-                }
-            }
-            else
+            if (!hasStoredPositions)
             {
                 float curX = 0f;
                 for (int i = 0; i < defs.Count; i++)
