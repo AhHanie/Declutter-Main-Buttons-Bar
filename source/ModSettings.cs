@@ -28,6 +28,8 @@ namespace Declutter_Main_Buttons_Bar
         public static bool useSearchablePlaySettingsMenu = true;
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
+        public static float gizmoDrawerScale = 1f;
+        public static bool gizmoScaleMapOnly = false;
 
         private static HashSet<MainButtonDef> hiddenFromBarSet;
         private static Dictionary<MainButtonDef, List<MainButtonDef>> dropdownEntriesCache;
@@ -86,7 +88,10 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
+            Scribe_Values.Look(ref gizmoDrawerScale, "gizmoDrawerScale", 1f);
+            Scribe_Values.Look(ref gizmoScaleMapOnly, "gizmoScaleMapOnly", false);
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
+            gizmoDrawerScale = Mathf.Clamp(gizmoDrawerScale, 0.5f, 1.5f);
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
@@ -227,6 +232,8 @@ namespace Declutter_Main_Buttons_Bar
             useSearchablePlaySettingsMenu = true;
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
+            gizmoDrawerScale = 1f;
+            gizmoScaleMapOnly = false;
             RebuildCaches();
         }
 

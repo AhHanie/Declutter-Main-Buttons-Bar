@@ -16,7 +16,7 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 280f
+            float viewHeight = 320f
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBButton.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
@@ -53,6 +53,9 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
             listing.CheckboxLabeled("DMMB.SettingsPlaySettingsMenuToggle".Translate(), ref ModSettings.useSearchablePlaySettingsMenu);
+            listing.Label("DMMB.SettingsGizmoScaleLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoDrawerScale * 100f)));
+            ModSettings.gizmoDrawerScale = listing.Slider(ModSettings.gizmoDrawerScale, 0.5f, 1.5f);
+            listing.CheckboxLabeled("DMMB.SettingsGizmoScaleMapOnly".Translate(), ref ModSettings.gizmoScaleMapOnly);
 
             Rect resetRow = listing.GetRect(Text.LineHeight);
             Rect resetLabelRect = resetRow;
