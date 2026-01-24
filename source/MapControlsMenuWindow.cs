@@ -10,6 +10,7 @@ namespace Declutter_Main_Buttons_Bar
         private const float RowHeight = 56f;
         private const float SearchHeight = 26f;
         private static readonly Color PanelBg = new Color(0.11f, 0.11f, 0.11f, 1f);
+        private readonly bool worldView;
 
         private Vector2 scrollPosition = Vector2.zero;
         private static string searchText = string.Empty;
@@ -25,8 +26,9 @@ namespace Declutter_Main_Buttons_Bar
             }
         }
 
-        public MapControlsTableWindow()
+        public MapControlsTableWindow(bool worldView)
         {
+            this.worldView = worldView;
             draggable = true;
             doCloseX = true;
             absorbInputAroundWindow = true;
@@ -100,7 +102,7 @@ namespace Declutter_Main_Buttons_Bar
             base.Notify_ClickOutsideWindow();
         }
 
-        private static void DrawMapControls()
+        private void DrawMapControls()
         {
             PlaySettings settings = Find.PlaySettings;
             if (settings == null)
@@ -109,7 +111,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             var row = new WidgetRow(0f, 0f, UIDirection.RightThenDown, 9999f);
-            settings.DoPlaySettingsGlobalControls(row, worldView: false);
+            settings.DoPlaySettingsGlobalControls(row, worldView: worldView);
         }
 
         private static void AddEditToggleRow(bool measureOnly)

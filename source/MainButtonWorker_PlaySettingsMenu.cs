@@ -1,5 +1,6 @@
 using RimWorld;
 using Verse;
+using RimWorld.Planet;
 
 namespace Declutter_Main_Buttons_Bar
 {
@@ -11,7 +12,7 @@ namespace Declutter_Main_Buttons_Bar
 
         public override void Activate()
         {
-            Find.WindowStack.Add(new MapControlsTableWindow());
+            Find.WindowStack.Add(new MapControlsTableWindow(WorldRendererUtility.WorldRendered));
         }
     }
 }
