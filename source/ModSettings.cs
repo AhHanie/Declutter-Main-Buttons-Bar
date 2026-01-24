@@ -26,6 +26,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
         public static bool useSearchablePlaySettingsMenu = true;
+        public static bool revealPlaySettingsOnHover = false;
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
         public static float gizmoDrawerScale = 1f;
@@ -86,6 +87,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
+            Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
             Scribe_Values.Look(ref gizmoDrawerScale, "gizmoDrawerScale", 1f);
@@ -95,6 +97,10 @@ namespace Declutter_Main_Buttons_Bar
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
+                {
+                    revealPlaySettingsOnHover = false;
+                }
                 NormalizeDropdownConfigs();
                 RebuildCaches();
             }
@@ -230,6 +236,7 @@ namespace Declutter_Main_Buttons_Bar
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
             useSearchablePlaySettingsMenu = true;
+            revealPlaySettingsOnHover = false;
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
             gizmoDrawerScale = 1f;

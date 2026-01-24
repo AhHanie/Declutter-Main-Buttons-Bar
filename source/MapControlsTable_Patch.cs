@@ -78,15 +78,126 @@ namespace Declutter_Main_Buttons_Bar
         }
     }
 
+    public static class PlaySettingsHoverContext
+    {
+        public static bool Active;
+        public static bool Hovered;
+        private static int dateFrame = -1;
+        private static float dateTopY;
+        private static float dateLeftX;
+        private static float dateWidth;
+
+        public static void SetDateBounds(float topY, float leftX, float width)
+        {
+            dateFrame = Time.frameCount;
+            dateTopY = topY;
+            dateLeftX = leftX;
+            dateWidth = width;
+        }
+
+        public static bool TryGetDateBounds(out float topY, out float leftX, out float width)
+        {
+            int frame = Time.frameCount;
+            if (dateFrame == frame || dateFrame == frame - 1)
+            {
+                topY = dateTopY;
+                leftX = dateLeftX;
+                width = dateWidth;
+                return true;
+            }
+
+            topY = 0f;
+            leftX = 0f;
+            width = 0f;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalControlsUtility), "DoDate")]
+    public static class GlobalControlsUtility_DoDate_Patch
+    {
+        [HarmonyPriority(Priority.Last)]
+        public static void Postfix(float leftX, float width, ref float curBaseY)
+        {
+            if (!ModSettings.revealPlaySettingsOnHover)
+            {
+                return;
+            }
+
+            float topY = curBaseY;
+            PlaySettingsHoverContext.SetDateBounds(topY, leftX, width);
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalControlsUtility), "DoPlaySettings")]
+    public static class GlobalControlsUtility_DoPlaySettings_Patch
+    {
+        private const float HoverAreaWidth = 141f;
+
+        [HarmonyPriority(Priority.First)]
+        public static void Prefix(ref float curBaseY, out PlaySettingsHoverState __state)
+        {
+            __state = default;
+            if (!ModSettings.revealPlaySettingsOnHover)
+            {
+                return;
+            }
+
+            __state.Active = true;
+            __state.PrevBaseY = curBaseY;
+            Rect hoverRect;
+            if (PlaySettingsHoverContext.TryGetDateBounds(out float topY, out float leftX, out float width))
+            {
+                float minX = leftX;
+                float maxX = leftX + width;
+                float minY = topY;
+                float maxY = curBaseY;
+                hoverRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            }
+            else
+            {
+                float y = curBaseY - TimeControls.TimeButSize.y;
+                hoverRect = new Rect(UI.screenWidth - HoverAreaWidth, y, HoverAreaWidth, TimeControls.TimeButSize.y);
+            }
+            PlaySettingsHoverContext.Active = true;
+            PlaySettingsHoverContext.Hovered = Mouse.IsOver(hoverRect);
+        }
+
+        [HarmonyPriority(Priority.Last)]
+        public static void Postfix(PlaySettingsHoverState __state)
+        {
+            if (!__state.Active)
+            {
+                return;
+            }
+
+            PlaySettingsHoverContext.Active = false;
+            PlaySettingsHoverContext.Hovered = false;
+        }
+    }
+
+    public struct PlaySettingsHoverState
+    {
+        public bool Active;
+        public float PrevBaseY;
+    }
+
     [HarmonyPatch(typeof(PlaySettings), "DoPlaySettingsGlobalControls")]
     public static class MapControlsTable_DoPlaySettingsGlobalControls_Patch
     {
         [HarmonyPriority(Priority.First)]
         public static bool Prefix()
         {
-            if (ModSettings.useSearchablePlaySettingsMenu && !MapControlsTableContext.Active)
+            if ((ModSettings.useSearchablePlaySettingsMenu || ModSettings.revealPlaySettingsOnHover) && !MapControlsTableContext.Active)
             {
-                MapControlsTableContext.SuppressExternal = true;
+                if (ModSettings.revealPlaySettingsOnHover)
+                {
+                    MapControlsTableContext.SuppressExternal = !PlaySettingsHoverContext.Hovered;
+                }
+                else
+                {
+                    MapControlsTableContext.SuppressExternal = true;
+                }
             }
 
             return true;
@@ -102,7 +213,7 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch]
     public static class MapControlsTable_ToggleableIcon_Patch
     {
-        static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+        public static IEnumerable<System.Reflection.MethodBase> TargetMethods()
         {
             return AccessTools.GetDeclaredMethods(typeof(WidgetRow))
                 .Where(method => method.Name == "ToggleableIcon")
@@ -146,7 +257,7 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch]
     public static class MapControlsTable_ButtonIcon_Patch
     {
-        static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+        public static IEnumerable<System.Reflection.MethodBase> TargetMethods()
         {
             return AccessTools.GetDeclaredMethods(typeof(WidgetRow))
                 .Where(method => method.Name == "ButtonIcon")
@@ -188,7 +299,7 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch]
     public static class MapControlsTable_ButtonIconRect_Patch
     {
-        static System.Reflection.MethodBase TargetMethod()
+        public static System.Reflection.MethodBase TargetMethod()
         {
             return AccessTools.Method(typeof(WidgetRow), "ButtonIconRect");
         }

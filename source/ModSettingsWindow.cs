@@ -52,7 +52,27 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
-            listing.CheckboxLabeled("DMMB.SettingsPlaySettingsMenuToggle".Translate(), ref ModSettings.useSearchablePlaySettingsMenu);
+            bool useMenu = ModSettings.useSearchablePlaySettingsMenu;
+            listing.CheckboxLabeled("DMMB.SettingsPlaySettingsMenuToggle".Translate(), ref useMenu);
+            if (useMenu != ModSettings.useSearchablePlaySettingsMenu)
+            {
+                ModSettings.useSearchablePlaySettingsMenu = useMenu;
+                if (useMenu)
+                {
+                    ModSettings.revealPlaySettingsOnHover = false;
+                }
+            }
+
+            bool hoverReveal = ModSettings.revealPlaySettingsOnHover;
+            listing.CheckboxLabeled("DMMB.SettingsPlaySettingsHoverToggle".Translate(), ref hoverReveal, "DMMB.SettingsPlaySettingsHoverToggleDesc".Translate());
+            if (hoverReveal != ModSettings.revealPlaySettingsOnHover)
+            {
+                ModSettings.revealPlaySettingsOnHover = hoverReveal;
+                if (hoverReveal)
+                {
+                    ModSettings.useSearchablePlaySettingsMenu = false;
+                }
+            }
             listing.Label("DMMB.SettingsGizmoScaleLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoDrawerScale * 100f)));
             ModSettings.gizmoDrawerScale = listing.Slider(ModSettings.gizmoDrawerScale, 0.5f, 1.5f);
             listing.CheckboxLabeled("DMMB.SettingsGizmoScaleMapOnly".Translate(), ref ModSettings.gizmoScaleMapOnly);

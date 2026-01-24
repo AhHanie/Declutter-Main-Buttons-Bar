@@ -6,7 +6,7 @@ namespace Declutter_Main_Buttons_Bar
 {
     public class MainButtonWorker_PlaySettingsMenu : MainButtonWorker
     {
-        public override bool Visible => ModSettings.useSearchablePlaySettingsMenu;
+        public override bool Visible => ModSettings.useSearchablePlaySettingsMenu && !ModSettings.revealPlaySettingsOnHover;
 
         public override bool Disabled => false;
 

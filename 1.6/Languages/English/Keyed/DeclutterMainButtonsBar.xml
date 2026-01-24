@@ -9,6 +9,8 @@
   <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
+  <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
+  <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
   <DMMB.SettingsGizmoScaleMapOnly>Only scale map gizmos</DMMB.SettingsGizmoScaleMapOnly>
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
