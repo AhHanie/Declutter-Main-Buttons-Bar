@@ -16,6 +16,7 @@
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
+  <DMMB.SettingsMenuBlacklistUseHidden>Show only disabled buttons in the menu</DMMB.SettingsMenuBlacklistUseHidden>
   <DMMB.PlaySettingsEditDropdowns>Edit main buttons (move, resize, and set dropdowns)</DMMB.PlaySettingsEditDropdowns>
   <DMMB.PlaySettingsMenuButton>Open play settings</DMMB.PlaySettingsMenuButton>
   <DMMB.PlaySettingsMenuTitle>Play settings</DMMB.PlaySettingsMenuTitle>

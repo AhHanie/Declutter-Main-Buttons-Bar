@@ -442,11 +442,6 @@ namespace Declutter_Main_Buttons_Bar
 
         private static bool ShouldShowOnBar(MainButtonDef def)
         {
-            if (def == MainButtonsMenuDefOf.DMMB_MainButtonsMenu)
-            {
-                return true;
-            }
-
             return !ModSettings.IsHiddenFromBar(def);
         }
 

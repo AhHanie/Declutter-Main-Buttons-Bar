@@ -200,6 +200,28 @@ namespace Declutter_Main_Buttons_Bar
                         }
                     }
 
+                    if (wouldOverflow)
+                    {
+                        float totalWidth = 0f;
+                        for (int i = 0; i < newOrder.Count; i++)
+                        {
+                            totalWidth += widths[newOrder[i]];
+                        }
+
+                        if (totalWidth <= availableWidth + 0.5f)
+                        {
+                            float curX = 0f;
+                            for (int i = 0; i < newOrder.Count; i++)
+                            {
+                                MainButtonDef def = newOrder[i];
+                                testPositions[def] = curX;
+                                curX += widths[def];
+                            }
+
+                            wouldOverflow = false;
+                        }
+                    }
+
                     if (!wouldOverflow)
                     {
                         foreach (var kvp in testPositions)
@@ -270,7 +292,14 @@ namespace Declutter_Main_Buttons_Bar
                 return defs;
             }
 
+            int dragIndex = defs.IndexOf(draggingDef);
+            if (dragIndex < 0 || dragIndex >= rects.Count)
+            {
+                return defs;
+            }
+
             float dragX = Event.current.mousePosition.x - dragOffsetX;
+            float dragCenterX = dragX + rects[dragIndex].width * 0.5f;
 
             List<MainButtonDef> reordered = new List<MainButtonDef>(defs);
             reordered.Remove(draggingDef);
@@ -282,7 +311,7 @@ namespace Declutter_Main_Buttons_Bar
                 if (origIndex >= 0 && origIndex < rects.Count)
                 {
                     Rect rect = rects[origIndex];
-                    if (dragX > rect.x + rect.width / 2f)
+                    if (dragCenterX > rect.x + rect.width / 2f)
                     {
                         insertIndex = i + 1;
                     }

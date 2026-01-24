@@ -97,9 +97,9 @@ namespace Declutter_Main_Buttons_Bar
             listing.Label("DMMB.SettingsDesc".Translate());
             listing.GapLine();
 
-            for (int i = 0; i < MainButtonsCache.AllButtonsInOrderNoDMMBButton.Count; i++)
+            for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
             {
-                MainButtonDef def = MainButtonsCache.AllButtonsInOrderNoDMMBButton[i];
+                MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
                 bool showOnBar = !ModSettings.IsHiddenFromBar(def);
                 bool newValue = showOnBar;
                 listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
@@ -113,6 +113,15 @@ namespace Declutter_Main_Buttons_Bar
             listing.Gap(20f);
             listing.Label("DMMB.SettingsMenuBlacklistDesc".Translate());
             listing.GapLine();
+
+            Rect syncRow = listing.GetRect(Text.LineHeight + 2f);
+            if (Widgets.ButtonText(syncRow, "DMMB.SettingsMenuBlacklistUseHidden".Translate()))
+            {
+                PopulateMenuBlacklistFromHidden();
+                Mod.Settings.Write();
+            }
+
+            listing.Gap(6f);
 
             for (int i = 0; i < MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count; i++)
             {
@@ -128,6 +137,27 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.End();
             Widgets.EndScrollView();
+        }
+
+        private static void PopulateMenuBlacklistFromHidden()
+        {
+            List<MainButtonDef> defs = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton;
+            List<MainButtonDef> newBlacklist = new List<MainButtonDef>(defs.Count);
+            for (int i = 0; i < defs.Count; i++)
+            {
+                MainButtonDef def = defs[i];
+                if (def == null)
+                {
+                    continue;
+                }
+
+                if (!ModSettings.IsHiddenFromBar(def))
+                {
+                    newBlacklist.Add(def);
+                }
+            }
+
+            ModSettings.blacklistedFromMenuDefs = newBlacklist;
         }
     }
 }
