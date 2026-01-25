@@ -341,7 +341,7 @@ namespace Declutter_Main_Buttons_Bar
                 return 75f;
             }
 
-            float spacing = GizmoGridDrawer.GizmoSpacing.x;
+            float spacing = ModSettings.gizmoSpacingX;
             float total = 0f;
             for (int i = 0; i < gizmos.Count; i++)
             {

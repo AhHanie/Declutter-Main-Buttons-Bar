@@ -30,6 +30,8 @@ namespace Declutter_Main_Buttons_Bar
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
         public static float gizmoDrawerScale = 1f;
+        public static float gizmoSpacingX = 5f;
+        public static float gizmoSpacingY = 14f;
         public static bool gizmoScaleMapOnly = false;
 
         private static HashSet<MainButtonDef> hiddenFromBarSet;
@@ -91,9 +93,13 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
             Scribe_Values.Look(ref gizmoDrawerScale, "gizmoDrawerScale", 1f);
+            Scribe_Values.Look(ref gizmoSpacingX, "gizmoSpacingX", 5f);
+            Scribe_Values.Look(ref gizmoSpacingY, "gizmoSpacingY", 14f);
             Scribe_Values.Look(ref gizmoScaleMapOnly, "gizmoScaleMapOnly", false);
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
             gizmoDrawerScale = Mathf.Clamp(gizmoDrawerScale, 0.5f, 1.5f);
+            gizmoSpacingX = Mathf.Clamp(gizmoSpacingX, 0f, 20f);
+            gizmoSpacingY = Mathf.Clamp(gizmoSpacingY, -10f, 30f);
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
@@ -240,6 +246,8 @@ namespace Declutter_Main_Buttons_Bar
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
             gizmoDrawerScale = 1f;
+            gizmoSpacingX = 5f;
+            gizmoSpacingY = 14f;
             gizmoScaleMapOnly = false;
             RebuildCaches();
         }

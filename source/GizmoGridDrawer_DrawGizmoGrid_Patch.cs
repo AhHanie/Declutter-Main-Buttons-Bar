@@ -18,9 +18,15 @@ namespace Declutter_Main_Buttons_Bar
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             MethodInfo adjustMethod = AccessTools.Method(typeof(GizmoGridDrawer_DrawGizmoGrid_Patch), nameof(AdjustVector));
+            MethodInfo spacingXMethod = AccessTools.Method(typeof(GizmoGridDrawer_DrawGizmoGrid_Patch), nameof(GetSpacingX));
+            MethodInfo spacingYMethod = AccessTools.Method(typeof(GizmoGridDrawer_DrawGizmoGrid_Patch), nameof(GetSpacingY));
             ConstructorInfo vectorCtor = AccessTools.Constructor(typeof(Vector2), new[] { typeof(float), typeof(float) });
+            FieldInfo gizmoSpacingField = AccessTools.Field(typeof(GizmoGridDrawer), "GizmoSpacing");
+            FieldInfo vectorXField = AccessTools.Field(typeof(Vector2), "x");
+            FieldInfo vectorYField = AccessTools.Field(typeof(Vector2), "y");
             var codes = new List<CodeInstruction>(instructions);
-            bool patched = false;
+            bool offsetPatched = false;
+            bool spacingPatched = false;
 
             for (int i = 0; i < codes.Count - 3; i++)
             {
@@ -55,11 +61,47 @@ namespace Declutter_Main_Buttons_Bar
                     new CodeInstruction(OpCodes.Ldloca_S, local),
                     new CodeInstruction(OpCodes.Call, adjustMethod)
                 });
-                patched = true;
+                offsetPatched = true;
                 i += 5;
             }
 
-            if (patched)
+            for (int i = 0; i < codes.Count - 1; i++)
+            {
+                if (codes[i].opcode != OpCodes.Ldsflda || !Equals(codes[i].operand, gizmoSpacingField))
+                {
+                    continue;
+                }
+
+                if (codes[i + 1].opcode != OpCodes.Ldfld)
+                {
+                    continue;
+                }
+
+                MethodInfo spacingMethod = null;
+                if (Equals(codes[i + 1].operand, vectorXField))
+                {
+                    spacingMethod = spacingXMethod;
+                }
+                else if (Equals(codes[i + 1].operand, vectorYField))
+                {
+                    spacingMethod = spacingYMethod;
+                }
+
+                if (spacingMethod == null)
+                {
+                    continue;
+                }
+
+                var callInstruction = new CodeInstruction(OpCodes.Call, spacingMethod);
+                callInstruction.labels.AddRange(codes[i].labels);
+                callInstruction.blocks.AddRange(codes[i].blocks);
+                codes[i] = callInstruction;
+                codes.RemoveAt(i + 1);
+                spacingPatched = true;
+                i += 1;
+            }
+
+            if (offsetPatched && spacingPatched)
             {
                 Logger.Message("GizmoGridDrawer.DrawGizmoGrid patch applied.");
             }
@@ -109,6 +151,20 @@ namespace Declutter_Main_Buttons_Bar
             {
                 lastPreviewPosition = value;
             }
+        }
+
+        private static float GetSpacingX()
+        {
+            bool apply = !ModSettings.gizmoScaleMapOnly || ApplyOffset;
+            float value = apply ? ModSettings.gizmoSpacingX : GizmoGridDrawer.GizmoSpacing.x;
+            return apply && !previewDrawActive ? value * ModSettings.gizmoDrawerScale : value;
+        }
+
+        private static float GetSpacingY()
+        {
+            bool apply = !ModSettings.gizmoScaleMapOnly || ApplyOffset;
+            float value = apply ? ModSettings.gizmoSpacingY : GizmoGridDrawer.GizmoSpacing.y;
+            return apply && !previewDrawActive ? value * ModSettings.gizmoDrawerScale : value;
         }
     }
 }

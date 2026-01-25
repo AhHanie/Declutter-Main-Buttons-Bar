@@ -73,9 +73,16 @@ namespace Declutter_Main_Buttons_Bar
                     ModSettings.useSearchablePlaySettingsMenu = false;
                 }
             }
+            listing.CheckboxLabeled(
+                "DMMB.SettingsGizmoScaleMapOnly".Translate(),
+                ref ModSettings.gizmoScaleMapOnly,
+                "DMMB.SettingsGizmoScaleMapOnlyDesc".Translate());
             listing.Label("DMMB.SettingsGizmoScaleLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoDrawerScale * 100f)));
             ModSettings.gizmoDrawerScale = listing.Slider(ModSettings.gizmoDrawerScale, 0.5f, 1.5f);
-            listing.CheckboxLabeled("DMMB.SettingsGizmoScaleMapOnly".Translate(), ref ModSettings.gizmoScaleMapOnly);
+            listing.Label("DMMB.SettingsGizmoSpacingXLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoSpacingX)));
+            ModSettings.gizmoSpacingX = listing.Slider(ModSettings.gizmoSpacingX, 0f, 20f);
+            listing.Label("DMMB.SettingsGizmoSpacingYLabel".Translate(Mathf.RoundToInt(ModSettings.gizmoSpacingY)));
+            ModSettings.gizmoSpacingY = listing.Slider(ModSettings.gizmoSpacingY, -10f, 30f);
 
             Rect resetRow = listing.GetRect(Text.LineHeight);
             Rect resetLabelRect = resetRow;

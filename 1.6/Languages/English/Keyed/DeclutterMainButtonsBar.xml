@@ -12,7 +12,10 @@
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
-  <DMMB.SettingsGizmoScaleMapOnly>Only scale map gizmos</DMMB.SettingsGizmoScaleMapOnly>
+  <DMMB.SettingsGizmoScaleMapOnly>Scale Map Gizmos</DMMB.SettingsGizmoScaleMapOnly>
+  <DMMB.SettingsGizmoScaleMapOnlyDesc>These controls only scale map gizmos which are rendered when you select either a colonist/building on the map.</DMMB.SettingsGizmoScaleMapOnlyDesc>
+  <DMMB.SettingsGizmoSpacingXLabel>Gizmo spacing (X): {0}px</DMMB.SettingsGizmoSpacingXLabel>
+  <DMMB.SettingsGizmoSpacingYLabel>Gizmo spacing (Y): {0}px</DMMB.SettingsGizmoSpacingYLabel>
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
