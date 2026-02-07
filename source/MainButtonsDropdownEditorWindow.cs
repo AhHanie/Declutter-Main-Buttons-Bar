@@ -68,13 +68,12 @@ namespace Declutter_Main_Buttons_Bar
                 textRect.xMax = rowRect.xMax - RowPadding;
 
                 bool inDropdown = ModSettings.IsInDropdown(parentDef, def);
-                bool canToggle = !ModSettings.IsHiddenFromBar(def) || inDropdown;
                 
                 Texture2D toggleTex = inDropdown
                     ? TexButton.Minus
                     : TexButton.Plus;
 
-                if (canToggle && Widgets.ButtonImage(toggleRect, toggleTex))
+                if (Widgets.ButtonImage(toggleRect, toggleTex))
                 {
                     ModSettings.SetDropdownEntry(parentDef, def, !inDropdown);
                 }

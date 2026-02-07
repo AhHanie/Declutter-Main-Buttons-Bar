@@ -134,7 +134,7 @@ namespace Declutter_Main_Buttons_Bar
                 }
 
                 List<MainButtonDef> entries = config.entries
-                    .Where(entry => entry != config.parent && !IsHiddenFromBar(entry) && entry.Worker.Visible)
+                    .Where(entry => entry != config.parent && entry.Worker.Visible)
                     .Distinct()
                     .OrderBy(entry => entry.order)
                     .ToList();

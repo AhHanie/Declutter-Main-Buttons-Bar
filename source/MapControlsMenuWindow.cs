@@ -6,7 +6,7 @@ namespace Declutter_Main_Buttons_Bar
 {
     public class MapControlsTableWindow : Window
     {
-        public static bool IsOpen;
+        public new static bool IsOpen;
         private const float RowHeight = 56f;
         private const float SearchHeight = 26f;
         private static readonly Color PanelBg = new Color(0.11f, 0.11f, 0.11f, 1f);
