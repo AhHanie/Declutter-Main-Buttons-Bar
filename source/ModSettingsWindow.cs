@@ -26,7 +26,10 @@ namespace Declutter_Main_Buttons_Bar
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(viewRect);
 
-            listing.CheckboxLabeled("DMMB.SettingsFreeSizeToggle".Translate(), ref ModSettings.useFreeSizeMode);
+            listing.CheckboxLabeled(
+                "DMMB.AdvancedEditMode".Translate(),
+                ref ModSettings.useFreeSizeMode,
+                "DMMB.AdvancedEditModeDesc".Translate());
             if (ModSettings.useFreeSizeMode)
             {
                 ModSettings.useFixedWidthMode = false;

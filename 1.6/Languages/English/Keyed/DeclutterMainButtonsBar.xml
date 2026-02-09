@@ -2,7 +2,8 @@
 <LanguageData>
   <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
-  <DMMB.SettingsFreeSizeToggle>Enable free-size main buttons (drag to resize)</DMMB.SettingsFreeSizeToggle>
+  <DMMB.AdvancedEditMode>Advanced edit mode</DMMB.AdvancedEditMode>
+  <DMMB.AdvancedEditModeDesc>In this mode, you can resize buttons and add dropdown menus to each button.</DMMB.AdvancedEditModeDesc>
   <DMMB.SettingsSnapThresholdLabel>Snap threshold: {0}px</DMMB.SettingsSnapThresholdLabel>
   <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
