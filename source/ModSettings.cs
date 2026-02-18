@@ -27,6 +27,8 @@ namespace Declutter_Main_Buttons_Bar
         public static bool pinMenuButtonRight = false;
         public static bool useSearchablePlaySettingsMenu = true;
         public static bool revealPlaySettingsOnHover = false;
+        public static bool defaultNewButtonsToHidden = false;
+        public static List<string> knownMainButtonDefNames = new List<string>();
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
         public static float gizmoDrawerScale = 1f;
@@ -90,6 +92,8 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
+            Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
+            Scribe_Collections.Look(ref knownMainButtonDefNames, "knownMainButtonDefNames", LookMode.Value);
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
             Scribe_Values.Look(ref gizmoDrawerScale, "gizmoDrawerScale", 1f);
@@ -103,6 +107,17 @@ namespace Declutter_Main_Buttons_Bar
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                if (knownMainButtonDefNames == null)
+                {
+                    knownMainButtonDefNames = new List<string>();
+                }
+                else
+                {
+                    knownMainButtonDefNames = knownMainButtonDefNames
+                        .Where(defName => !string.IsNullOrEmpty(defName))
+                        .ToList();
+                }
+
                 if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
                 {
                     revealPlaySettingsOnHover = false;
@@ -243,6 +258,8 @@ namespace Declutter_Main_Buttons_Bar
             pinMenuButtonRight = false;
             useSearchablePlaySettingsMenu = true;
             revealPlaySettingsOnHover = false;
+            defaultNewButtonsToHidden = false;
+            knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
             gizmoDrawerScale = 1f;
@@ -250,6 +267,37 @@ namespace Declutter_Main_Buttons_Bar
             gizmoSpacingY = 14f;
             gizmoScaleMapOnly = false;
             RebuildCaches();
+        }
+
+        public static bool DetectAndHideNewButtonsFromBarIfNeeded()
+        {
+            HashSet<string> knownDefs = new HashSet<string>(knownMainButtonDefNames);
+            bool settingsChanged = false;
+
+            if (defaultNewButtonsToHidden)
+            {
+                for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
+                {
+                    MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
+                    if (knownDefs.Contains(def.defName))
+                    {
+                        continue;
+                    }
+
+                    if (!IsHiddenFromBar(def))
+                    {
+                        SetHiddenFromBar(def, hidden: true);
+                        settingsChanged = true;
+                    }
+                }
+            }
+
+            if (settingsChanged)
+            {
+                knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+            }
+
+            return settingsChanged;
         }
 
         public static bool HasDropdown(MainButtonDef def)

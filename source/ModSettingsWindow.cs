@@ -76,6 +76,12 @@ namespace Declutter_Main_Buttons_Bar
                     ModSettings.useSearchablePlaySettingsMenu = false;
                 }
             }
+
+            listing.CheckboxLabeled(
+                "DMMB.SettingsDefaultNewButtonsHidden".Translate(),
+                ref ModSettings.defaultNewButtonsToHidden,
+                "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
+
             listing.CheckboxLabeled(
                 "DMMB.SettingsGizmoScaleMapOnly".Translate(),
                 ref ModSettings.gizmoScaleMapOnly,

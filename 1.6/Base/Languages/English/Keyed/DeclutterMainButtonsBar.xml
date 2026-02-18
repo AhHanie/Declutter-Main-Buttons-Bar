@@ -12,6 +12,8 @@
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
+  <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>
+  <DMMB.SettingsDefaultNewButtonsHiddenDesc>When enabled, newly added main buttons (from new or updated mods) are automatically hidden from the bottom bar.</DMMB.SettingsDefaultNewButtonsHiddenDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
   <DMMB.SettingsGizmoScaleMapOnly>Scale Map Gizmos</DMMB.SettingsGizmoScaleMapOnly>
   <DMMB.SettingsGizmoScaleMapOnlyDesc>These controls only scale map gizmos which are rendered when you select either a colonist/building on the map.</DMMB.SettingsGizmoScaleMapOnlyDesc>
