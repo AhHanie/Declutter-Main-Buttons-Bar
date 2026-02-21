@@ -43,6 +43,7 @@ namespace Declutter_Main_Buttons_Bar
         public override void PreOpen()
         {
             base.PreOpen();
+            AlignWindowToRightIfNeeded();
             RebuildMenuCache();
             quickSearchWidget.Reset();
             CacheSearchState();
@@ -215,6 +216,17 @@ namespace Declutter_Main_Buttons_Bar
             cachedMenuDefs = cachedDefs
                 .Where(def => !ModSettings.IsBlacklistedFromMenu(def))
                 .ToList();
+        }
+
+        private void AlignWindowToRightIfNeeded()
+        {
+            if (!ModSettings.pinMainButtonsMenuWindowRight)
+            {
+                return;
+            }
+
+            float width = windowRect.width > 0f ? windowRect.width : RequestedTabSize.x;
+            windowRect.x = Mathf.Max(0f, UI.screenWidth - width);
         }
 
         private List<MainButtonDef> GetVisibleMenuDefs()
