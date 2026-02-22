@@ -10,8 +10,7 @@
   <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
   <DMMB.SettingsPinMainButtonsMenuWindowRight>Open main buttons menu on the far right</DMMB.SettingsPinMainButtonsMenuWindowRight>
-  <DMMB.SettingsPinOtherMainTabsRight>Also pin other main tabs to the right</DMMB.SettingsPinOtherMainTabsRight>
-  <DMMB.SettingsPinOtherMainTabsRightDesc>Requires "Open main buttons menu on the far right" to be enabled.</DMMB.SettingsPinOtherMainTabsRightDesc>
+  <DMMB.SettingsPinMainButtonsMenuWindowRightDesc>Windows opened from this menu will also open on the far right.</DMMB.SettingsPinMainButtonsMenuWindowRightDesc>
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>

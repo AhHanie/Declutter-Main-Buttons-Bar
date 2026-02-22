@@ -136,6 +136,7 @@ namespace Declutter_Main_Buttons_Bar
 
                 if (enabled && !starClicked && Widgets.ButtonInvisible(rowRect))
                 {
+                    MainTabWindow_RightAlign_Eligibility.NotifyMainButtonOpenedFromMenu(def);
                     def.Worker.InterfaceTryActivate();
                 }
 

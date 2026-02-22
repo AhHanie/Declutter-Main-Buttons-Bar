@@ -26,7 +26,6 @@ namespace Declutter_Main_Buttons_Bar
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
         public static bool pinMainButtonsMenuWindowRight = false;
-        public static bool pinOtherMainTabWindowsRight = false;
         public static bool useSearchablePlaySettingsMenu = true;
         public static bool revealPlaySettingsOnHover = false;
         public static bool defaultNewButtonsToHidden = false;
@@ -93,7 +92,6 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
-            Scribe_Values.Look(ref pinOtherMainTabWindowsRight, "pinOtherMainTabWindowsRight", false);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
             Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
@@ -113,7 +111,7 @@ namespace Declutter_Main_Buttons_Bar
             {
                 if (knownMainButtonDefNames == null)
                 {
-                    knownMainButtonDefNames = new List<string>();
+                    knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
                 }
                 else
                 {
@@ -127,10 +125,6 @@ namespace Declutter_Main_Buttons_Bar
                     revealPlaySettingsOnHover = false;
                 }
 
-                if (!pinMainButtonsMenuWindowRight)
-                {
-                    pinOtherMainTabWindowsRight = false;
-                }
                 NormalizeDropdownConfigs();
                 RebuildCaches();
             }
@@ -266,7 +260,6 @@ namespace Declutter_Main_Buttons_Bar
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
             pinMainButtonsMenuWindowRight = false;
-            pinOtherMainTabWindowsRight = false;
             useSearchablePlaySettingsMenu = true;
             revealPlaySettingsOnHover = false;
             defaultNewButtonsToHidden = false;
@@ -282,6 +275,11 @@ namespace Declutter_Main_Buttons_Bar
 
         public static bool DetectAndHideNewButtonsFromBarIfNeeded()
         {
+            if (knownMainButtonDefNames.Count == 0)
+            {
+                knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+            }
+
             HashSet<string> knownDefs = new HashSet<string>(knownMainButtonDefNames);
             bool settingsChanged = false;
 

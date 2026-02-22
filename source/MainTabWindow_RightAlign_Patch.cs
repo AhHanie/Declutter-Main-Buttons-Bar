@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -7,16 +8,29 @@ namespace Declutter_Main_Buttons_Bar
 {
     public static class MainTabWindow_RightAlign_Eligibility
     {
+        private static Type lastWindowOpenedFromMenuType;
+
+        public static void NotifyMainButtonOpenedFromMenu(MainButtonDef def)
+        {
+            Type openedType = def.tabWindowClass;
+            if (openedType == null || openedType == typeof(MainTabWindow_MainButtonsMenu))
+            {
+                return;
+            }
+
+            lastWindowOpenedFromMenuType = openedType;
+        }
+
         public static bool ShouldAlign(MainTabWindow window)
         {
-            if (!ModSettings.pinMainButtonsMenuWindowRight || !ModSettings.pinOtherMainTabWindowsRight)
+            if (!ModSettings.pinMainButtonsMenuWindowRight || window == null)
             {
                 return false;
             }
 
             if (window is MainTabWindow_MainButtonsMenu)
             {
-                return false;
+                return true;
             }
 
             if (window is MainTabWindow_Research)
@@ -25,6 +39,16 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             if (window is MainTabWindow_Inspect)
+            {
+                return false;
+            }
+
+            if (lastWindowOpenedFromMenuType == null)
+            {
+                return false;
+            }
+
+            if (window.GetType() != lastWindowOpenedFromMenuType)
             {
                 return false;
             }

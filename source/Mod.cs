@@ -20,9 +20,9 @@ namespace Declutter_Main_Buttons_Bar
 
         public void Init()
         {
+            MainButtonsCache.Rebuild();
             Settings = GetSettings<ModSettings>();
             new Harmony("sk.dmmb").PatchAll();
-            MainButtonsCache.Rebuild();
             if (ModSettings.DetectAndHideNewButtonsFromBarIfNeeded())
             {
                 Settings.Write();
