@@ -56,6 +56,7 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
             listing.CheckboxLabeled("DMMB.SettingsPinMainButtonsMenuWindowRight".Translate(), ref ModSettings.pinMainButtonsMenuWindowRight);
+            listing.CheckboxLabeled("DMMB.SettingsPinOtherMainTabsRight".Translate(), ref ModSettings.pinOtherMainTabWindowsRight, "DMMB.SettingsPinOtherMainTabsRightDesc".Translate());
             bool useMenu = ModSettings.useSearchablePlaySettingsMenu;
             listing.CheckboxLabeled("DMMB.SettingsPlaySettingsMenuToggle".Translate(), ref useMenu);
             if (useMenu != ModSettings.useSearchablePlaySettingsMenu)

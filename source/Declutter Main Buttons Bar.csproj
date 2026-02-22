@@ -92,6 +92,7 @@
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Render.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.State.cs" />
     <Compile Include="MainButtonsRoot_DoButtons_Patch.cs" />
+    <Compile Include="MainTabWindow_RightAlign_Patch.cs" />
     <Compile Include="MapControlsTable_Patch.cs" />
     <Compile Include="MapControlsMenuWindow.cs" />
     <Compile Include="MapGizmoUtility_MapUIOnGUI_Patch.cs" />

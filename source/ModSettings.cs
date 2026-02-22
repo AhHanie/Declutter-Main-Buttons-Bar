@@ -26,6 +26,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
         public static bool pinMainButtonsMenuWindowRight = false;
+        public static bool pinOtherMainTabWindowsRight = false;
         public static bool useSearchablePlaySettingsMenu = true;
         public static bool revealPlaySettingsOnHover = false;
         public static bool defaultNewButtonsToHidden = false;
@@ -92,6 +93,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
+            Scribe_Values.Look(ref pinOtherMainTabWindowsRight, "pinOtherMainTabWindowsRight", false);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
             Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
@@ -123,6 +125,11 @@ namespace Declutter_Main_Buttons_Bar
                 if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
                 {
                     revealPlaySettingsOnHover = false;
+                }
+
+                if (!pinMainButtonsMenuWindowRight)
+                {
+                    pinOtherMainTabWindowsRight = false;
                 }
                 NormalizeDropdownConfigs();
                 RebuildCaches();
@@ -259,6 +266,7 @@ namespace Declutter_Main_Buttons_Bar
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
             pinMainButtonsMenuWindowRight = false;
+            pinOtherMainTabWindowsRight = false;
             useSearchablePlaySettingsMenu = true;
             revealPlaySettingsOnHover = false;
             defaultNewButtonsToHidden = false;
