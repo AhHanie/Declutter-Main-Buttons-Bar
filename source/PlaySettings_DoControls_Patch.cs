@@ -28,7 +28,7 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static void DrawDropdownEditToggle(WidgetRow row)
         {
-            if (ModSettings.useSearchablePlaySettingsMenu)
+            if (ModSettings.useSearchablePlaySettingsMenu || ModSettings.hideEditModePlaySettingsButton)
             {
                 return;
             }

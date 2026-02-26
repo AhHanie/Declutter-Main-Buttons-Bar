@@ -14,6 +14,8 @@
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
+  <DMMB.SettingsHidePlaySettingsEditModeButton>Hide edit mode button</DMMB.SettingsHidePlaySettingsEditModeButton>
+  <DMMB.SettingsHidePlaySettingsEditModeButtonDesc>Only applies when searchable play settings menu is disabled.</DMMB.SettingsHidePlaySettingsEditModeButtonDesc>
   <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>
   <DMMB.SettingsDefaultNewButtonsHiddenDesc>When enabled, newly added main buttons (from new or updated mods) are automatically hidden from the bottom bar.</DMMB.SettingsDefaultNewButtonsHiddenDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>

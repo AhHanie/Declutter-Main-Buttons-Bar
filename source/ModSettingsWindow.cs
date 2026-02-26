@@ -82,6 +82,11 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             listing.CheckboxLabeled(
+                "DMMB.SettingsHidePlaySettingsEditModeButton".Translate(),
+                ref ModSettings.hideEditModePlaySettingsButton,
+                "DMMB.SettingsHidePlaySettingsEditModeButtonDesc".Translate());
+
+            listing.CheckboxLabeled(
                 "DMMB.SettingsDefaultNewButtonsHidden".Translate(),
                 ref ModSettings.defaultNewButtonsToHidden,
                 "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
