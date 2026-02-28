@@ -8,7 +8,7 @@ namespace Declutter_Main_Buttons_Bar
 {
     public static class MainTabWindow_RightAlign_Eligibility
     {
-        private static Type lastWindowOpenedFromMenuType;
+        public static Type lastWindowOpenedFromMenuType;
 
         public static void NotifyMainButtonOpenedFromMenu(MainButtonDef def)
         {
@@ -55,6 +55,23 @@ namespace Declutter_Main_Buttons_Bar
 
             return true;
         }
+
+        public static void AlignToRight(MainTabWindow window)
+        {
+            if (!ShouldAlign(window))
+            {
+                return;
+            }
+
+            if (Compat_OmniTab_RightAlign.TryAlign(window))
+            {
+                return;
+            }
+
+            Rect rect = window.windowRect;
+            rect.x = Mathf.Max(0f, UI.screenWidth - rect.width);
+            window.windowRect = rect;
+        }
     }
 
     [HarmonyPatch(typeof(MainTabWindow), "SetInitialSizeAndPosition")]
@@ -62,14 +79,7 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static void Postfix(MainTabWindow __instance)
         {
-            if (!MainTabWindow_RightAlign_Eligibility.ShouldAlign(__instance))
-            {
-                return;
-            }
-
-            Rect rect = __instance.windowRect;
-            rect.x = Mathf.Max(0f, UI.screenWidth - rect.width);
-            __instance.windowRect = rect;
+            MainTabWindow_RightAlign_Eligibility.AlignToRight(__instance);
         }
     }
 
@@ -78,14 +88,7 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static void Postfix(MainTabWindow __instance)
         {
-            if (!MainTabWindow_RightAlign_Eligibility.ShouldAlign(__instance))
-            {
-                return;
-            }
-
-            Rect rect = __instance.windowRect;
-            rect.x = Mathf.Max(0f, UI.screenWidth - rect.width);
-            __instance.windowRect = rect;
+            MainTabWindow_RightAlign_Eligibility.AlignToRight(__instance);
         }
     }
 }

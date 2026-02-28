@@ -77,6 +77,7 @@
     <Compile Include="GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
     <Compile Include="Command_GizmoSize_Patch.cs" />
     <Compile Include="Compat\Compat_BetterTrees_PlaySettingsHUD_Patch.cs" />
+    <Compile Include="Compat\Compat_OmniTab_RightAlign.cs" />
     <Compile Include="DMMBTextures.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainButtonDropdownConfig.cs" />
