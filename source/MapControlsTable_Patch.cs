@@ -86,6 +86,9 @@ namespace Declutter_Main_Buttons_Bar
         private static float dateTopY;
         private static float dateLeftX;
         private static float dateWidth;
+        private static int playSettingsFrame = -1;
+        private static float playSettingsTopY;
+        private static float playSettingsBottomY;
 
         public static void SetDateBounds(float topY, float leftX, float width)
         {
@@ -111,6 +114,28 @@ namespace Declutter_Main_Buttons_Bar
             width = 0f;
             return false;
         }
+
+        public static void SetPlaySettingsBounds(float topY, float bottomY)
+        {
+            playSettingsFrame = Time.frameCount;
+            playSettingsTopY = topY;
+            playSettingsBottomY = bottomY;
+        }
+
+        public static bool TryGetPlaySettingsBounds(out float topY, out float bottomY)
+        {
+            int frame = Time.frameCount;
+            if (playSettingsFrame == frame || playSettingsFrame == frame - 1)
+            {
+                topY = playSettingsTopY;
+                bottomY = playSettingsBottomY;
+                return true;
+            }
+
+            topY = 0f;
+            bottomY = 0f;
+            return false;
+        }
     }
 
     [HarmonyPatch(typeof(GlobalControlsUtility), "DoDate")]
@@ -132,7 +157,8 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GlobalControlsUtility), "DoPlaySettings")]
     public static class GlobalControlsUtility_DoPlaySettings_Patch
     {
-        private const float HoverAreaWidth = 141f;
+        private const float HoverAreaWidth = 250f;
+        private const float FallbackMinHoverHeight = 36f;
 
         [HarmonyPriority(Priority.First)]
         public static void Prefix(ref float curBaseY, out PlaySettingsHoverState __state)
@@ -150,25 +176,44 @@ namespace Declutter_Main_Buttons_Bar
             {
                 float minX = leftX;
                 float maxX = leftX + width;
-                float minY = topY;
-                float maxY = curBaseY;
+                float minY = Mathf.Min(topY, curBaseY);
+                float maxY = Mathf.Max(topY, curBaseY);
                 hoverRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            }
+            else if (PlaySettingsHoverContext.TryGetPlaySettingsBounds(out float cachedTopY, out float cachedBottomY))
+            {
+                float minY = Mathf.Min(cachedTopY, cachedBottomY);
+                float maxY = Mathf.Max(cachedTopY, cachedBottomY);
+                hoverRect = Rect.MinMaxRect(UI.screenWidth - HoverAreaWidth, minY, UI.screenWidth, maxY);
             }
             else
             {
-                float y = curBaseY - TimeControls.TimeButSize.y;
-                hoverRect = new Rect(UI.screenWidth - HoverAreaWidth, y, HoverAreaWidth, TimeControls.TimeButSize.y);
+                float hoverHeight = TimeControls.TimeButSize.y;
+                if (hoverHeight < FallbackMinHoverHeight)
+                {
+                    hoverHeight = FallbackMinHoverHeight;
+                }
+
+                float y = curBaseY - hoverHeight;
+                hoverRect = new Rect(UI.screenWidth - HoverAreaWidth, y, HoverAreaWidth, hoverHeight);
             }
             PlaySettingsHoverContext.Active = true;
             PlaySettingsHoverContext.Hovered = Mouse.IsOver(hoverRect);
         }
 
         [HarmonyPriority(Priority.Last)]
-        public static void Postfix(PlaySettingsHoverState __state)
+        public static void Postfix(ref float curBaseY, PlaySettingsHoverState __state)
         {
             if (!__state.Active)
             {
                 return;
+            }
+
+            float topY = Mathf.Min(curBaseY, __state.PrevBaseY);
+            float bottomY = Mathf.Max(curBaseY, __state.PrevBaseY);
+            if (bottomY - topY > 1f)
+            {
+                PlaySettingsHoverContext.SetPlaySettingsBounds(topY, bottomY);
             }
 
             PlaySettingsHoverContext.Active = false;
