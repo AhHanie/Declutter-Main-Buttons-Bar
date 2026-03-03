@@ -31,9 +31,11 @@ namespace Declutter_Main_Buttons_Bar
             this.worldView = worldView;
             draggable = true;
             doCloseX = true;
-            absorbInputAroundWindow = true;
+            absorbInputAroundWindow = false;
             closeOnAccept = false;
             closeOnCancel = false;
+            forcePause = false;
+            preventCameraMotion = false;
             optionalTitle = "DMMB.PlaySettingsMenuTitle".Translate();
         }
 

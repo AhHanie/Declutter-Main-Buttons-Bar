@@ -417,6 +417,17 @@ namespace Declutter_Main_Buttons_Bar
             bool value = toggleable;
             bool newValue = value;
             Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ToggleSize, paintable: false);
+            bool rowClicked = Widgets.ButtonInvisible(new Rect(rowRect.x, rowRect.y, toggleRect.xMin - rowRect.x, rowRect.height));
+            if (!rowClicked && rowRect.xMax > toggleRect.xMax)
+            {
+                rowClicked = Widgets.ButtonInvisible(new Rect(toggleRect.xMax, rowRect.y, rowRect.xMax - toggleRect.xMax, rowRect.height));
+            }
+
+            if (rowClicked)
+            {
+                newValue = !newValue;
+            }
+
             if (newValue != value)
             {
                 toggleable = newValue;
@@ -461,6 +472,17 @@ namespace Declutter_Main_Buttons_Bar
             bool value = toggleable;
             bool newValue = value;
             Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ToggleSize, paintable: false);
+            bool rowClicked = Widgets.ButtonInvisible(new Rect(rowRect.x, rowRect.y, toggleRect.xMin - rowRect.x, rowRect.height));
+            if (!rowClicked && rowRect.xMax > toggleRect.xMax)
+            {
+                rowClicked = Widgets.ButtonInvisible(new Rect(toggleRect.xMax, rowRect.y, rowRect.xMax - toggleRect.xMax, rowRect.height));
+            }
+
+            if (rowClicked)
+            {
+                newValue = !newValue;
+            }
+
             if (newValue != value)
             {
                 toggleable = newValue;
