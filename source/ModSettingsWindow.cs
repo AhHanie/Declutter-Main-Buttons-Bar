@@ -16,8 +16,8 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 320f
-                + (MainButtonsCache.AllButtonsInOrderNoDMMBButton.Count * 28f)
+            float viewHeight = 1000f
+                + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
 
@@ -26,16 +26,23 @@ namespace Declutter_Main_Buttons_Bar
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(viewRect);
 
+            bool oldAdvancedEditMode = ModSettings.useAdvancedEditMode;
+
             listing.CheckboxLabeled(
                 "DMMB.AdvancedEditMode".Translate(),
-                ref ModSettings.useFreeSizeMode,
+                ref ModSettings.useAdvancedEditMode,
                 "DMMB.AdvancedEditModeDesc".Translate());
-            if (ModSettings.useFreeSizeMode)
+            if (ModSettings.useAdvancedEditMode)
             {
                 ModSettings.useFixedWidthMode = false;
             }
 
-            if (ModSettings.useFreeSizeMode)
+            if (!oldAdvancedEditMode && ModSettings.useAdvancedEditMode)
+            {
+                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterChange();
+            }
+
+            if (ModSettings.useAdvancedEditMode)
             {
                 listing.Label("DMMB.SettingsSnapThresholdLabel".Translate(Mathf.RoundToInt(ModSettings.snapThreshold)));
                 ModSettings.snapThreshold = listing.Slider(ModSettings.snapThreshold, 0f, 30f);
@@ -44,7 +51,7 @@ namespace Declutter_Main_Buttons_Bar
             listing.CheckboxLabeled("DMMB.SettingsFixedWidthToggle".Translate(), ref ModSettings.useFixedWidthMode);
             if (ModSettings.useFixedWidthMode)
             {
-                ModSettings.useFreeSizeMode = false;
+                ModSettings.useAdvancedEditMode = false;
             }
 
             if (ModSettings.useFixedWidthMode)
@@ -90,6 +97,75 @@ namespace Declutter_Main_Buttons_Bar
                 "DMMB.SettingsDefaultNewButtonsHidden".Translate(),
                 ref ModSettings.defaultNewButtonsToHidden,
                 "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
+            bool oldExperimentalAtlasOptimization = ModSettings.experimentalMainButtonsAtlasOptimization;
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsExperimentalAtlasOptimization".Translate(),
+                ref ModSettings.experimentalMainButtonsAtlasOptimization,
+                "DMMB.SettingsExperimentalAtlasOptimizationDesc".Translate());
+            if (oldExperimentalAtlasOptimization != ModSettings.experimentalMainButtonsAtlasOptimization)
+            {
+                MainButtonsAtlasTextureCache.ClearCache();
+            }
+            listing.Gap(6f);
+            listing.Label("DMMB.SettingsWidgetsTitle".Translate());
+            listing.GapLine();
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetTime".Translate(),
+                ref ModSettings.showTimeWidget,
+                "DMMB.SettingsWidgetTimeDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetTimeIrl".Translate(),
+                ref ModSettings.showTimeIrlWidget,
+                "DMMB.SettingsWidgetTimeIrlDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetTimeSpeed".Translate(),
+                ref ModSettings.showTimeSpeedWidget,
+                "DMMB.SettingsWidgetTimeSpeedDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetWeather".Translate(),
+                ref ModSettings.showWeatherWidget,
+                "DMMB.SettingsWidgetWeatherDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetFpsTps".Translate(),
+                ref ModSettings.showFpsTpsWidget,
+                "DMMB.SettingsWidgetFpsTpsDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetBattery".Translate(),
+                ref ModSettings.showBatteryWidget,
+                "DMMB.SettingsWidgetBatteryDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaDateReadout".Translate(),
+                ref ModSettings.disableVanillaDateReadout,
+                "DMMB.SettingsWidgetDisableVanillaDateReadoutDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaTimeControls".Translate(),
+                ref ModSettings.disableVanillaTimeControls,
+                "DMMB.SettingsWidgetDisableVanillaTimeControlsDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaWeatherWidget".Translate(),
+                ref ModSettings.disableVanillaWeatherWidget,
+                "DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaConditionsWidget".Translate(),
+                ref ModSettings.disableVanillaConditionsWidget,
+                "DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaTemperatureWidget".Translate(),
+                ref ModSettings.disableVanillaTemperatureWidget,
+                "DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc".Translate());
+            listing.GapLine();
 
             listing.CheckboxLabeled(
                 "DMMB.SettingsGizmoScaleMapOnly".Translate(),
@@ -183,6 +259,32 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             ModSettings.blacklistedFromMenuDefs = newBlacklist;
+        }
+
+        private static void CheckboxLabeledWithNewBadge(Listing_Standard listing, string label, ref bool value, string tooltip = null)
+        {
+            const float badgeHeight = 32f;
+            Rect row = listing.GetRect(Mathf.Max(Text.LineHeight, badgeHeight + 2f));
+            Widgets.DrawHighlightIfMouseover(row);
+            Rect checkboxRect = row;
+            checkboxRect.xMax -= 44f;
+            Widgets.CheckboxLabeled(checkboxRect, label, ref value);
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(checkboxRect, tooltip);
+            }
+
+            Texture2D newIcon = DMMBTextures.New.Texture;
+
+            float iconHeight = badgeHeight;
+            float iconWidth = iconHeight * ((float)newIcon.width / Mathf.Max(1f, newIcon.height));
+            Rect iconRect = new Rect(
+                row.xMax - iconWidth - 2f,
+                row.y + (row.height - iconHeight) * 0.5f,
+                iconWidth,
+                iconHeight);
+            Widgets.DrawTextureFitted(iconRect, newIcon, 1f);
         }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <DMMB.LoadingLabel>Decluttering UI ...</DMMB.LoadingLabel>
   <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
   <DMMB.AdvancedEditMode>Advanced edit mode</DMMB.AdvancedEditMode>
@@ -18,6 +19,31 @@
   <DMMB.SettingsHidePlaySettingsEditModeButtonDesc>Only applies when searchable play settings menu is disabled.</DMMB.SettingsHidePlaySettingsEditModeButtonDesc>
   <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>
   <DMMB.SettingsDefaultNewButtonsHiddenDesc>When enabled, newly added main buttons (from new or updated mods) are automatically hidden from the bottom bar.</DMMB.SettingsDefaultNewButtonsHiddenDesc>
+  <DMMB.SettingsWidgetsTitle>Widgets</DMMB.SettingsWidgetsTitle>
+  <DMMB.SettingsWidgetTime>Show in-game time/date widget</DMMB.SettingsWidgetTime>
+  <DMMB.SettingsWidgetTimeDesc>Shows the vanilla in-game date and time readout as a bar widget.</DMMB.SettingsWidgetTimeDesc>
+  <DMMB.SettingsWidgetTimeIrl>Show IRL time widget</DMMB.SettingsWidgetTimeIrl>
+  <DMMB.SettingsWidgetTimeIrlDesc>Shows your real local clock time in the bar.</DMMB.SettingsWidgetTimeIrlDesc>
+  <DMMB.SettingsWidgetTimeSpeed>Show time speed widget</DMMB.SettingsWidgetTimeSpeed>
+  <DMMB.SettingsWidgetTimeSpeedDesc>Shows pause/speed controls in the bar.</DMMB.SettingsWidgetTimeSpeedDesc>
+  <DMMB.SettingsWidgetWeather>Show weather widget</DMMB.SettingsWidgetWeather>
+  <DMMB.SettingsWidgetWeatherDesc>Shows current map weather and outdoor temperature in the bar.</DMMB.SettingsWidgetWeatherDesc>
+  <DMMB.SettingsWidgetFpsTps>Show FPS/TPS widget</DMMB.SettingsWidgetFpsTps>
+  <DMMB.SettingsWidgetFpsTpsDesc>Shows current FPS and TPS in the bar.</DMMB.SettingsWidgetFpsTpsDesc>
+  <DMMB.SettingsWidgetBattery>Show battery widget</DMMB.SettingsWidgetBattery>
+  <DMMB.SettingsWidgetBatteryDesc>Shows laptop battery charge and charging status.</DMMB.SettingsWidgetBatteryDesc>
+  <DMMB.SettingsWidgetDisableVanillaDateReadout>Disable vanilla date readout</DMMB.SettingsWidgetDisableVanillaDateReadout>
+  <DMMB.SettingsWidgetDisableVanillaDateReadoutDesc>Hides RimWorld's default date/time UI on the right side so only widget-based date/time is shown.</DMMB.SettingsWidgetDisableVanillaDateReadoutDesc>
+  <DMMB.SettingsWidgetDisableVanillaTimeControls>Disable vanilla time controls</DMMB.SettingsWidgetDisableVanillaTimeControls>
+  <DMMB.SettingsWidgetDisableVanillaTimeControlsDesc>Hides RimWorld's default pause/speed controls so only widget-based controls are shown.</DMMB.SettingsWidgetDisableVanillaTimeControlsDesc>
+  <DMMB.SettingsWidgetDisableVanillaWeatherWidget>Disable vanilla weather widget</DMMB.SettingsWidgetDisableVanillaWeatherWidget>
+  <DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>Hides RimWorld's default weather readout on the right side so only widget-based weather is shown.</DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>
+  <DMMB.SettingsWidgetDisableVanillaConditionsWidget>Disable vanilla conditions widget</DMMB.SettingsWidgetDisableVanillaConditionsWidget>
+  <DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>Hides the game condition readout list on the right side.</DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>
+  <DMMB.SettingsWidgetDisableVanillaTemperatureWidget>Disable vanilla temperature widget</DMMB.SettingsWidgetDisableVanillaTemperatureWidget>
+  <DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>Hides the vanilla outdoors/indoors temperature text by returning an empty string.</DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>
+  <DMMB.SettingsExperimentalAtlasOptimization>Experimental Optimization: cache main button atlas drawing. Improves render performance of the bottom bar buttons.</DMMB.SettingsExperimentalAtlasOptimization>
+  <DMMB.SettingsExperimentalAtlasOptimizationDesc>Only applies while this mod draws the main button bar. Caches stitched atlas textures to reduce repeated per-slice draw calls.</DMMB.SettingsExperimentalAtlasOptimizationDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
   <DMMB.SettingsGizmoScaleMapOnly>Scale Map Gizmos</DMMB.SettingsGizmoScaleMapOnly>
   <DMMB.SettingsGizmoScaleMapOnlyDesc>These controls only scale map gizmos which are rendered when you select either a colonist/building on the map.</DMMB.SettingsGizmoScaleMapOnlyDesc>
@@ -33,6 +59,15 @@
   <DMMB.PlaySettingsMenuCollecting>Collecting play settings...</DMMB.PlaySettingsMenuCollecting>
   <DMMB.PlaySettingsMenuUnknown>Unknown</DMMB.PlaySettingsMenuUnknown>
   <DMMB.DropdownEditButton>Edit dropdown</DMMB.DropdownEditButton>
+  <DMMB.WidgetTimeIrlTooltip>Current real time</DMMB.WidgetTimeIrlTooltip>
+  <DMMB.WidgetWeatherTooltip>Current map weather and outdoor temperature</DMMB.WidgetWeatherTooltip>
+  <DMMB.WidgetFpsTpsTooltip>Current FPS and TPS</DMMB.WidgetFpsTpsTooltip>
+  <DMMB.WidgetBatteryTooltip>Laptop battery status</DMMB.WidgetBatteryTooltip>
+  <DMMB.WidgetBatteryStateNoBattery>No battery detected</DMMB.WidgetBatteryStateNoBattery>
+  <DMMB.WidgetBatteryStateCharging>Charging</DMMB.WidgetBatteryStateCharging>
+  <DMMB.WidgetBatteryStateFull>Full</DMMB.WidgetBatteryStateFull>
+  <DMMB.WidgetBatteryStateDischarging>Discharging</DMMB.WidgetBatteryStateDischarging>
+  <DMMB.WidgetBatteryStateNotCharging>Not charging</DMMB.WidgetBatteryStateNotCharging>
   <DMMB.ExitEditMode>Exit UI edit mode</DMMB.ExitEditMode>
   <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
   <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>

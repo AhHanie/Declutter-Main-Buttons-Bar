@@ -24,6 +24,11 @@ namespace Declutter_Main_Buttons_Bar
         private static float resizeStartWidth;
         private static float resizeStartMouseX;
         private static List<MainButtonDef> currentDragOrder = new List<MainButtonDef>();
+        private static string draggingWidgetId;
+        private static float widgetDragOffsetX;
+        private static string resizingWidgetId;
+        private static float widgetResizeStartWidth;
+        private static float widgetResizeStartMouseX;
 
         private static bool gizmoDragActive;
         private static Vector2 gizmoDragStartMouse;
@@ -37,6 +42,8 @@ namespace Declutter_Main_Buttons_Bar
         private static int lastVisibleCheckFrame = -1;
         private static readonly Dictionary<MainButtonDef, float> scratchFreeSizeWidths = new Dictionary<MainButtonDef, float>();
         private static readonly Dictionary<MainButtonDef, float> scratchFreeSizeXPositions = new Dictionary<MainButtonDef, float>();
+        private static readonly Dictionary<string, float> scratchWidgetWidths = new Dictionary<string, float>();
+        private static readonly Dictionary<string, float> scratchWidgetXPositions = new Dictionary<string, float>();
 
         public static void ClearDropdownState()
         {

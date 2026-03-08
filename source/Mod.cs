@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Declutter_Main_Buttons_Bar.Compat;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Declutter_Main_Buttons_Bar
 
         public Mod(ModContentPack content) : base(content)
         {
-            LongEventHandler.QueueLongEvent(Init, "Declutter Main Buttons Bar Init", doAsynchronously: true, null);
+            LongEventHandler.QueueLongEvent(Init, "DMMB.LoadingLabel", doAsynchronously: true, null);
         }
 
         public void Init()
@@ -23,9 +24,18 @@ namespace Declutter_Main_Buttons_Bar
             MainButtonsCache.Rebuild();
             Settings = GetSettings<ModSettings>();
             new Harmony("sk.dmmb").PatchAll();
-            if (ModSettings.DetectAndHideNewButtonsFromBarIfNeeded())
+            bool settingsChanged = ModSettings.DetectAndHideNewButtonsFromBarIfNeeded();
+            if (ModSettings.EnsureCustomOrderCoverage())
+            {
+                settingsChanged = true;
+            }
+            if (settingsChanged)
             {
                 Settings.Write();
+            }
+            if (Compat_SmartSpeed.IsEnabled())
+            {
+                MainButtonsRoot_DoButtons_Patch.SetSmartSpeedMode();
             }
         }
 

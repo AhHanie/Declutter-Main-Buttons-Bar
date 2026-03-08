@@ -74,8 +74,10 @@
     <Publicize Include="Assembly-CSharp:RimWorld.PlaySettings.DoPlaySettingsGlobalControls" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
-    <Compile Include="Command_GizmoSize_Patch.cs" />
+    <Compile Include="Compat\Compat_SmartSpeed.cs" />
+    <Compile Include="Patches\Command_GizmoSize_Patch.cs" />
+    <Compile Include="Patches\Vanilla_Widgets_Patch.cs" />
+    <Compile Include="Patches\GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
     <Compile Include="Compat\Compat_BetterTrees_PlaySettingsHUD_Patch.cs" />
     <Compile Include="Compat\Compat_OmniTab_RightAlign.cs" />
     <Compile Include="DMMBTextures.cs" />
@@ -92,16 +94,26 @@
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Rects.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Render.cs" />
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.State.cs" />
-    <Compile Include="MainButtonsRoot_DoButtons_Patch.cs" />
-    <Compile Include="MainTabWindow_RightAlign_Patch.cs" />
-    <Compile Include="MapControlsTable_Patch.cs" />
+    <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Widgets.cs" />
+    <Compile Include="MainButtonsBar\MainBarWidgetIds.cs" />
+    <Compile Include="Patches\MainButtonsRoot_DoButtons_Patch.cs" />
+    <Compile Include="Patches\MainTabWindow_RightAlign_Patch.cs" />
+    <Compile Include="Patches\MapControlsTable_Patch.cs" />
     <Compile Include="MapControlsMenuWindow.cs" />
-    <Compile Include="MapGizmoUtility_MapUIOnGUI_Patch.cs" />
+    <Compile Include="Patches\MapGizmoUtility_MapUIOnGUI_Patch.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="ModSettings.cs" />
     <Compile Include="ModSettingsWindow.cs" />
-    <Compile Include="PlaySettings_DoControls_Patch.cs" />
+    <Compile Include="Patches\PlaySettings_DoControls_Patch.cs" />
+    <Compile Include="Patches\Widgets_DrawAtlas_Optimization_Patch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Widgets\BatteryWidgetRenderer.cs" />
+    <Compile Include="Widgets\FpsTpsWidgetRenderer.cs" />
+    <Compile Include="Widgets\TimeWidgetRenderer.cs" />
+    <Compile Include="Widgets\TimeIrlWidgetRenderer.cs" />
+    <Compile Include="Widgets\TimeSpeedWidgetRenderer.cs" />
+    <Compile Include="Widgets\WeatherWidgetRenderer.cs" />
+    <Compile Include="Widgets\WidgetRenderUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

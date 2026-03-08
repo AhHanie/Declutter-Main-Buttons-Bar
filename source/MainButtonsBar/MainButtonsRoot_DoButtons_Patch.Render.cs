@@ -65,6 +65,8 @@ namespace Declutter_Main_Buttons_Bar
             List<MainButtonDef> defs,
             Dictionary<MainButtonDef, float> widths,
             Dictionary<MainButtonDef, float> xPositions,
+            Dictionary<string, float> widgetWidths,
+            Dictionary<string, float> widgetXPositions,
             float availableWidth,
             bool allowDropdown,
             bool allowReorder,
@@ -83,7 +85,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             List<Rect> baseRects = BuildRectsWithPositions(baseDefs, widths, xPositions);
-            HandleEditInputWithPositions(baseDefs, widths, xPositions, baseRects, availableWidth, allowReorder);
+            HandleEditInputWithPositions(baseDefs, widths, xPositions, widgetWidths, widgetXPositions, baseRects, availableWidth, allowReorder);
 
             List<MainButtonDef> drawOrder = GetDragOrderWithPositions(baseDefs, widths, xPositions, baseRects, availableWidth);
             currentDragOrder = drawOrder;
@@ -92,7 +94,7 @@ namespace Declutter_Main_Buttons_Bar
 
             if (draggingDef != null && ModSettings.editDropdownsMode)
             {
-                CalculateDragPositions(drawOrder, widths, drawPositions, availableWidth);
+                CalculateDragPositions(drawOrder, widths, drawPositions, widgetWidths, widgetXPositions, availableWidth);
             }
 
             List<Rect> drawRects = BuildRectsWithPositions(drawOrder, widths, drawPositions);

@@ -20,7 +20,7 @@ namespace Declutter_Main_Buttons_Bar
         public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
         public static float snapThreshold = 8f;
         public static bool editDropdownsMode = false;
-        public static bool useFreeSizeMode = false;
+        public static bool useAdvancedEditMode = false;
         public static bool useFixedWidthMode = false;
         public static float fixedButtonWidth = 120f;
         public static bool centerFixedWidthButtons = false;
@@ -30,6 +30,20 @@ namespace Declutter_Main_Buttons_Bar
         public static bool revealPlaySettingsOnHover = false;
         public static bool hideEditModePlaySettingsButton = false;
         public static bool defaultNewButtonsToHidden = false;
+        public static bool showTimeWidget = false;
+        public static bool showTimeIrlWidget = false;
+        public static bool showTimeSpeedWidget = false;
+        public static bool showWeatherWidget = false;
+        public static bool showFpsTpsWidget = false;
+        public static bool showBatteryWidget = false;
+        public static bool disableVanillaDateReadout = false;
+        public static bool disableVanillaTimeControls = false;
+        public static bool disableVanillaWeatherWidget = false;
+        public static bool disableVanillaConditionsWidget = false;
+        public static bool disableVanillaTemperatureWidget = false;
+        public static bool experimentalMainButtonsAtlasOptimization = false;
+        public static Dictionary<string, float> widgetWidths = new Dictionary<string, float>();
+        public static Dictionary<string, float> widgetXPositions = new Dictionary<string, float>();
         public static List<string> knownMainButtonDefNames = new List<string>();
         public static float gizmoDrawerOffsetX = 0f;
         public static float gizmoDrawerOffsetY = 0f;
@@ -41,6 +55,9 @@ namespace Declutter_Main_Buttons_Bar
         private static HashSet<MainButtonDef> hiddenFromBarSet;
         private static Dictionary<MainButtonDef, List<MainButtonDef>> dropdownEntriesCache;
         private static bool dropdownCacheDirty = true;
+        private static readonly List<string> enabledWidgetIdsCache = new List<string>();
+        private static bool enabledWidgetCacheInitialized;
+        private static int enabledWidgetCacheFlags = -1;
 
         public override void ExposeData()
         {
@@ -86,7 +103,7 @@ namespace Declutter_Main_Buttons_Bar
                 freeSizeXPositions = new Dictionary<MainButtonDef, float>();
             }
 
-            Scribe_Values.Look(ref useFreeSizeMode, "useFreeSizeMode", false);
+            Scribe_Values.Look(ref useAdvancedEditMode, "useFreeSizeMode", false);
             Scribe_Values.Look(ref useFixedWidthMode, "useFixedWidthMode", false);
             Scribe_Values.Look(ref fixedButtonWidth, "fixedButtonWidth", 120f);
             Scribe_Values.Look(ref snapThreshold, "snapThreshold", 8f);
@@ -97,6 +114,28 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
             Scribe_Values.Look(ref hideEditModePlaySettingsButton, "hideEditModePlaySettingsButton", false);
             Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
+            Scribe_Values.Look(ref showTimeWidget, "showTimeWidget", false);
+            Scribe_Values.Look(ref showTimeIrlWidget, "showTimeIrlWidget", false);
+            Scribe_Values.Look(ref showTimeSpeedWidget, "showTimeSpeedWidget", false);
+            Scribe_Values.Look(ref showWeatherWidget, "showWeatherWidget", false);
+            Scribe_Values.Look(ref showFpsTpsWidget, "showFpsTpsWidget", false);
+            Scribe_Values.Look(ref showBatteryWidget, "showBatteryWidget", false);
+            Scribe_Values.Look(ref disableVanillaDateReadout, "disableVanillaDateReadout", false);
+            Scribe_Values.Look(ref disableVanillaTimeControls, "disableVanillaTimeControls", false);
+            Scribe_Values.Look(ref disableVanillaWeatherWidget, "disableVanillaWeatherWidget", false);
+            Scribe_Values.Look(ref disableVanillaConditionsWidget, "disableVanillaConditionsWidget", false);
+            Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
+            Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", false);
+            Scribe_Collections.Look(ref widgetWidths, "widgetWidths", LookMode.Value, LookMode.Value);
+            if (widgetWidths == null)
+            {
+                widgetWidths = new Dictionary<string, float>();
+            }
+            Scribe_Collections.Look(ref widgetXPositions, "widgetXPositions", LookMode.Value, LookMode.Value);
+            if (widgetXPositions == null)
+            {
+                widgetXPositions = new Dictionary<string, float>();
+            }
             Scribe_Collections.Look(ref knownMainButtonDefNames, "knownMainButtonDefNames", LookMode.Value);
             Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
             Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
@@ -122,6 +161,27 @@ namespace Declutter_Main_Buttons_Bar
                         .ToList();
                 }
 
+                hiddenFromBarDefs = hiddenFromBarDefs.Where(defName => defName != null)
+                        .ToList();
+                blacklistedFromMenuDefs = blacklistedFromMenuDefs.Where(defName => defName != null)
+                        .ToList();
+                favoriteDefs = favoriteDefs.Where(defName => defName != null)
+                        .ToList();
+                customOrderDefs = customOrderDefs.Where(defName => defName != null)
+                        .ToList();
+                freeSizeWidths = freeSizeWidths
+                    .Where(kvp => kvp.Key != null)
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                freeSizeXPositions = freeSizeXPositions
+                    .Where(kvp => kvp.Key != null)
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                widgetWidths = widgetWidths
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Key) && MainBarWidgetIds.IsKnown(kvp.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                widgetXPositions = widgetXPositions
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Key) && MainBarWidgetIds.IsKnown(kvp.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
                 if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
                 {
                     revealPlaySettingsOnHover = false;
@@ -129,6 +189,7 @@ namespace Declutter_Main_Buttons_Bar
 
                 NormalizeDropdownConfigs();
                 RebuildCaches();
+                enabledWidgetCacheInitialized = false;
             }
         }
 
@@ -139,6 +200,57 @@ namespace Declutter_Main_Buttons_Bar
 
             // Mark dropdown cache as dirty so it rebuilds on next access
             dropdownCacheDirty = true;
+        }
+
+        public static bool EnsureCustomOrderCoverage()
+        {
+            if (customOrderDefs == null)
+            {
+                customOrderDefs = new List<MainButtonDef>();
+            }
+
+            List<MainButtonDef> allButtons = MainButtonsCache.AllButtonsInOrder;
+            List<MainButtonDef> normalized = new List<MainButtonDef>(allButtons.Count);
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+
+            for (int i = 0; i < customOrderDefs.Count; i++)
+            {
+                MainButtonDef def = customOrderDefs[i];
+                if (seen.Add(def))
+                {
+                    normalized.Add(def);
+                }
+            }
+
+            for (int i = 0; i < allButtons.Count; i++)
+            {
+                MainButtonDef def = allButtons[i];
+                if (seen.Add(def))
+                {
+                    normalized.Add(def);
+                }
+            }
+
+            bool changed = normalized.Count != customOrderDefs.Count;
+            if (!changed)
+            {
+                for (int i = 0; i < normalized.Count; i++)
+                {
+                    if (normalized[i] != customOrderDefs[i])
+                    {
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+
+            if (changed)
+            {
+                customOrderDefs = normalized;
+                MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+            }
+
+            return changed;
         }
 
         private static void RebuildDropdownCache()
@@ -198,11 +310,6 @@ namespace Declutter_Main_Buttons_Bar
 
             dropdownCacheDirty = true;
             MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
-
-            if (useFreeSizeMode && !hidden)
-            {
-                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterVisibilityChange();
-            }
         }
 
         public static bool IsFavorite(MainButtonDef def)
@@ -251,11 +358,11 @@ namespace Declutter_Main_Buttons_Bar
             favoriteDefs.Clear();
             blacklistedFromMenuDefs.Clear();
             dropdownConfigs.Clear();
-            customOrderDefs.Clear();
+            customOrderDefs = new List<MainButtonDef>(MainButtonsCache.AllButtonsInOrder);
             freeSizeWidths.Clear();
             freeSizeXPositions.Clear();
             editDropdownsMode = false;
-            useFreeSizeMode = false;
+            useAdvancedEditMode = false;
             useFixedWidthMode = false;
             fixedButtonWidth = 120f;
             snapThreshold = 8f;
@@ -266,6 +373,24 @@ namespace Declutter_Main_Buttons_Bar
             revealPlaySettingsOnHover = false;
             hideEditModePlaySettingsButton = false;
             defaultNewButtonsToHidden = false;
+            showTimeWidget = false;
+            showTimeIrlWidget = false;
+            showTimeSpeedWidget = false;
+            showWeatherWidget = false;
+            showFpsTpsWidget = false;
+            showBatteryWidget = false;
+            disableVanillaDateReadout = false;
+            disableVanillaTimeControls = false;
+            disableVanillaWeatherWidget = false;
+            disableVanillaConditionsWidget = false;
+            disableVanillaTemperatureWidget = false;
+            experimentalMainButtonsAtlasOptimization = false;
+            MainButtonsAtlasTextureCache.ClearCache();
+            widgetWidths.Clear();
+            widgetXPositions.Clear();
+            enabledWidgetIdsCache.Clear();
+            enabledWidgetCacheInitialized = false;
+            enabledWidgetCacheFlags = -1;
             knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
             gizmoDrawerOffsetX = 0f;
             gizmoDrawerOffsetY = 0f;
@@ -274,6 +399,7 @@ namespace Declutter_Main_Buttons_Bar
             gizmoSpacingY = 14f;
             gizmoScaleMapOnly = false;
             RebuildCaches();
+            EnsureCustomOrderCoverage();
         }
 
         public static bool DetectAndHideNewButtonsFromBarIfNeeded()
@@ -286,22 +412,21 @@ namespace Declutter_Main_Buttons_Bar
             HashSet<string> knownDefs = new HashSet<string>(knownMainButtonDefNames);
             bool settingsChanged = false;
 
-            if (defaultNewButtonsToHidden)
+           
+            for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
             {
-                for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
+                MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
+                if (knownDefs.Contains(def.defName))
                 {
-                    MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
-                    if (knownDefs.Contains(def.defName))
-                    {
-                        continue;
-                    }
-
-                    if (!IsHiddenFromBar(def))
-                    {
-                        SetHiddenFromBar(def, hidden: true);
-                        settingsChanged = true;
-                    }
+                    continue;
                 }
+
+                if (defaultNewButtonsToHidden && !IsHiddenFromBar(def))
+                {
+                    SetHiddenFromBar(def, hidden: true);
+                }
+
+                settingsChanged = true;
             }
 
             if (settingsChanged)
@@ -310,6 +435,73 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             return settingsChanged;
+        }
+
+        public static bool IsWidgetEnabled(string widgetId)
+        {
+            if (widgetId == MainBarWidgetIds.Time)
+            {
+                return showTimeWidget;
+            }
+            if (widgetId == MainBarWidgetIds.TimeIrl)
+            {
+                return showTimeIrlWidget;
+            }
+            if (widgetId == MainBarWidgetIds.TimeSpeed)
+            {
+                return showTimeSpeedWidget;
+            }
+            if (widgetId == MainBarWidgetIds.Weather)
+            {
+                return showWeatherWidget;
+            }
+            if (widgetId == MainBarWidgetIds.FpsTps)
+            {
+                return showFpsTpsWidget;
+            }
+            if (widgetId == MainBarWidgetIds.Battery)
+            {
+                return showBatteryWidget;
+            }
+
+            return false;
+        }
+
+        public static List<string> GetEnabledWidgetIds()
+        {
+            int currentFlags = BuildEnabledWidgetFlags();
+            if (!enabledWidgetCacheInitialized || enabledWidgetCacheFlags != currentFlags)
+            {
+                RebuildEnabledWidgetIdsCache();
+                enabledWidgetCacheFlags = currentFlags;
+                enabledWidgetCacheInitialized = true;
+            }
+
+            return enabledWidgetIdsCache;
+        }
+
+        private static int BuildEnabledWidgetFlags()
+        {
+            int flags = 0;
+            if (showTimeWidget) flags |= 1 << 0;
+            if (showTimeIrlWidget) flags |= 1 << 1;
+            if (showTimeSpeedWidget) flags |= 1 << 2;
+            if (showWeatherWidget) flags |= 1 << 3;
+            if (showFpsTpsWidget) flags |= 1 << 4;
+            if (showBatteryWidget) flags |= 1 << 5;
+            return flags;
+        }
+
+        private static void RebuildEnabledWidgetIdsCache()
+        {
+            enabledWidgetIdsCache.Clear();
+
+            if (showTimeWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Time);
+            if (showTimeIrlWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.TimeIrl);
+            if (showTimeSpeedWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.TimeSpeed);
+            if (showWeatherWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Weather);
+            if (showFpsTpsWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.FpsTps);
+            if (showBatteryWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Battery);
         }
 
         public static bool HasDropdown(MainButtonDef def)

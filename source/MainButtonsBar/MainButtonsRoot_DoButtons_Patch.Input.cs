@@ -103,6 +103,8 @@ namespace Declutter_Main_Buttons_Bar
             List<MainButtonDef> defs,
             Dictionary<MainButtonDef, float> widths,
             Dictionary<MainButtonDef, float> xPositions,
+            Dictionary<string, float> widgetWidths,
+            Dictionary<string, float> widgetXPositions,
             List<Rect> rects,
             float availableWidth,
             bool allowReorder)
@@ -169,6 +171,8 @@ namespace Declutter_Main_Buttons_Bar
                             finalDragX = nextX - dragWidth;
                         }
                     }
+
+                    finalDragX = SnapButtonToWidgets(finalDragX, dragWidth, widgetWidths, widgetXPositions, availableWidth);
 
                     Dictionary<MainButtonDef, float> testPositions = new Dictionary<MainButtonDef, float>(xPositions);
                     testPositions[draggingDef] = finalDragX;
@@ -330,6 +334,8 @@ namespace Declutter_Main_Buttons_Bar
             List<MainButtonDef> orderedDefs,
             Dictionary<MainButtonDef, float> widths,
             Dictionary<MainButtonDef, float> positions,
+            Dictionary<string, float> widgetWidths,
+            Dictionary<string, float> widgetXPositions,
             float availableWidth)
         {
             if (draggingDef == null)
@@ -369,7 +375,54 @@ namespace Declutter_Main_Buttons_Bar
                 }
             }
 
+            dragX = SnapButtonToWidgets(dragX, dragWidth, widgetWidths, widgetXPositions, availableWidth);
             positions[draggingDef] = dragX;
+        }
+
+        private static float SnapButtonToWidgets(
+            float buttonX,
+            float buttonWidth,
+            Dictionary<string, float> widgetWidths,
+            Dictionary<string, float> widgetXPositions,
+            float availableWidth)
+        {
+            if (widgetXPositions == null || widgetWidths == null || widgetXPositions.Count == 0)
+            {
+                return buttonX;
+            }
+
+            float threshold = ModSettings.snapThreshold;
+            float bestGap = threshold + 0.001f;
+            float bestX = buttonX;
+
+            foreach (KeyValuePair<string, float> kvp in widgetXPositions)
+            {
+                string widgetId = kvp.Key;
+                if (!widgetWidths.TryGetValue(widgetId, out float widgetWidth))
+                {
+                    continue;
+                }
+
+                float widgetLeft = kvp.Value;
+                float widgetRight = widgetLeft + widgetWidth;
+
+                float gapToWidgetRight = buttonX - widgetRight;
+                if (gapToWidgetRight >= 0f && gapToWidgetRight <= threshold && gapToWidgetRight < bestGap)
+                {
+                    bestGap = gapToWidgetRight;
+                    bestX = widgetRight;
+                }
+
+                float gapToWidgetLeft = widgetLeft - (buttonX + buttonWidth);
+                if (gapToWidgetLeft >= 0f && gapToWidgetLeft <= threshold && gapToWidgetLeft < bestGap)
+                {
+                    bestGap = gapToWidgetLeft;
+                    bestX = widgetLeft - buttonWidth;
+                }
+            }
+
+            float maxX = Mathf.Max(0f, availableWidth - buttonWidth);
+            return Mathf.Clamp(bestX, 0f, maxX);
         }
 
         private static List<MainButtonDef> GetDragOrderWithPositions(
@@ -462,10 +515,11 @@ namespace Declutter_Main_Buttons_Bar
             List<MainButtonDef> defs,
             Dictionary<MainButtonDef, float> widths)
         {
-            if (!ModSettings.useFreeSizeMode)
+            if (!ModSettings.useAdvancedEditMode)
             {
-                ModSettings.useFreeSizeMode = true;
+                ModSettings.useAdvancedEditMode = true;
                 ModSettings.useFixedWidthMode = false;
+                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterChange();
             }
 
             for (int i = 0; i < defs.Count; i++)
@@ -484,7 +538,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < visibleOrder.Count; i++)
             {
                 MainButtonDef def = visibleOrder[i];
-                if (def != null && !newOrder.Contains(def))
+                if (!newOrder.Contains(def))
                 {
                     newOrder.Add(def);
                 }
@@ -493,7 +547,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < ModSettings.customOrderDefs.Count; i++)
             {
                 MainButtonDef def = ModSettings.customOrderDefs[i];
-                if (def != null && !newOrder.Contains(def))
+                if (!newOrder.Contains(def))
                 {
                     newOrder.Add(def);
                 }
@@ -502,7 +556,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < allButtons.Count; i++)
             {
                 MainButtonDef def = allButtons[i];
-                if (def != null && !newOrder.Contains(def))
+                if (!newOrder.Contains(def))
                 {
                     newOrder.Add(def);
                 }

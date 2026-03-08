@@ -9,8 +9,10 @@ namespace Declutter_Main_Buttons_Bar
     {
         public static bool Prefix(MainButtonsRoot __instance)
         {
+            MainButtonsDrawAtlasOptimizationScope.Begin();
             List<MainButtonDef> allButtons = MainButtonsCache.AllButtonsInOrder;
             DrawButtons(allButtons);
+            MainButtonsDrawAtlasOptimizationScope.End();
             return false;
         }
     }
