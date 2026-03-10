@@ -107,6 +107,16 @@ namespace Declutter_Main_Buttons_Bar
             {
                 MainButtonsAtlasTextureCache.ClearCache();
             }
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaResourceReadout".Translate(),
+                ref ModSettings.disableVanillaResourceReadout,
+                "DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetDisableVanillaMouseoverReadout".Translate(),
+                ref ModSettings.disableVanillaMouseoverReadout,
+                "DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc".Translate());
             listing.Gap(6f);
             listing.Label("DMMB.SettingsWidgetsTitle".Translate());
             listing.GapLine();

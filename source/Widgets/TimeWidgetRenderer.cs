@@ -10,11 +10,19 @@ namespace Declutter_Main_Buttons_Bar
     public static class TimeWidgetRenderer
     {
         private const float InnerPadding = 6f;
+        private const float IconGap = 4f;
+        private const float IconSize = 20f;
         private const float MinPreferredWidth = 160f;
         private const float PreferredWidthCacheIntervalSeconds = 2f;
+        private const float DateTextCacheIntervalSeconds = 2f;
+        private const float DateTextLocationEpsilonSqr = 0.001f;
 
         private static float cachedPreferredWidth = 220f;
         private static float nextPreferredWidthRefreshRealtime = -1f;
+        private static string cachedDateText = string.Empty;
+        private static float nextDateTextRefreshRealtime = -1f;
+        private static Vector2 cachedDateLongLat;
+        private static bool hasCachedDateLongLat;
 
         public static float GetPreferredWidth()
         {
@@ -37,12 +45,12 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             int ticksAbs = Find.TickManager.TicksAbs;
-            string dateText = GenDate.DateReadoutStringAt(ticksAbs, longLat);
+            string dateText = GetDateText(ticksAbs, longLat);
             string timeText = GetTimeText(ticksAbs, longLat.x);
 
             GameFont oldFont = Text.Font;
             Text.Font = GameFont.Small;
-            float width = InnerPadding * 2f + Text.CalcSize(dateText).x + 10f + Text.CalcSize(timeText).x;
+            float width = InnerPadding * 2f + IconSize + IconGap + Text.CalcSize(dateText).x + 10f + Text.CalcSize(timeText).x;
             Text.Font = oldFont;
 
             return Mathf.Max(MinPreferredWidth, width);
@@ -58,12 +66,17 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             int ticksAbs = Find.TickManager.TicksAbs;
-            string dateText = GenDate.DateReadoutStringAt(ticksAbs, longLat);
+            string dateText = GetDateText(ticksAbs, longLat);
             string timeText = GetTimeText(ticksAbs, longLat.x);
             Season season = GenDate.Season(ticksAbs, longLat);
 
             Rect inner = rect.ContractedBy(InnerPadding);
+            float iconSize = Mathf.Min(IconSize, inner.height);
+            Rect iconRect = new Rect(inner.x, inner.center.y - iconSize * 0.5f, iconSize, iconSize);
+            Widgets.DrawTextureFitted(iconRect, DMMBTextures.GetSeasonIcon(season), 1f);
+
             Rect textRect = inner;
+            textRect.xMin = iconRect.xMax + IconGap;
             if (textRect.width <= 8f)
             {
                 return;
@@ -140,6 +153,28 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             return hour.ToString("00") + ":" + minute.ToString("00");
+        }
+
+        private static string GetDateText(int ticksAbs, Vector2 longLat)
+        {
+            bool locationChanged = !hasCachedDateLongLat
+                || (cachedDateLongLat - longLat).sqrMagnitude > DateTextLocationEpsilonSqr;
+            float now = Time.realtimeSinceStartup;
+            bool cacheValid = !locationChanged
+                && nextDateTextRefreshRealtime >= 0f
+                && now < nextDateTextRefreshRealtime
+                && !string.IsNullOrEmpty(cachedDateText);
+
+            if (cacheValid)
+            {
+                return cachedDateText;
+            }
+
+            cachedDateText = GenDate.DateReadoutStringAt(ticksAbs, longLat);
+            cachedDateLongLat = longLat;
+            hasCachedDateLongLat = true;
+            nextDateTextRefreshRealtime = now + DateTextCacheIntervalSeconds;
+            return cachedDateText;
         }
 
         private static TipSignal BuildDateTooltip(Vector2 longLat, Season season)

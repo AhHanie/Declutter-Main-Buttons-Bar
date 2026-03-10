@@ -1,6 +1,7 @@
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
+using Verse;
 
 namespace Declutter_Main_Buttons_Bar
 {
@@ -43,6 +44,24 @@ namespace Declutter_Main_Buttons_Bar
         public static bool Prefix()
         {
             return !ModSettings.disableVanillaConditionsWidget;
+        }
+    }
+
+    [HarmonyPatch(typeof(ResourceReadout), nameof(ResourceReadout.ResourceReadoutOnGUI))]
+    public static class ResourceReadout_ResourceReadoutOnGUI_DisableVanillaPatch
+    {
+        public static bool Prefix()
+        {
+            return !ModSettings.disableVanillaResourceReadout;
+        }
+    }
+
+    [HarmonyPatch(typeof(MouseoverReadout), nameof(MouseoverReadout.MouseoverReadoutOnGUI))]
+    public static class MouseoverReadout_MouseoverReadoutOnGUI_DisableVanillaPatch
+    {
+        public static bool Prefix()
+        {
+            return !ModSettings.disableVanillaMouseoverReadout;
         }
     }
 

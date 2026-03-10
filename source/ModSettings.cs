@@ -40,6 +40,8 @@ namespace Declutter_Main_Buttons_Bar
         public static bool disableVanillaTimeControls = false;
         public static bool disableVanillaWeatherWidget = false;
         public static bool disableVanillaConditionsWidget = false;
+        public static bool disableVanillaResourceReadout = false;
+        public static bool disableVanillaMouseoverReadout = false;
         public static bool disableVanillaTemperatureWidget = false;
         public static bool experimentalMainButtonsAtlasOptimization = false;
         public static Dictionary<string, float> widgetWidths = new Dictionary<string, float>();
@@ -124,6 +126,8 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref disableVanillaTimeControls, "disableVanillaTimeControls", false);
             Scribe_Values.Look(ref disableVanillaWeatherWidget, "disableVanillaWeatherWidget", false);
             Scribe_Values.Look(ref disableVanillaConditionsWidget, "disableVanillaConditionsWidget", false);
+            Scribe_Values.Look(ref disableVanillaResourceReadout, "disableVanillaResourceReadout", false);
+            Scribe_Values.Look(ref disableVanillaMouseoverReadout, "disableVanillaMouseoverReadout", false);
             Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
             Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", false);
             Scribe_Collections.Look(ref widgetWidths, "widgetWidths", LookMode.Value, LookMode.Value);
@@ -383,6 +387,8 @@ namespace Declutter_Main_Buttons_Bar
             disableVanillaTimeControls = false;
             disableVanillaWeatherWidget = false;
             disableVanillaConditionsWidget = false;
+            disableVanillaResourceReadout = false;
+            disableVanillaMouseoverReadout = false;
             disableVanillaTemperatureWidget = false;
             experimentalMainButtonsAtlasOptimization = false;
             MainButtonsAtlasTextureCache.ClearCache();
