@@ -55,6 +55,8 @@
   <DMMB.SettingsGizmoSpacingYLabel>Gizmo spacing (Y): {0}px</DMMB.SettingsGizmoSpacingYLabel>
   <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
   <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
+  <DMMB.SettingsForceShowTitle>Force-show hidden buttons</DMMB.SettingsForceShowTitle>
+  <DMMB.SettingsForceShowDesc>Select buttons that should stay available even when their normal visibility worker would hide them. Buttons hidden from the bar are still hidden.</DMMB.SettingsForceShowDesc>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
   <DMMB.SettingsMenuBlacklistUseHidden>Show only disabled buttons in the menu</DMMB.SettingsMenuBlacklistUseHidden>
   <DMMB.PlaySettingsEditDropdowns>Edit main buttons (move, resize, and set dropdowns)</DMMB.PlaySettingsEditDropdowns>
@@ -72,6 +74,7 @@
   <DMMB.WidgetBatteryStateFull>Full</DMMB.WidgetBatteryStateFull>
   <DMMB.WidgetBatteryStateDischarging>Discharging</DMMB.WidgetBatteryStateDischarging>
   <DMMB.WidgetBatteryStateNotCharging>Not charging</DMMB.WidgetBatteryStateNotCharging>
+  <DMMB.ResetEditModeWidths>Reset widths</DMMB.ResetEditModeWidths>
   <DMMB.ExitEditMode>Exit UI edit mode</DMMB.ExitEditMode>
   <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
   <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>

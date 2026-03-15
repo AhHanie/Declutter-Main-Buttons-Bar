@@ -244,6 +244,90 @@ namespace Declutter_Main_Buttons_Bar
             }
         }
 
+        public static void ResetEditModeWidths()
+        {
+            if (!ModSettings.useAdvancedEditMode)
+            {
+                ModSettings.useAdvancedEditMode = true;
+                ModSettings.useFixedWidthMode = false;
+            }
+
+            List<MainButtonDef> orderedVisible = GetOrderedVisibleDefs(MainButtonsCache.AllButtonsInOrder, includePinnedMenu: true);
+            List<string> widgetIds = ModSettings.GetEnabledWidgetIds();
+            if (orderedVisible.Count == 0 && widgetIds.Count == 0)
+            {
+                return;
+            }
+
+            float availableWidth = UI.screenWidth;
+            Dictionary<MainButtonDef, float> widths = scratchFreeSizeWidths;
+            Dictionary<MainButtonDef, float> xPositions = scratchFreeSizeXPositions;
+            Dictionary<string, float> widgetWidths = scratchWidgetWidths;
+            Dictionary<string, float> widgetXPositions = scratchWidgetXPositions;
+            widths.Clear();
+            xPositions.Clear();
+            widgetWidths.Clear();
+            widgetXPositions.Clear();
+
+            float widgetTotalWidth = 0f;
+            for (int i = 0; i < widgetIds.Count; i++)
+            {
+                string widgetId = widgetIds[i];
+                float width = Mathf.Max(GetWidgetMinWidth(widgetId), GetWidgetPreferredWidth(widgetId));
+                widgetWidths[widgetId] = width;
+                widgetTotalWidth += width;
+            }
+
+            float remainingButtonWidth = Mathf.Max(0f, availableWidth - widgetTotalWidth);
+            float equalButtonWidth = orderedVisible.Count > 0 ? remainingButtonWidth / orderedVisible.Count : 0f;
+            float curX = 0f;
+            for (int i = 0; i < orderedVisible.Count; i++)
+            {
+                MainButtonDef def = orderedVisible[i];
+                widths[def] = equalButtonWidth;
+                xPositions[def] = curX;
+                curX += equalButtonWidth;
+            }
+
+            float widgetX = Mathf.Max(0f, availableWidth - widgetTotalWidth);
+            for (int i = 0; i < widgetIds.Count; i++)
+            {
+                string widgetId = widgetIds[i];
+                widgetXPositions[widgetId] = widgetX;
+                widgetX += widgetWidths[widgetId];
+            }
+
+            NormalizeCombinedFreeSizeLayout(
+                orderedVisible,
+                widths,
+                xPositions,
+                widgetIds,
+                widgetWidths,
+                widgetXPositions,
+                availableWidth);
+
+            for (int i = 0; i < orderedVisible.Count; i++)
+            {
+                MainButtonDef def = orderedVisible[i];
+                ModSettings.freeSizeWidths[def] = widths[def];
+                ModSettings.freeSizeXPositions[def] = xPositions[def];
+            }
+
+            for (int i = 0; i < widgetIds.Count; i++)
+            {
+                string widgetId = widgetIds[i];
+                ModSettings.widgetWidths[widgetId] = widgetWidths[widgetId];
+                ModSettings.widgetXPositions[widgetId] = widgetXPositions[widgetId];
+            }
+
+            draggingDef = null;
+            resizingDef = null;
+            draggingWidgetId = null;
+            resizingWidgetId = null;
+            currentDragOrder.Clear();
+            nextCombinedFreeSizeNormalizeRealtime = -1f;
+        }
+
         private static List<MainButtonDef> GetOrderedVisibleDefs(List<MainButtonDef> allButtons, bool includePinnedMenu)
         {
             // Check cache validity (rebuild every 60 frames to catch visibility changes)
@@ -263,7 +347,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < allButtons.Count; i++)
             {
                 MainButtonDef def = allButtons[i];
-                if (!def.Worker.Visible || !ShouldShowOnBar(def))
+                if ((!ModSettings.IsForceShown(def) && !def.Worker.Visible) || !ShouldShowOnBar(def))
                 {
                     continue;
                 }

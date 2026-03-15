@@ -241,7 +241,7 @@ namespace Declutter_Main_Buttons_Bar
                     continue;
                 }
 
-                if (!def.Worker.Visible || def.Worker.Disabled)
+                if ((!ModSettings.IsForceShown(def) && !def.Worker.Visible) || def.Worker.Disabled)
                 {
                     continue;
                 }

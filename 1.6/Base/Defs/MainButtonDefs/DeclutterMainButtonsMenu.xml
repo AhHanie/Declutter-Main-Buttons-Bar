@@ -14,5 +14,7 @@
     <description>Open a searchable list of play settings.</description>
     <workerClass>Declutter_Main_Buttons_Bar.MainButtonWorker_PlaySettingsMenu</workerClass>
     <order>499</order>
+    <iconPath>DMMB/UI/PlaySettings</iconPath>
+    <minimized>true</minimized>
   </MainButtonDef>
 </Defs>

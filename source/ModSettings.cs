@@ -12,6 +12,7 @@ namespace Declutter_Main_Buttons_Bar
     public class ModSettings : Verse.ModSettings
     {
         public static List<MainButtonDef> hiddenFromBarDefs = new List<MainButtonDef>();
+        public static HashSet<MainButtonDef> forceShowDefs = new HashSet<MainButtonDef>();
         public static List<MainButtonDef> favoriteDefs = new List<MainButtonDef>();
         public static List<MainButtonDef> blacklistedFromMenuDefs = new List<MainButtonDef>();
         public static List<MainButtonDropdownConfig> dropdownConfigs = new List<MainButtonDropdownConfig>();
@@ -67,6 +68,12 @@ namespace Declutter_Main_Buttons_Bar
             if (hiddenFromBarDefs == null)
             {
                 hiddenFromBarDefs = new List<MainButtonDef>();
+            }
+
+            Scribe_Collections.Look(ref forceShowDefs, "forceShowDefs", LookMode.Def);
+            if (forceShowDefs == null)
+            {
+                forceShowDefs = new HashSet<MainButtonDef>();
             }
 
             Scribe_Collections.Look(ref favoriteDefs, "favoriteDefs", LookMode.Def);
@@ -167,6 +174,7 @@ namespace Declutter_Main_Buttons_Bar
 
                 hiddenFromBarDefs = hiddenFromBarDefs.Where(defName => defName != null)
                         .ToList();
+                forceShowDefs = new HashSet<MainButtonDef>(forceShowDefs.Where(defName => defName != null));
                 blacklistedFromMenuDefs = blacklistedFromMenuDefs.Where(defName => defName != null)
                         .ToList();
                 favoriteDefs = favoriteDefs.Where(defName => defName != null)
@@ -283,11 +291,12 @@ namespace Declutter_Main_Buttons_Bar
 
         public static bool IsHiddenFromBar(MainButtonDef def)
         {
-            if (hiddenFromBarSet == null)
-            {
-                hiddenFromBarSet = new HashSet<MainButtonDef>(hiddenFromBarDefs);
-            }
             return hiddenFromBarSet.Contains(def);
+        }
+
+        public static bool IsForceShown(MainButtonDef def)
+        {
+            return forceShowDefs.Contains(def);
         }
 
         public static void SetHiddenFromBar(MainButtonDef def, bool hidden)
@@ -297,22 +306,30 @@ namespace Declutter_Main_Buttons_Bar
                 if (!hiddenFromBarDefs.Contains(def))
                 {
                     hiddenFromBarDefs.Add(def);
-                    if (hiddenFromBarSet != null)
-                    {
-                        hiddenFromBarSet.Add(def);
-                    }
+                    hiddenFromBarSet.Add(def);
                 }
             }
             else
             {
                 hiddenFromBarDefs.Remove(def);
-                if (hiddenFromBarSet != null)
-                {
-                    hiddenFromBarSet.Remove(def);
-                }
+                hiddenFromBarSet.Remove(def);
             }
 
             dropdownCacheDirty = true;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+        }
+
+        public static void SetForceShown(MainButtonDef def, bool forceShown)
+        {
+            if (forceShown)
+            {
+                forceShowDefs.Add(def);
+            }
+            else
+            {
+                forceShowDefs.Remove(def);
+            }
+
             MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
         }
 
@@ -359,6 +376,7 @@ namespace Declutter_Main_Buttons_Bar
         public static void ResetToDefaults()
         {
             hiddenFromBarDefs.Clear();
+            forceShowDefs.Clear();
             favoriteDefs.Clear();
             blacklistedFromMenuDefs.Clear();
             dropdownConfigs.Clear();

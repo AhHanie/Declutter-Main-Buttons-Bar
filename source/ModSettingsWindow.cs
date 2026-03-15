@@ -11,12 +11,18 @@ namespace Declutter_Main_Buttons_Bar
 {
     public static class ModSettingsWindow
     {
+        private const float ForceShowListHeight = 220f;
+        private const float ForceShowRowHeight = 28f;
+        private const float ForceShowToggleSize = 24f;
+        private const float ForceShowRowPadding = 6f;
+
         private static Vector2 scrollPosition = Vector2.zero;
+        private static Vector2 forceShowScrollPosition = Vector2.zero;
 
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 1000f
+            float viewHeight = 1240f
                 + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
@@ -98,8 +104,7 @@ namespace Declutter_Main_Buttons_Bar
                 ref ModSettings.defaultNewButtonsToHidden,
                 "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
             bool oldExperimentalAtlasOptimization = ModSettings.experimentalMainButtonsAtlasOptimization;
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsExperimentalAtlasOptimization".Translate(),
                 ref ModSettings.experimentalMainButtonsAtlasOptimization,
                 "DMMB.SettingsExperimentalAtlasOptimizationDesc".Translate());
@@ -107,71 +112,58 @@ namespace Declutter_Main_Buttons_Bar
             {
                 MainButtonsAtlasTextureCache.ClearCache();
             }
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaResourceReadout".Translate(),
                 ref ModSettings.disableVanillaResourceReadout,
                 "DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaMouseoverReadout".Translate(),
                 ref ModSettings.disableVanillaMouseoverReadout,
                 "DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc".Translate());
             listing.Gap(6f);
             listing.Label("DMMB.SettingsWidgetsTitle".Translate());
             listing.GapLine();
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetTime".Translate(),
                 ref ModSettings.showTimeWidget,
                 "DMMB.SettingsWidgetTimeDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetTimeIrl".Translate(),
                 ref ModSettings.showTimeIrlWidget,
                 "DMMB.SettingsWidgetTimeIrlDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetTimeSpeed".Translate(),
                 ref ModSettings.showTimeSpeedWidget,
                 "DMMB.SettingsWidgetTimeSpeedDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetWeather".Translate(),
                 ref ModSettings.showWeatherWidget,
                 "DMMB.SettingsWidgetWeatherDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetFpsTps".Translate(),
                 ref ModSettings.showFpsTpsWidget,
                 "DMMB.SettingsWidgetFpsTpsDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetBattery".Translate(),
                 ref ModSettings.showBatteryWidget,
                 "DMMB.SettingsWidgetBatteryDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaDateReadout".Translate(),
                 ref ModSettings.disableVanillaDateReadout,
                 "DMMB.SettingsWidgetDisableVanillaDateReadoutDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaTimeControls".Translate(),
                 ref ModSettings.disableVanillaTimeControls,
                 "DMMB.SettingsWidgetDisableVanillaTimeControlsDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaWeatherWidget".Translate(),
                 ref ModSettings.disableVanillaWeatherWidget,
                 "DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaConditionsWidget".Translate(),
                 ref ModSettings.disableVanillaConditionsWidget,
                 "DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidget".Translate(),
                 ref ModSettings.disableVanillaTemperatureWidget,
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc".Translate());
@@ -246,6 +238,14 @@ namespace Declutter_Main_Buttons_Bar
                 }
             }
 
+            listing.GapLine();
+            listing.Gap(20f);
+            DrawLabelWithNewBadge(listing, "DMMB.SettingsForceShowTitle".Translate());
+            listing.Gap(4f);
+            listing.Label("DMMB.SettingsForceShowDesc".Translate());
+            listing.Gap(6f);
+            DrawForceShowList(listing.GetRect(ForceShowListHeight));
+
             listing.End();
             Widgets.EndScrollView();
         }
@@ -271,19 +271,72 @@ namespace Declutter_Main_Buttons_Bar
             ModSettings.blacklistedFromMenuDefs = newBlacklist;
         }
 
-        private static void CheckboxLabeledWithNewBadge(Listing_Standard listing, string label, ref bool value, string tooltip = null)
+        private static void DrawForceShowList(Rect rect)
+        {
+            Rect outRect = rect;
+            float contentHeight = MainButtonsCache.AllButtonsInOrder.Count * ForceShowRowHeight;
+            Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, Mathf.Max(contentHeight, outRect.height));
+            Widgets.BeginScrollView(outRect, ref forceShowScrollPosition, viewRect);
+
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+
+            float curY = 0f;
+            for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
+            {
+                MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
+                Rect rowRect = new Rect(0f, curY, viewRect.width, ForceShowRowHeight);
+                Widgets.DrawHighlightIfMouseover(rowRect);
+
+                Rect contentRect = rowRect.ContractedBy(ForceShowRowPadding);
+                Rect toggleRect = new Rect(
+                    contentRect.xMax - ForceShowToggleSize,
+                    contentRect.y + (contentRect.height - ForceShowToggleSize) * 0.5f,
+                    ForceShowToggleSize,
+                    ForceShowToggleSize);
+                Rect labelRect = contentRect;
+                labelRect.xMax = toggleRect.xMin - ForceShowRowPadding;
+
+                Widgets.Label(labelRect, def.LabelCap);
+
+                bool forceShown = ModSettings.IsForceShown(def);
+                bool newValue = forceShown;
+                Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ForceShowToggleSize, paintable: false);
+
+                bool rowClicked = Widgets.ButtonInvisible(new Rect(rowRect.x, rowRect.y, toggleRect.xMin - rowRect.x, rowRect.height));
+                if (!rowClicked && rowRect.xMax > toggleRect.xMax)
+                {
+                    rowClicked = Widgets.ButtonInvisible(new Rect(toggleRect.xMax, rowRect.y, rowRect.xMax - toggleRect.xMax, rowRect.height));
+                }
+
+                if (rowClicked)
+                {
+                    newValue = !newValue;
+                }
+
+                if (newValue != forceShown)
+                {
+                    ModSettings.SetForceShown(def, newValue);
+                }
+
+                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                curY += ForceShowRowHeight;
+            }
+
+            Text.Anchor = prevAnchor;
+            Widgets.EndScrollView();
+        }
+
+        private static void DrawLabelWithNewBadge(Listing_Standard listing, string label)
         {
             const float badgeHeight = 32f;
             Rect row = listing.GetRect(Mathf.Max(Text.LineHeight, badgeHeight + 2f));
-            Widgets.DrawHighlightIfMouseover(row);
-            Rect checkboxRect = row;
-            checkboxRect.xMax -= 44f;
-            Widgets.CheckboxLabeled(checkboxRect, label, ref value);
-
-            if (!string.IsNullOrEmpty(tooltip))
-            {
-                TooltipHandler.TipRegion(checkboxRect, tooltip);
-            }
+            Rect labelRect = row;
+            labelRect.xMax -= 44f;
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(labelRect, label);
+            Text.Anchor = prevAnchor;
 
             Texture2D newIcon = DMMBTextures.New.Texture;
 

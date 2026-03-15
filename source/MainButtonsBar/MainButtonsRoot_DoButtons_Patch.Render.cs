@@ -387,14 +387,23 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
-            const float buttonWidth = 260f;
+            const float resetButtonWidth = 220f;
+            const float exitButtonWidth = 260f;
             const float buttonHeight = 36f;
             const float gap = 8f;
-            float x = Mathf.Round((UI.screenWidth - buttonWidth) * 0.5f);
+            float totalWidth = resetButtonWidth + gap + exitButtonWidth;
+            float x = Mathf.Round((UI.screenWidth - totalWidth) * 0.5f);
             float y = UI.screenHeight - BarBottomOffset - BarHeight - buttonHeight - gap;
-            Rect rect = new Rect(x, y, buttonWidth, buttonHeight);
+            Rect resetRect = new Rect(x, y, resetButtonWidth, buttonHeight);
+            Rect exitRect = new Rect(resetRect.xMax + gap, y, exitButtonWidth, buttonHeight);
 
-            if (Widgets.ButtonText(rect, "DMMB.ExitEditMode".Translate()))
+            if (Widgets.ButtonText(resetRect, "DMMB.ResetEditModeWidths".Translate()))
+            {
+                ResetEditModeWidths();
+                Mod.Settings.Write();
+            }
+
+            if (Widgets.ButtonText(exitRect, "DMMB.ExitEditMode".Translate()))
             {
                 ModSettings.editDropdownsMode = false;
                 MainButtonsRoot_DoButtons_Patch.ClearDropdownState();
