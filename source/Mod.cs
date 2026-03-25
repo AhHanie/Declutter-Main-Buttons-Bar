@@ -23,6 +23,7 @@ namespace Declutter_Main_Buttons_Bar
         {
             MainButtonsCache.Rebuild();
             Settings = GetSettings<ModSettings>();
+            ModSettings.Init();
             new Harmony("sk.dmmb").PatchAll();
             bool settingsChanged = ModSettings.DetectAndHideNewButtonsFromBarIfNeeded();
             if (ModSettings.EnsureCustomOrderCoverage())

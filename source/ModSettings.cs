@@ -205,10 +205,6 @@ namespace Declutter_Main_Buttons_Bar
                 {
                     disableVanillaResourceReadout = false;
                 }
-
-                NormalizeDropdownConfigs();
-                RebuildCaches();
-                enabledWidgetCacheInitialized = false;
             }
         }
 
@@ -219,6 +215,13 @@ namespace Declutter_Main_Buttons_Bar
 
             // Mark dropdown cache as dirty so it rebuilds on next access
             dropdownCacheDirty = true;
+        }
+
+        public static void Init()
+        {
+            RebuildCaches();
+            NormalizeDropdownConfigs();
+            enabledWidgetCacheInitialized = false;
         }
 
         public static bool EnsureCustomOrderCoverage()
