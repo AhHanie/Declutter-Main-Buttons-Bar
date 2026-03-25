@@ -112,10 +112,25 @@ namespace Declutter_Main_Buttons_Bar
             {
                 MainButtonsAtlasTextureCache.ClearCache();
             }
+            bool revealResourceReadoutOnHover = ModSettings.revealVanillaResourceReadoutOnHover;
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover".Translate(),
+                ref revealResourceReadoutOnHover,
+                "DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc".Translate());
+            if (revealResourceReadoutOnHover != ModSettings.revealVanillaResourceReadoutOnHover)
+            {
+                ModSettings.SetVanillaResourceReadoutHover(revealResourceReadoutOnHover);
+            }
+            bool disableResourceReadout = ModSettings.disableVanillaResourceReadout;
             listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaResourceReadout".Translate(),
-                ref ModSettings.disableVanillaResourceReadout,
+                ref disableResourceReadout,
                 "DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc".Translate());
+            if (disableResourceReadout != ModSettings.disableVanillaResourceReadout)
+            {
+                ModSettings.SetVanillaResourceReadoutDisabled(disableResourceReadout);
+            }
             listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetDisableVanillaMouseoverReadout".Translate(),
                 ref ModSettings.disableVanillaMouseoverReadout,
@@ -240,7 +255,7 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.GapLine();
             listing.Gap(20f);
-            DrawLabelWithNewBadge(listing, "DMMB.SettingsForceShowTitle".Translate());
+            listing.Label("DMMB.SettingsForceShowTitle".Translate());
             listing.Gap(4f);
             listing.Label("DMMB.SettingsForceShowDesc".Translate());
             listing.Gap(6f);
@@ -327,17 +342,23 @@ namespace Declutter_Main_Buttons_Bar
             Widgets.EndScrollView();
         }
 
-        private static void DrawLabelWithNewBadge(Listing_Standard listing, string label)
+        private static void CheckboxLabeledWithNewBadge(Listing_Standard listing, string label, ref bool checkOn, string tooltip = null)
         {
             const float badgeHeight = 32f;
             Rect row = listing.GetRect(Mathf.Max(Text.LineHeight, badgeHeight + 2f));
-            Rect labelRect = row;
-            labelRect.xMax -= 44f;
-            TextAnchor prevAnchor = Text.Anchor;
-            Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(labelRect, label);
-            Text.Anchor = prevAnchor;
+            Rect checkboxRect = row;
+            checkboxRect.xMax -= 44f;
+            Widgets.DrawHighlightIfMouseover(checkboxRect);
+            Widgets.CheckboxLabeled(checkboxRect, label, ref checkOn);
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(checkboxRect, tooltip);
+            }
+            DrawNewBadge(row, badgeHeight);
+        }
 
+        private static void DrawNewBadge(Rect row, float badgeHeight)
+        {
             Texture2D newIcon = DMMBTextures.New.Texture;
 
             float iconHeight = badgeHeight;

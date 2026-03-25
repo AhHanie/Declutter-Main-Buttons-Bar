@@ -40,6 +40,8 @@
   <DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>Hides RimWorld's default weather readout on the right side so only widget-based weather is shown.</DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>
   <DMMB.SettingsWidgetDisableVanillaConditionsWidget>Disable vanilla conditions widget</DMMB.SettingsWidgetDisableVanillaConditionsWidget>
   <DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>Hides the game condition readout list on the right side.</DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>
+  <DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover>Reveal vanilla resource readout on hover</DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover>
+  <DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc>Shows the resource list only while the mouse is within the resource readout width on the left side of the screen.</DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc>
   <DMMB.SettingsWidgetDisableVanillaResourceReadout>Disable vanilla resource readout</DMMB.SettingsWidgetDisableVanillaResourceReadout>
   <DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc>Hides the resource list on the left side.</DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc>
   <DMMB.SettingsWidgetDisableVanillaMouseoverReadout>Disable vanilla mouseover readout</DMMB.SettingsWidgetDisableVanillaMouseoverReadout>

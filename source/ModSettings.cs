@@ -41,6 +41,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool disableVanillaTimeControls = false;
         public static bool disableVanillaWeatherWidget = false;
         public static bool disableVanillaConditionsWidget = false;
+        public static bool revealVanillaResourceReadoutOnHover = false;
         public static bool disableVanillaResourceReadout = false;
         public static bool disableVanillaMouseoverReadout = false;
         public static bool disableVanillaTemperatureWidget = false;
@@ -133,6 +134,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref disableVanillaTimeControls, "disableVanillaTimeControls", false);
             Scribe_Values.Look(ref disableVanillaWeatherWidget, "disableVanillaWeatherWidget", false);
             Scribe_Values.Look(ref disableVanillaConditionsWidget, "disableVanillaConditionsWidget", false);
+            Scribe_Values.Look(ref revealVanillaResourceReadoutOnHover, "revealVanillaResourceReadoutOnHover", false);
             Scribe_Values.Look(ref disableVanillaResourceReadout, "disableVanillaResourceReadout", false);
             Scribe_Values.Look(ref disableVanillaMouseoverReadout, "disableVanillaMouseoverReadout", false);
             Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
@@ -197,6 +199,11 @@ namespace Declutter_Main_Buttons_Bar
                 if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
                 {
                     revealPlaySettingsOnHover = false;
+                }
+
+                if (revealVanillaResourceReadoutOnHover && disableVanillaResourceReadout)
+                {
+                    disableVanillaResourceReadout = false;
                 }
 
                 NormalizeDropdownConfigs();
@@ -280,7 +287,6 @@ namespace Declutter_Main_Buttons_Bar
                 List<MainButtonDef> entries = config.entries
                     .Where(entry => entry != config.parent && entry.Worker.Visible)
                     .Distinct()
-                    .OrderBy(entry => entry.order)
                     .ToList();
 
                 dropdownEntriesCache[config.parent] = entries;
@@ -373,6 +379,24 @@ namespace Declutter_Main_Buttons_Bar
             }
         }
 
+        public static void SetVanillaResourceReadoutDisabled(bool disabled)
+        {
+            disableVanillaResourceReadout = disabled;
+            if (disabled)
+            {
+                revealVanillaResourceReadoutOnHover = false;
+            }
+        }
+
+        public static void SetVanillaResourceReadoutHover(bool revealOnHover)
+        {
+            revealVanillaResourceReadoutOnHover = revealOnHover;
+            if (revealOnHover)
+            {
+                disableVanillaResourceReadout = false;
+            }
+        }
+
         public static void ResetToDefaults()
         {
             hiddenFromBarDefs.Clear();
@@ -405,6 +429,7 @@ namespace Declutter_Main_Buttons_Bar
             disableVanillaTimeControls = false;
             disableVanillaWeatherWidget = false;
             disableVanillaConditionsWidget = false;
+            revealVanillaResourceReadoutOnHover = false;
             disableVanillaResourceReadout = false;
             disableVanillaMouseoverReadout = false;
             disableVanillaTemperatureWidget = false;

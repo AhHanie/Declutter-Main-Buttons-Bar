@@ -48,11 +48,31 @@ namespace Declutter_Main_Buttons_Bar
     }
 
     [HarmonyPatch(typeof(ResourceReadout), nameof(ResourceReadout.ResourceReadoutOnGUI))]
-    public static class ResourceReadout_ResourceReadoutOnGUI_DisableVanillaPatch
+    public static class ResourceReadout_ResourceReadoutOnGUI_VisibilityPatch
     {
         public static bool Prefix()
         {
-            return !ModSettings.disableVanillaResourceReadout;
+            if (ModSettings.disableVanillaResourceReadout)
+            {
+                return false;
+            }
+
+            if (!ModSettings.revealVanillaResourceReadoutOnHover)
+            {
+                return true;
+            }
+
+            return Mouse.IsOver(GetHoverRect());
+        }
+
+        private static Rect GetHoverRect()
+        {
+            bool categorized = Prefs.ResourceReadoutCategorized;
+            return new Rect(
+                categorized ? 2f : 7f,
+                0f,
+                categorized ? 124f : 110f,
+                UI.screenHeight);
         }
     }
 
