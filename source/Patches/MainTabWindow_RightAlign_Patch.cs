@@ -63,11 +63,6 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
-            if (Compat_OmniTab_RightAlign.TryAlign(window))
-            {
-                return;
-            }
-
             Rect rect = window.windowRect;
             rect.x = Mathf.Max(0f, UI.screenWidth - rect.width);
             window.windowRect = rect;
