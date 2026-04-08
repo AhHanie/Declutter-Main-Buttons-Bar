@@ -41,5 +41,42 @@ namespace Declutter_Main_Buttons_Bar
             Text.Font = oldFont;
             return width;
         }
+
+        public static string TruncateSmallText(string text, float maxWidth)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            if (MeasureSmallTextWidth(text) <= maxWidth)
+            {
+                return text;
+            }
+
+            const string ellipsis = "...";
+            if (MeasureSmallTextWidth(ellipsis) >= maxWidth)
+            {
+                return ellipsis;
+            }
+
+            int low = 0;
+            int high = text.Length;
+            while (low < high)
+            {
+                int mid = (low + high + 1) / 2;
+                string candidate = text.Substring(0, mid).TrimEnd() + ellipsis;
+                if (MeasureSmallTextWidth(candidate) <= maxWidth)
+                {
+                    low = mid;
+                }
+                else
+                {
+                    high = mid - 1;
+                }
+            }
+
+            return text.Substring(0, low).TrimEnd() + ellipsis;
+        }
     }
 }

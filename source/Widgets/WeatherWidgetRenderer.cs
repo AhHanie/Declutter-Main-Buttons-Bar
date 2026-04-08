@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -10,6 +11,9 @@ namespace Declutter_Main_Buttons_Bar
         private const float IconGap = 4f;
         private const float IconSize = 20f;
         private const float MinPreferredWidth = 132f;
+
+        private static readonly Dictionary<string, string> CachedDisplayTextByWeatherText = new Dictionary<string, string>();
+        private static int cachedDisplayWidth = -1;
 
         public static float GetPreferredWidth()
         {
@@ -36,13 +40,16 @@ namespace Declutter_Main_Buttons_Bar
             textRect.xMin = iconRect.xMax + IconGap;
             if (textRect.width > 2f)
             {
+                string weatherText = GetWeatherText();
+                string displayText = GetDisplayText(weatherText, textRect.width);
+                bool textFits = displayText == weatherText;
                 TextAnchor oldAnchor = Text.Anchor;
                 bool oldWordWrap = Text.WordWrap;
                 GameFont oldFont = Text.Font;
-                Text.Anchor = TextAnchor.MiddleCenter;
+                Text.Anchor = textFits ? TextAnchor.MiddleCenter : TextAnchor.MiddleLeft;
                 Text.WordWrap = false;
                 Text.Font = GameFont.Small;
-                Widgets.Label(textRect, GetWeatherText());
+                Widgets.Label(textRect, displayText);
                 Text.Anchor = oldAnchor;
                 Text.WordWrap = oldWordWrap;
                 Text.Font = oldFont;
@@ -56,6 +63,28 @@ namespace Declutter_Main_Buttons_Bar
             string temperature = Mathf.Round(Find.CurrentMap.mapTemperature.OutdoorTemp).ToStringTemperature("F0");
             string weather = Find.CurrentMap.weatherManager.CurWeatherPerceived.LabelCap;
             return temperature + " | " + weather;
+        }
+
+        private static string GetDisplayText(string weatherText, float maxWidth)
+        {
+            int widthKey = Mathf.FloorToInt(maxWidth);
+            if (cachedDisplayWidth != widthKey)
+            {
+                cachedDisplayWidth = widthKey;
+                CachedDisplayTextByWeatherText.Clear();
+            }
+
+            if (CachedDisplayTextByWeatherText.TryGetValue(weatherText, out string cachedDisplayText))
+            {
+                return cachedDisplayText;
+            }
+
+            string displayText = WidgetRenderUtility.MeasureSmallTextWidth(weatherText) <= widthKey
+                ? weatherText
+                : WidgetRenderUtility.TruncateSmallText(weatherText, widthKey);
+
+            CachedDisplayTextByWeatherText[weatherText] = displayText;
+            return displayText;
         }
 
         private static string BuildTooltip(WeatherDef weatherDef)
