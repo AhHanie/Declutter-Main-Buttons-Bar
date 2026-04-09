@@ -45,7 +45,14 @@ namespace Declutter_Main_Buttons_Bar
         public static bool disableVanillaResourceReadout = false;
         public static bool disableVanillaMouseoverReadout = false;
         public static bool disableVanillaTemperatureWidget = false;
+        public static bool hideAllGizmoLabels = false;
+        public static bool hideGizmoLabelsForSelectedColonistsOnly = false;
         public static bool experimentalMainButtonsAtlasOptimization = false;
+        public static bool enableCommandGizmoSizePatches = true;
+        public static bool enableGizmoLabelVisibilityPatches = true;
+        public static bool enableSelectorSelectionStatePatches = true;
+        public static bool enableVanillaWidgetPatches = true;
+        public static bool enableAtlasOptimizationPatch = true;
         public static Dictionary<string, float> widgetWidths = new Dictionary<string, float>();
         public static Dictionary<string, float> widgetXPositions = new Dictionary<string, float>();
         public static List<string> knownMainButtonDefNames = new List<string>();
@@ -138,7 +145,14 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref disableVanillaResourceReadout, "disableVanillaResourceReadout", false);
             Scribe_Values.Look(ref disableVanillaMouseoverReadout, "disableVanillaMouseoverReadout", false);
             Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
+            Scribe_Values.Look(ref hideAllGizmoLabels, "hideAllGizmoLabels", false);
+            Scribe_Values.Look(ref hideGizmoLabelsForSelectedColonistsOnly, "hideGizmoLabelsForSelectedColonistsOnly", false);
             Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", false);
+            Scribe_Values.Look(ref enableCommandGizmoSizePatches, "enableCommandGizmoSizePatches", true);
+            Scribe_Values.Look(ref enableGizmoLabelVisibilityPatches, "enableGizmoLabelVisibilityPatches", true);
+            Scribe_Values.Look(ref enableSelectorSelectionStatePatches, "enableSelectorSelectionStatePatches", true);
+            Scribe_Values.Look(ref enableVanillaWidgetPatches, "enableVanillaWidgetPatches", true);
+            Scribe_Values.Look(ref enableAtlasOptimizationPatch, "enableAtlasOptimizationPatch", true);
             Scribe_Collections.Look(ref widgetWidths, "widgetWidths", LookMode.Value, LookMode.Value);
             if (widgetWidths == null)
             {
@@ -436,7 +450,14 @@ namespace Declutter_Main_Buttons_Bar
             disableVanillaResourceReadout = false;
             disableVanillaMouseoverReadout = false;
             disableVanillaTemperatureWidget = false;
+            hideAllGizmoLabels = false;
+            hideGizmoLabelsForSelectedColonistsOnly = false;
             experimentalMainButtonsAtlasOptimization = false;
+            enableCommandGizmoSizePatches = true;
+            enableGizmoLabelVisibilityPatches = true;
+            enableSelectorSelectionStatePatches = true;
+            enableVanillaWidgetPatches = true;
+            enableAtlasOptimizationPatch = true;
             MainButtonsAtlasTextureCache.ClearCache();
             widgetWidths.Clear();
             widgetXPositions.Clear();

@@ -22,7 +22,7 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 1240f
+            float viewHeight = 1610f
                 + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
@@ -113,8 +113,7 @@ namespace Declutter_Main_Buttons_Bar
                 MainButtonsAtlasTextureCache.ClearCache();
             }
             bool revealResourceReadoutOnHover = ModSettings.revealVanillaResourceReadoutOnHover;
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover".Translate(),
                 ref revealResourceReadoutOnHover,
                 "DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc".Translate());
@@ -182,6 +181,16 @@ namespace Declutter_Main_Buttons_Bar
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidget".Translate(),
                 ref ModSettings.disableVanillaTemperatureWidget,
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsHideAllGizmoLabels".Translate(),
+                ref ModSettings.hideAllGizmoLabels,
+                "DMMB.SettingsHideAllGizmoLabelsDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly".Translate(),
+                ref ModSettings.hideGizmoLabelsForSelectedColonistsOnly,
+                "DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc".Translate());
             listing.GapLine();
 
             listing.CheckboxLabeled(
@@ -260,6 +269,33 @@ namespace Declutter_Main_Buttons_Bar
             listing.Label("DMMB.SettingsForceShowDesc".Translate());
             listing.Gap(6f);
             DrawForceShowList(listing.GetRect(ForceShowListHeight));
+
+            listing.GapLine();
+            listing.Gap(20f);
+            listing.Label("DMMB.SettingsAdvancedTitle".Translate());
+            listing.Gap(4f);
+            listing.Label("DMMB.SettingsAdvancedDesc".Translate());
+            listing.Gap(6f);
+            listing.CheckboxLabeled(
+                "DMMB.SettingsEnableCommandGizmoSizePatches".Translate(),
+                ref ModSettings.enableCommandGizmoSizePatches,
+                "DMMB.SettingsEnableCommandGizmoSizePatchesDesc".Translate());
+            listing.CheckboxLabeled(
+                "DMMB.SettingsEnableGizmoLabelVisibilityPatches".Translate(),
+                ref ModSettings.enableGizmoLabelVisibilityPatches,
+                "DMMB.SettingsEnableGizmoLabelVisibilityPatchesDesc".Translate());
+            listing.CheckboxLabeled(
+                "DMMB.SettingsEnableSelectorSelectionStatePatches".Translate(),
+                ref ModSettings.enableSelectorSelectionStatePatches,
+                "DMMB.SettingsEnableSelectorSelectionStatePatchesDesc".Translate());
+            listing.CheckboxLabeled(
+                "DMMB.SettingsEnableVanillaWidgetPatches".Translate(),
+                ref ModSettings.enableVanillaWidgetPatches,
+                "DMMB.SettingsEnableVanillaWidgetPatchesDesc".Translate());
+            listing.CheckboxLabeled(
+                "DMMB.SettingsEnableAtlasOptimizationPatch".Translate(),
+                ref ModSettings.enableAtlasOptimizationPatch,
+                "DMMB.SettingsEnableAtlasOptimizationPatchDesc".Translate());
 
             listing.End();
             Widgets.EndScrollView();

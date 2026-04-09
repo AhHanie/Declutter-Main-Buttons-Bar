@@ -8,6 +8,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GlobalControlsUtility), nameof(GlobalControlsUtility.DoDate))]
     public static class GlobalControlsUtility_DoDate_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix()
         {
             return !ModSettings.disableVanillaDateReadout;
@@ -17,6 +22,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GlobalControlsUtility), nameof(GlobalControlsUtility.DoTimespeedControls))]
     public static class GlobalControlsUtility_DoTimespeedControls_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix()
         {
             return !ModSettings.disableVanillaTimeControls;
@@ -26,6 +36,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(WeatherManager), nameof(WeatherManager.DoWeatherGUI))]
     public static class WeatherManager_DoWeatherGUI_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix(ref Rect rect)
         {
             if (!ModSettings.disableVanillaWeatherWidget)
@@ -41,6 +56,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GameConditionManager), nameof(GameConditionManager.DoConditionsUI))]
     public static class GameConditionManager_DoConditionsUI_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix()
         {
             return !ModSettings.disableVanillaConditionsWidget;
@@ -50,6 +70,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(ResourceReadout), nameof(ResourceReadout.ResourceReadoutOnGUI))]
     public static class ResourceReadout_ResourceReadoutOnGUI_VisibilityPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix()
         {
             if (ModSettings.disableVanillaResourceReadout)
@@ -79,6 +104,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(MouseoverReadout), nameof(MouseoverReadout.MouseoverReadoutOnGUI))]
     public static class MouseoverReadout_MouseoverReadoutOnGUI_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix()
         {
             return !ModSettings.disableVanillaMouseoverReadout;
@@ -88,6 +118,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(GlobalControls), "TemperatureString")]
     public static class GlobalControls_TemperatureString_DisableVanillaPatch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableVanillaWidgetPatches;
+        }
+
         public static bool Prefix(ref string __result)
         {
             if (!ModSettings.disableVanillaTemperatureWidget)

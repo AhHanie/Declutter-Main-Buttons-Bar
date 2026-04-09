@@ -48,6 +48,10 @@
   <DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc>Hides the mouseover readout text near the bottom-left.</DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc>
   <DMMB.SettingsWidgetDisableVanillaTemperatureWidget>Disable vanilla temperature widget</DMMB.SettingsWidgetDisableVanillaTemperatureWidget>
   <DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>Hides the vanilla outdoors/indoors temperature text by returning an empty string.</DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>
+  <DMMB.SettingsHideAllGizmoLabels>Hide all gizmo labels</DMMB.SettingsHideAllGizmoLabels>
+  <DMMB.SettingsHideAllGizmoLabelsDesc>Hides gizmo label text, extra label text, and cooldown text. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideAllGizmoLabelsDesc>
+  <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>Hide gizmo labels for selected colonists only</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>
+  <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>Hides label text, extra label text, and cooldown text only when every selected object is a colonist. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>
   <DMMB.SettingsExperimentalAtlasOptimization>Experimental Optimization: cache main button atlas drawing. Improves render performance of the bottom bar buttons.</DMMB.SettingsExperimentalAtlasOptimization>
   <DMMB.SettingsExperimentalAtlasOptimizationDesc>Only applies while this mod draws the main button bar. Caches stitched atlas textures to reduce repeated per-slice draw calls.</DMMB.SettingsExperimentalAtlasOptimizationDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
@@ -61,6 +65,18 @@
   <DMMB.SettingsForceShowDesc>Select buttons that should stay available even when their normal visibility worker would hide them. Buttons hidden from the bar are still hidden.</DMMB.SettingsForceShowDesc>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
   <DMMB.SettingsMenuBlacklistUseHidden>Show only disabled buttons in the menu</DMMB.SettingsMenuBlacklistUseHidden>
+  <DMMB.SettingsAdvancedTitle>Advanced Settings</DMMB.SettingsAdvancedTitle>
+  <DMMB.SettingsAdvancedDesc>These settings control whether specific Harmony patch groups are applied at startup. Changing them requires a game restart. Disabling patch groups you are not using can provide a tiny performance improvement.</DMMB.SettingsAdvancedDesc>
+  <DMMB.SettingsEnableCommandGizmoSizePatches>Enable gizmo size patches</DMMB.SettingsEnableCommandGizmoSizePatches>
+  <DMMB.SettingsEnableCommandGizmoSizePatchesDesc>Controls patches that adjust command gizmo width and height for the gizmo scale and spacing settings. Requires restart.</DMMB.SettingsEnableCommandGizmoSizePatchesDesc>
+  <DMMB.SettingsEnableGizmoLabelVisibilityPatches>Enable gizmo label visibility patches</DMMB.SettingsEnableGizmoLabelVisibilityPatches>
+  <DMMB.SettingsEnableGizmoLabelVisibilityPatchesDesc>Controls patches that hide command gizmo labels, extra labels, and ability cooldown text. Requires restart.</DMMB.SettingsEnableGizmoLabelVisibilityPatchesDesc>
+  <DMMB.SettingsEnableSelectorSelectionStatePatches>Enable selector selection state patches</DMMB.SettingsEnableSelectorSelectionStatePatches>
+  <DMMB.SettingsEnableSelectorSelectionStatePatchesDesc>Controls Selector patches that cache whether all selected map objects are colonists for the selected-colonists-only gizmo label setting. Requires restart.</DMMB.SettingsEnableSelectorSelectionStatePatchesDesc>
+  <DMMB.SettingsEnableVanillaWidgetPatches>Enable vanilla widget patches</DMMB.SettingsEnableVanillaWidgetPatches>
+  <DMMB.SettingsEnableVanillaWidgetPatchesDesc>Controls patches that hide or reveal vanilla date, time controls, weather, conditions, resource readout, mouseover readout, and temperature UI. Requires restart.</DMMB.SettingsEnableVanillaWidgetPatchesDesc>
+  <DMMB.SettingsEnableAtlasOptimizationPatch>Enable atlas optimization patch</DMMB.SettingsEnableAtlasOptimizationPatch>
+  <DMMB.SettingsEnableAtlasOptimizationPatchDesc>Controls the Widgets.DrawAtlas hook used by the experimental main button atlas optimization. Requires restart.</DMMB.SettingsEnableAtlasOptimizationPatchDesc>
   <DMMB.PlaySettingsEditDropdowns>Edit main buttons (move, resize, and set dropdowns)</DMMB.PlaySettingsEditDropdowns>
   <DMMB.PlaySettingsMenuButton>Open play settings</DMMB.PlaySettingsMenuButton>
   <DMMB.PlaySettingsMenuTitle>Play settings</DMMB.PlaySettingsMenuTitle>

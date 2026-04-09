@@ -272,6 +272,11 @@ namespace Declutter_Main_Buttons_Bar
     [HarmonyPatch(typeof(Widgets), nameof(Widgets.DrawAtlas), new Type[] { typeof(Rect), typeof(Texture2D), typeof(bool) })]
     public static class Widgets_DrawAtlas_Optimization_Patch
     {
+        public static bool Prepare()
+        {
+            return ModSettings.enableAtlasOptimizationPatch;
+        }
+
         public static bool Prefix(ref Rect rect, Texture2D atlas, bool drawTop)
         {
             if (!ModSettings.experimentalMainButtonsAtlasOptimization)
