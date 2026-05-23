@@ -60,6 +60,10 @@ namespace Declutter_Main_Buttons_Bar
 
         private static string GetWeatherText()
         {
+            if (Find.CurrentMap == null)
+            {
+                return "";
+            }
             string temperature = Mathf.Round(Find.CurrentMap.mapTemperature.OutdoorTemp).ToStringTemperature("F0");
             string weather = Find.CurrentMap.weatherManager.CurWeatherPerceived.LabelCap;
             return temperature + " | " + weather;
