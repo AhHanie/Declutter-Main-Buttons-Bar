@@ -47,7 +47,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool disableVanillaTemperatureWidget = false;
         public static bool hideAllGizmoLabels = false;
         public static bool hideGizmoLabelsForSelectedColonistsOnly = false;
-        public static bool experimentalMainButtonsAtlasOptimization = false;
+        public static bool experimentalMainButtonsAtlasOptimization = true;
         public static bool enableCommandGizmoSizePatches = true;
         public static bool enableGizmoLabelVisibilityPatches = true;
         public static bool enableSelectorSelectionStatePatches = true;
@@ -147,7 +147,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
             Scribe_Values.Look(ref hideAllGizmoLabels, "hideAllGizmoLabels", false);
             Scribe_Values.Look(ref hideGizmoLabelsForSelectedColonistsOnly, "hideGizmoLabelsForSelectedColonistsOnly", false);
-            Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", false);
+            Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", true);
             Scribe_Values.Look(ref enableCommandGizmoSizePatches, "enableCommandGizmoSizePatches", true);
             Scribe_Values.Look(ref enableGizmoLabelVisibilityPatches, "enableGizmoLabelVisibilityPatches", true);
             Scribe_Values.Look(ref enableSelectorSelectionStatePatches, "enableSelectorSelectionStatePatches", true);
@@ -452,7 +452,7 @@ namespace Declutter_Main_Buttons_Bar
             disableVanillaTemperatureWidget = false;
             hideAllGizmoLabels = false;
             hideGizmoLabelsForSelectedColonistsOnly = false;
-            experimentalMainButtonsAtlasOptimization = false;
+            experimentalMainButtonsAtlasOptimization = true;
             enableCommandGizmoSizePatches = true;
             enableGizmoLabelVisibilityPatches = true;
             enableSelectorSelectionStatePatches = true;

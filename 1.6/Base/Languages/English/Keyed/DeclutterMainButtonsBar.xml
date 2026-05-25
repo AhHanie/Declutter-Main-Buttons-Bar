@@ -52,7 +52,7 @@
   <DMMB.SettingsHideAllGizmoLabelsDesc>Hides gizmo label text, extra label text, and cooldown text. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideAllGizmoLabelsDesc>
   <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>Hide gizmo labels for selected colonists only</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>
   <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>Hides label text, extra label text, and cooldown text only when every selected object is a colonist. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>
-  <DMMB.SettingsExperimentalAtlasOptimization>Experimental Optimization: cache main button atlas drawing. Improves render performance of the bottom bar buttons.</DMMB.SettingsExperimentalAtlasOptimization>
+  <DMMB.SettingsExperimentalAtlasOptimization>Optimization: cache main button atlas drawing. Improves render performance of the bottom bar buttons.</DMMB.SettingsExperimentalAtlasOptimization>
   <DMMB.SettingsExperimentalAtlasOptimizationDesc>Only applies while this mod draws the main button bar. Caches stitched atlas textures to reduce repeated per-slice draw calls.</DMMB.SettingsExperimentalAtlasOptimizationDesc>
   <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
   <DMMB.SettingsGizmoScaleMapOnly>Scale Map Gizmos</DMMB.SettingsGizmoScaleMapOnly>
