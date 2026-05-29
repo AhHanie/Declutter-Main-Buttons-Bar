@@ -29,6 +29,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool pinMainButtonsMenuWindowRight = false;
         public static bool useSearchablePlaySettingsMenu = true;
         public static bool revealPlaySettingsOnHover = false;
+        public static bool reservePlaySettingsHoverSpace = false;
         public static bool hideEditModePlaySettingsButton = false;
         public static bool defaultNewButtonsToHidden = false;
         public static bool showTimeWidget = false;
@@ -129,6 +130,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
+            Scribe_Values.Look(ref reservePlaySettingsHoverSpace, "reservePlaySettingsHoverSpace", false);
             Scribe_Values.Look(ref hideEditModePlaySettingsButton, "hideEditModePlaySettingsButton", false);
             Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
             Scribe_Values.Look(ref showTimeWidget, "showTimeWidget", false);
@@ -434,6 +436,7 @@ namespace Declutter_Main_Buttons_Bar
             pinMainButtonsMenuWindowRight = false;
             useSearchablePlaySettingsMenu = true;
             revealPlaySettingsOnHover = false;
+            reservePlaySettingsHoverSpace = false;
             hideEditModePlaySettingsButton = false;
             defaultNewButtonsToHidden = false;
             showTimeWidget = false;

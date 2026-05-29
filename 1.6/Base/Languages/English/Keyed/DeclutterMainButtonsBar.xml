@@ -15,6 +15,8 @@
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
+  <DMMB.SettingsPlaySettingsHoverReserveSpaceToggle>Reserve space for hidden play settings</DMMB.SettingsPlaySettingsHoverReserveSpaceToggle>
+  <DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc>When reveal on hover is enabled, keeps the play settings row's vertical space reserved while the buttons are hidden.</DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc>
   <DMMB.SettingsHidePlaySettingsEditModeButton>Hide edit mode button</DMMB.SettingsHidePlaySettingsEditModeButton>
   <DMMB.SettingsHidePlaySettingsEditModeButtonDesc>Only applies when searchable play settings menu is disabled.</DMMB.SettingsHidePlaySettingsEditModeButtonDesc>
   <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>

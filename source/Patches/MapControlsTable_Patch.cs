@@ -209,6 +209,11 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
+            if (ModSettings.reservePlaySettingsHoverSpace && !PlaySettingsHoverContext.Hovered)
+            {
+                curBaseY = __state.PrevBaseY - GetReservedHeight();
+            }
+
             float topY = Mathf.Min(curBaseY, __state.PrevBaseY);
             float bottomY = Mathf.Max(curBaseY, __state.PrevBaseY);
             if (bottomY - topY > 1f)
@@ -218,6 +223,16 @@ namespace Declutter_Main_Buttons_Bar
 
             PlaySettingsHoverContext.Active = false;
             PlaySettingsHoverContext.Hovered = false;
+        }
+
+        private static float GetReservedHeight()
+        {
+            if (PlaySettingsHoverContext.TryGetPlaySettingsBounds(out float cachedTopY, out float cachedBottomY))
+            {
+                return Mathf.Max(FallbackMinHoverHeight, Mathf.Abs(cachedBottomY - cachedTopY));
+            }
+
+            return Mathf.Max(FallbackMinHoverHeight, TimeControls.TimeButSize.y);
         }
     }
 

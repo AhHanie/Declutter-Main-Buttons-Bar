@@ -22,7 +22,7 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 1610f
+            float viewHeight = 1638f
                 + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
@@ -93,6 +93,12 @@ namespace Declutter_Main_Buttons_Bar
                     ModSettings.useSearchablePlaySettingsMenu = false;
                 }
             }
+
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsPlaySettingsHoverReserveSpaceToggle".Translate(),
+                ref ModSettings.reservePlaySettingsHoverSpace,
+                "DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc".Translate());
 
             listing.CheckboxLabeled(
                 "DMMB.SettingsHidePlaySettingsEditModeButton".Translate(),
@@ -181,13 +187,11 @@ namespace Declutter_Main_Buttons_Bar
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidget".Translate(),
                 ref ModSettings.disableVanillaTemperatureWidget,
                 "DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsHideAllGizmoLabels".Translate(),
                 ref ModSettings.hideAllGizmoLabels,
                 "DMMB.SettingsHideAllGizmoLabelsDesc".Translate());
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly".Translate(),
                 ref ModSettings.hideGizmoLabelsForSelectedColonistsOnly,
                 "DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc".Translate());
