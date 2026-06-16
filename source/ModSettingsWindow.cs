@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RimWorld;
 using Verse;
 using UnityEngine;
+using Declutter_Main_Buttons_Bar.Compat;
 
 namespace Declutter_Main_Buttons_Bar
 {
@@ -24,13 +25,29 @@ namespace Declutter_Main_Buttons_Bar
             Rect outRect = parent.ContractedBy(8f);
             float viewHeight = 1638f
                 + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
-                + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f);
+                + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f)
+                + (Compat_FernyModConfigs.IsEnabled() ? 56f : 0f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, viewHeight);
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
 
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(viewRect);
+
+            if (Compat_FernyModConfigs.IsEnabled())
+            {
+                listing.CheckboxLabeled(
+                    "DMMB.SettingsAutoLoadFernyModConfigs".Translate(),
+                    ref ModSettings.autoLoadFernyModConfigs,
+                    "DMMB.SettingsAutoLoadFernyModConfigsDesc".Translate());
+
+                if (!string.IsNullOrEmpty(ModSettings.lastFernyPresetName) && !string.IsNullOrEmpty(ModSettings.lastFernyPresetVersion))
+                {
+                    listing.Label("DMMB.SettingsFernyPresetStatus".Translate(ModSettings.lastFernyPresetName, ModSettings.lastFernyPresetVersion));
+                }
+
+                listing.GapLine();
+            }
 
             bool oldAdvancedEditMode = ModSettings.useAdvancedEditMode;
 

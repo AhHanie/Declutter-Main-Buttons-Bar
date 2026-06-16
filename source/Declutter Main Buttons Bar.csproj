@@ -74,6 +74,7 @@
     <Publicize Include="Assembly-CSharp:RimWorld.PlaySettings.DoPlaySettingsGlobalControls" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compat\Compat_FernyModConfigs.cs" />
     <Compile Include="Compat\Compat_SmartSpeed.cs" />
     <Compile Include="Patches\Command_GizmoSize_Patch.cs" />
     <Compile Include="Patches\GizmoLabelVisibility_Patch.cs" />

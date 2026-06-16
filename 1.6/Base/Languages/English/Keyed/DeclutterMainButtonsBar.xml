@@ -99,4 +99,7 @@
   <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
   <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>
   <DMMB.DropdownEditorDesc>Select which buttons should appear when you hover a main button.</DMMB.DropdownEditorDesc>
+  <DMMB.SettingsAutoLoadFernyModConfigs>Use Ferny's Mod Configs preset when installed</DMMB.SettingsAutoLoadFernyModConfigs>
+  <DMMB.SettingsAutoLoadFernyModConfigsDesc>When Ferny's Mod Configs is active, Declutter UI reloads Ferny's latest preset at startup and ignores local Declutter UI changes while this is enabled. Disable it, restart, then customize Declutter UI manually.</DMMB.SettingsAutoLoadFernyModConfigsDesc>
+  <DMMB.SettingsFernyPresetStatus>Ferny's preset applied: {0} v{1}</DMMB.SettingsFernyPresetStatus>
 </LanguageData>

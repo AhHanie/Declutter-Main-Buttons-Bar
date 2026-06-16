@@ -23,13 +23,11 @@ namespace Declutter_Main_Buttons_Bar
         {
             MainButtonsCache.Rebuild();
             Settings = GetSettings<ModSettings>();
+            bool settingsChanged = Compat_FernyModConfigs.TryApplyAfterGetSettings(Settings);
             ModSettings.Init();
             new Harmony("sk.dmmb").PatchAll();
-            bool settingsChanged = ModSettings.DetectAndHideNewButtonsFromBarIfNeeded();
-            if (ModSettings.EnsureCustomOrderCoverage())
-            {
-                settingsChanged = true;
-            }
+            settingsChanged |= ModSettings.DetectAndHideNewButtonsFromBarIfNeeded();
+            settingsChanged |= ModSettings.EnsureCustomOrderCoverage();
             if (settingsChanged)
             {
                 Settings.Write();

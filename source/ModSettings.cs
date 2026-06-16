@@ -63,6 +63,10 @@ namespace Declutter_Main_Buttons_Bar
         public static float gizmoSpacingX = 5f;
         public static float gizmoSpacingY = 14f;
         public static bool gizmoScaleMapOnly = false;
+        public static bool autoLoadFernyModConfigs = true;
+        public static string lastFernyPresetName = null;
+        public static string lastFernyPresetVersion = null;
+        public static string lastFernyPresetAppliedUtc = null;
 
         private static HashSet<MainButtonDef> hiddenFromBarSet;
         private static Dictionary<MainButtonDef, List<MainButtonDef>> dropdownEntriesCache;
@@ -172,6 +176,10 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref gizmoSpacingX, "gizmoSpacingX", 5f);
             Scribe_Values.Look(ref gizmoSpacingY, "gizmoSpacingY", 14f);
             Scribe_Values.Look(ref gizmoScaleMapOnly, "gizmoScaleMapOnly", false);
+            Scribe_Values.Look(ref autoLoadFernyModConfigs, "autoLoadFernyModConfigs", true);
+            Scribe_Values.Look(ref lastFernyPresetName, "lastFernyPresetName");
+            Scribe_Values.Look(ref lastFernyPresetVersion, "lastFernyPresetVersion");
+            Scribe_Values.Look(ref lastFernyPresetAppliedUtc, "lastFernyPresetAppliedUtc");
             fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
             gizmoDrawerScale = Mathf.Clamp(gizmoDrawerScale, 0.5f, 1.5f);
             gizmoSpacingX = Mathf.Clamp(gizmoSpacingX, 0f, 20f);
@@ -474,6 +482,10 @@ namespace Declutter_Main_Buttons_Bar
             gizmoSpacingX = 5f;
             gizmoSpacingY = 14f;
             gizmoScaleMapOnly = false;
+            autoLoadFernyModConfigs = true;
+            lastFernyPresetName = null;
+            lastFernyPresetVersion = null;
+            lastFernyPresetAppliedUtc = null;
             RebuildCaches();
             EnsureCustomOrderCoverage();
         }
