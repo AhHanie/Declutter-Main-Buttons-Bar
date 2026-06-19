@@ -10,6 +10,8 @@ namespace Declutter_Main_Buttons_Bar
         public static List<MainButtonDef> AllButtonsInOrder = new List<MainButtonDef>();
         public static List<MainButtonDef> AllButtonsInOrderNoDMMBButton = new List<MainButtonDef>();
         public static List<MainButtonDef> AllButtonsInOrderNoDMMBInspectButton = new List<MainButtonDef>();
+        public static List<MainButtonDef> AllButtonsAlphabetical = new List<MainButtonDef>();
+        public static List<MainButtonDef> AllButtonsAlphabeticalNoDMMBInspectButton = new List<MainButtonDef>();
 
         public static void Rebuild()
         {
@@ -22,6 +24,14 @@ namespace Declutter_Main_Buttons_Bar
 
             AllButtonsInOrderNoDMMBInspectButton = new List<MainButtonDef>(AllButtonsInOrderNoDMMBButton);
             AllButtonsInOrderNoDMMBInspectButton.Remove(MainButtonDefOf.Inspect);
+
+            AllButtonsAlphabetical = DefDatabase<MainButtonDef>.AllDefs
+                .OrderBy(def => def.LabelCap.ToString())
+                .ToList();
+
+            AllButtonsAlphabeticalNoDMMBInspectButton = new List<MainButtonDef>(AllButtonsAlphabetical);
+            AllButtonsAlphabeticalNoDMMBInspectButton.Remove(MainButtonsMenuDefOf.DMMB_MainButtonsMenu);
+            AllButtonsAlphabeticalNoDMMBInspectButton.Remove(MainButtonDefOf.Inspect);
         }
     }
 }

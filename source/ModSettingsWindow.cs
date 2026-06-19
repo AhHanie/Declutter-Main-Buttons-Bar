@@ -245,9 +245,9 @@ namespace Declutter_Main_Buttons_Bar
             listing.Label("DMMB.SettingsDesc".Translate());
             listing.GapLine();
 
-            for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
+            for (int i = 0; i < MainButtonsCache.AllButtonsAlphabetical.Count; i++)
             {
-                MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
+                MainButtonDef def = MainButtonsCache.AllButtonsAlphabetical[i];
                 bool showOnBar = !ModSettings.IsHiddenFromBar(def);
                 bool newValue = showOnBar;
                 listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
@@ -271,9 +271,9 @@ namespace Declutter_Main_Buttons_Bar
 
             listing.Gap(6f);
 
-            for (int i = 0; i < MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count; i++)
+            for (int i = 0; i < MainButtonsCache.AllButtonsAlphabeticalNoDMMBInspectButton.Count; i++)
             {
-                MainButtonDef def = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton[i];
+                MainButtonDef def = MainButtonsCache.AllButtonsAlphabeticalNoDMMBInspectButton[i];
                 bool showInMenu = !ModSettings.IsBlacklistedFromMenu(def);
                 bool newValue = showInMenu;
                 listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
