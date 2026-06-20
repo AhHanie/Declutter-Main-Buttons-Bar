@@ -57,7 +57,10 @@ namespace Declutter_Main_Buttons_Bar
 
             if (!triedToFocus && openFrames == 2)
             {
-                quickSearchWidget.Focus();
+                if (ModSettings.focusMainButtonsMenuSearch)
+                {
+                    quickSearchWidget.Focus();
+                }
                 triedToFocus = true;
             }
 

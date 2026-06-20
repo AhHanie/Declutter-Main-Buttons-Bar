@@ -27,6 +27,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
         public static bool pinMainButtonsMenuWindowRight = false;
+        public static bool focusMainButtonsMenuSearch = true;
         public static bool useSearchablePlaySettingsMenu = true;
         public static bool revealPlaySettingsOnHover = false;
         public static bool reservePlaySettingsHoverSpace = false;
@@ -132,6 +133,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
             Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
+            Scribe_Values.Look(ref focusMainButtonsMenuSearch, "focusMainButtonsMenuSearch", true);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
             Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
             Scribe_Values.Look(ref reservePlaySettingsHoverSpace, "reservePlaySettingsHoverSpace", false);
@@ -442,6 +444,7 @@ namespace Declutter_Main_Buttons_Bar
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
             pinMainButtonsMenuWindowRight = false;
+            focusMainButtonsMenuSearch = true;
             useSearchablePlaySettingsMenu = true;
             revealPlaySettingsOnHover = false;
             reservePlaySettingsHoverSpace = false;

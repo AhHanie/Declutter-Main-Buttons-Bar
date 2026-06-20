@@ -23,7 +23,7 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(Rect parent)
         {
             Rect outRect = parent.ContractedBy(8f);
-            float viewHeight = 1638f
+            float viewHeight = 1666f
                 + (MainButtonsCache.AllButtonsInOrder.Count * 28f)
                 + (MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton.Count * 28f)
                 + (Compat_FernyModConfigs.IsEnabled() ? 56f : 0f);
@@ -89,6 +89,11 @@ namespace Declutter_Main_Buttons_Bar
                 "DMMB.SettingsPinMainButtonsMenuWindowRight".Translate(),
                 ref ModSettings.pinMainButtonsMenuWindowRight,
                 "DMMB.SettingsPinMainButtonsMenuWindowRightDesc".Translate());
+            CheckboxLabeledWithNewBadge(
+                listing,
+                "DMMB.SettingsFocusMainButtonsMenuSearch".Translate(),
+                ref ModSettings.focusMainButtonsMenuSearch,
+                "DMMB.SettingsFocusMainButtonsMenuSearchDesc".Translate());
             bool useMenu = ModSettings.useSearchablePlaySettingsMenu;
             listing.CheckboxLabeled("DMMB.SettingsPlaySettingsMenuToggle".Translate(), ref useMenu);
             if (useMenu != ModSettings.useSearchablePlaySettingsMenu)
@@ -111,8 +116,7 @@ namespace Declutter_Main_Buttons_Bar
                 }
             }
 
-            CheckboxLabeledWithNewBadge(
-                listing,
+            listing.CheckboxLabeled(
                 "DMMB.SettingsPlaySettingsHoverReserveSpaceToggle".Translate(),
                 ref ModSettings.reservePlaySettingsHoverSpace,
                 "DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc".Translate());

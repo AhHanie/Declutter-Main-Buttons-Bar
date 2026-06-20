@@ -12,6 +12,8 @@
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
   <DMMB.SettingsPinMainButtonsMenuWindowRight>Open main buttons menu on the far right</DMMB.SettingsPinMainButtonsMenuWindowRight>
   <DMMB.SettingsPinMainButtonsMenuWindowRightDesc>Windows opened from this menu will also open on the far right.</DMMB.SettingsPinMainButtonsMenuWindowRightDesc>
+  <DMMB.SettingsFocusMainButtonsMenuSearch>Focus search when opening main buttons menu</DMMB.SettingsFocusMainButtonsMenuSearch>
+  <DMMB.SettingsFocusMainButtonsMenuSearchDesc>When enabled, opening the main buttons menu automatically places keyboard focus in the search box.</DMMB.SettingsFocusMainButtonsMenuSearchDesc>
   <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
   <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
   <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
