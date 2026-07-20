@@ -19,6 +19,22 @@ namespace Declutter_Main_Buttons_Bar
         public static List<MainButtonDef> customOrderDefs = new List<MainButtonDef>();
         public static Dictionary<MainButtonDef, float> freeSizeWidths = new Dictionary<MainButtonDef, float>();
         public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+
+        // Persisted representation of the Def-based collections above. Stored as strings so a
+        // missing MainButtonDef (source mod removed) never reaches Scribe_Defs/LookMode.Def and
+        // never triggers RimWorld's "Could not load reference" error.
+        private static List<string> hiddenFromBarDefNames = new List<string>();
+        private static List<string> forceShowDefNames = new List<string>();
+        private static List<string> favoriteDefNames = new List<string>();
+        private static List<string> blacklistedFromMenuDefNames = new List<string>();
+        private static List<string> customOrderDefNames = new List<string>();
+        private static Dictionary<string, float> freeSizeWidthNames = new Dictionary<string, float>();
+        private static Dictionary<string, float> freeSizeXPositionNames = new Dictionary<string, float>();
+
+        private const int CurrentMainButtonSettingsSchemaVersion = 1;
+        private static int mainButtonSettingsSchemaVersion = 0;
+        private static bool settingsRewriteRequired = false;
+
         public static float snapThreshold = 8f;
         public static bool editDropdownsMode = false;
         public static bool useAdvancedEditMode = false;
@@ -78,28 +94,44 @@ namespace Declutter_Main_Buttons_Bar
 
         public override void ExposeData()
         {
-            Scribe_Collections.Look(ref hiddenFromBarDefs, "hiddenFromBarDefs", LookMode.Def);
-            if (hiddenFromBarDefs == null)
+            if (Scribe.mode == LoadSaveMode.Saving)
             {
-                hiddenFromBarDefs = new List<MainButtonDef>();
+                // Canonical cleanup point: project the live Def-based runtime state down to
+                // names right before it is written, so a null/stale ref is never serialized.
+                hiddenFromBarDefNames = CaptureDefNames(hiddenFromBarDefs);
+                forceShowDefNames = CaptureDefNames(forceShowDefs);
+                favoriteDefNames = CaptureDefNames(favoriteDefs);
+                blacklistedFromMenuDefNames = CaptureDefNames(blacklistedFromMenuDefs);
+                customOrderDefNames = CaptureDefNames(customOrderDefs);
+                freeSizeWidthNames = CaptureDefDictionary(freeSizeWidths);
+                freeSizeXPositionNames = CaptureDefDictionary(freeSizeXPositions);
+                mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
             }
 
-            Scribe_Collections.Look(ref forceShowDefs, "forceShowDefs", LookMode.Def);
-            if (forceShowDefs == null)
+            Scribe_Values.Look(ref mainButtonSettingsSchemaVersion, "mainButtonSettingsSchemaVersion", 0);
+
+            Scribe_Collections.Look(ref hiddenFromBarDefNames, "hiddenFromBarDefs", LookMode.Value);
+            if (hiddenFromBarDefNames == null)
             {
-                forceShowDefs = new HashSet<MainButtonDef>();
+                hiddenFromBarDefNames = new List<string>();
             }
 
-            Scribe_Collections.Look(ref favoriteDefs, "favoriteDefs", LookMode.Def);
-            if (favoriteDefs == null)
+            Scribe_Collections.Look(ref forceShowDefNames, "forceShowDefs", LookMode.Value);
+            if (forceShowDefNames == null)
             {
-                favoriteDefs = new List<MainButtonDef>();
+                forceShowDefNames = new List<string>();
             }
 
-            Scribe_Collections.Look(ref blacklistedFromMenuDefs, "blacklistedFromMenuDefs", LookMode.Def);
-            if (blacklistedFromMenuDefs == null)
+            Scribe_Collections.Look(ref favoriteDefNames, "favoriteDefs", LookMode.Value);
+            if (favoriteDefNames == null)
             {
-                blacklistedFromMenuDefs = new List<MainButtonDef>();
+                favoriteDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref blacklistedFromMenuDefNames, "blacklistedFromMenuDefs", LookMode.Value);
+            if (blacklistedFromMenuDefNames == null)
+            {
+                blacklistedFromMenuDefNames = new List<string>();
             }
 
             Scribe_Collections.Look(ref dropdownConfigs, "dropdownConfigs", LookMode.Deep);
@@ -108,22 +140,22 @@ namespace Declutter_Main_Buttons_Bar
                 dropdownConfigs = new List<MainButtonDropdownConfig>();
             }
 
-            Scribe_Collections.Look(ref customOrderDefs, "customOrderDefs", LookMode.Def);
-            if (customOrderDefs == null)
+            Scribe_Collections.Look(ref customOrderDefNames, "customOrderDefs", LookMode.Value);
+            if (customOrderDefNames == null)
             {
-                customOrderDefs = new List<MainButtonDef>();
+                customOrderDefNames = new List<string>();
             }
 
-            Scribe_Collections.Look(ref freeSizeWidths, "freeSizeWidths", LookMode.Def, LookMode.Value);
-            if (freeSizeWidths == null)
+            Scribe_Collections.Look(ref freeSizeWidthNames, "freeSizeWidths", LookMode.Value, LookMode.Value);
+            if (freeSizeWidthNames == null)
             {
-                freeSizeWidths = new Dictionary<MainButtonDef, float>();
+                freeSizeWidthNames = new Dictionary<string, float>();
             }
 
-            Scribe_Collections.Look(ref freeSizeXPositions, "freeSizeXPositions", LookMode.Def, LookMode.Value);
-            if (freeSizeXPositions == null)
+            Scribe_Collections.Look(ref freeSizeXPositionNames, "freeSizeXPositions", LookMode.Value, LookMode.Value);
+            if (freeSizeXPositionNames == null)
             {
-                freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+                freeSizeXPositionNames = new Dictionary<string, float>();
             }
 
             Scribe_Values.Look(ref useAdvancedEditMode, "useFreeSizeMode", false);
@@ -189,32 +221,60 @@ namespace Declutter_Main_Buttons_Bar
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                bool anyDropped = mainButtonSettingsSchemaVersion < CurrentMainButtonSettingsSchemaVersion;
+
+                hiddenFromBarDefs = ResolveDefList(hiddenFromBarDefNames, ref anyDropped);
+                forceShowDefs = ResolveDefSet(forceShowDefNames, ref anyDropped);
+                favoriteDefs = ResolveDefList(favoriteDefNames, ref anyDropped);
+                blacklistedFromMenuDefs = ResolveDefList(blacklistedFromMenuDefNames, ref anyDropped);
+                customOrderDefs = ResolveDefList(customOrderDefNames, ref anyDropped);
+                freeSizeWidths = ResolveDefDictionary(freeSizeWidthNames, ref anyDropped);
+                freeSizeXPositions = ResolveDefDictionary(freeSizeXPositionNames, ref anyDropped);
+
+                // Nested MainButtonDropdownConfig entries are registered for PostLoadInit before this
+                // (outer) object by RimWorld's Scribe deep-loading order, so their resolved state is
+                // already available here.
+                for (int i = 0; i < dropdownConfigs.Count; i++)
+                {
+                    if (dropdownConfigs[i] != null && dropdownConfigs[i].ResolvedWithDroppedData)
+                    {
+                        anyDropped = true;
+                        break;
+                    }
+                }
+
+                // Filter knownMainButtonDefNames with the same safe resolver before
+                // DetectAndHideNewButtonsFromBarIfNeeded runs, so a reinstalled def is treated as new.
                 if (knownMainButtonDefNames == null)
                 {
                     knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
                 }
                 else
                 {
-                    knownMainButtonDefNames = knownMainButtonDefNames
-                        .Where(defName => !string.IsNullOrEmpty(defName))
-                        .ToList();
+                    List<string> filteredKnownNames = new List<string>();
+                    HashSet<string> seenKnownNames = new HashSet<string>();
+                    for (int i = 0; i < knownMainButtonDefNames.Count; i++)
+                    {
+                        string defName = knownMainButtonDefNames[i];
+                        if (string.IsNullOrEmpty(defName) || ResolveMainButtonDef(defName) == null)
+                        {
+                            anyDropped = true;
+                            continue;
+                        }
+
+                        if (seenKnownNames.Add(defName))
+                        {
+                            filteredKnownNames.Add(defName);
+                        }
+                        else
+                        {
+                            anyDropped = true;
+                        }
+                    }
+
+                    knownMainButtonDefNames = filteredKnownNames;
                 }
 
-                hiddenFromBarDefs = hiddenFromBarDefs.Where(defName => defName != null)
-                        .ToList();
-                forceShowDefs = new HashSet<MainButtonDef>(forceShowDefs.Where(defName => defName != null));
-                blacklistedFromMenuDefs = blacklistedFromMenuDefs.Where(defName => defName != null)
-                        .ToList();
-                favoriteDefs = favoriteDefs.Where(defName => defName != null)
-                        .ToList();
-                customOrderDefs = customOrderDefs.Where(defName => defName != null)
-                        .ToList();
-                freeSizeWidths = freeSizeWidths
-                    .Where(kvp => kvp.Key != null)
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                freeSizeXPositions = freeSizeXPositions
-                    .Where(kvp => kvp.Key != null)
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                 widgetWidths = widgetWidths
                     .Where(kvp => !string.IsNullOrEmpty(kvp.Key) && MainBarWidgetIds.IsKnown(kvp.Key))
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -231,7 +291,131 @@ namespace Declutter_Main_Buttons_Bar
                 {
                     disableVanillaResourceReadout = false;
                 }
+
+                mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
+                settingsRewriteRequired = anyDropped;
             }
+        }
+
+        internal static MainButtonDef ResolveMainButtonDef(string defName)
+        {
+            if (string.IsNullOrWhiteSpace(defName))
+            {
+                return null;
+            }
+
+            return DefDatabase<MainButtonDef>.GetNamedSilentFail(defName);
+        }
+
+        private static List<string> CaptureDefNames(IEnumerable<MainButtonDef> defs)
+        {
+            List<string> result = new List<string>();
+            if (defs == null)
+            {
+                return result;
+            }
+
+            foreach (MainButtonDef def in defs)
+            {
+                if (def != null && !string.IsNullOrEmpty(def.defName))
+                {
+                    result.Add(def.defName);
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, float> CaptureDefDictionary(Dictionary<MainButtonDef, float> dict)
+        {
+            Dictionary<string, float> result = new Dictionary<string, float>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, float> kvp in dict)
+            {
+                if (kvp.Key != null && !string.IsNullOrEmpty(kvp.Key.defName))
+                {
+                    result[kvp.Key.defName] = kvp.Value;
+                }
+            }
+
+            return result;
+        }
+
+        private static List<MainButtonDef> ResolveDefList(List<string> names, ref bool anyDropped)
+        {
+            List<MainButtonDef> result = new List<MainButtonDef>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+            for (int i = 0; i < names.Count; i++)
+            {
+                MainButtonDef def = ResolveMainButtonDef(names[i]);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (seen.Add(def))
+                {
+                    result.Add(def);
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        private static HashSet<MainButtonDef> ResolveDefSet(List<string> names, ref bool anyDropped)
+        {
+            return new HashSet<MainButtonDef>(ResolveDefList(names, ref anyDropped));
+        }
+
+        private static Dictionary<MainButtonDef, float> ResolveDefDictionary(Dictionary<string, float> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, float> result = new Dictionary<MainButtonDef, float>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, float> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = kvp.Value;
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        public static bool ConsumeSettingsRewriteRequired()
+        {
+            bool result = settingsRewriteRequired;
+            settingsRewriteRequired = false;
+            return result;
         }
 
         private static void RebuildCaches()
