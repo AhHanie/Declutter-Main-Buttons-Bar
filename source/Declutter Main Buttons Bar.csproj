@@ -81,6 +81,7 @@
     <Compile Include="Patches\Selector_SelectionState_Patch.cs" />
     <Compile Include="Patches\Vanilla_Widgets_Patch.cs" />
     <Compile Include="Patches\GizmoGridDrawer_DrawGizmoGrid_Patch.cs" />
+    <Compile Include="Patches\Dialog_ModSettings_Open_Patch.cs" />
     <Compile Include="Compat\Compat_CompositeLoadouts_PlaySettings_Patch.cs" />
     <Compile Include="Compat\Compat_BetterTrees_PlaySettingsHUD_Patch.cs" />
     <Compile Include="DMMBTextures.cs" />

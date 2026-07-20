@@ -6,6 +6,7 @@ using Verse.Sound;
 
 namespace Declutter_Main_Buttons_Bar
 {
+    [StaticConstructorOnStartup]
     public static class MainButtonAppearanceRenderer
     {
         private const float IconOnlySize = 32f;
