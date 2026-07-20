@@ -2,6 +2,17 @@
 <LanguageData>
   <DMMB.LoadingLabel>Decluttering UI ...</DMMB.LoadingLabel>
   <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
+  <DMMB.SettingsTabMainBar>Main Bar</DMMB.SettingsTabMainBar>
+  <DMMB.SettingsTabButtons>Buttons</DMMB.SettingsTabButtons>
+  <DMMB.SettingsTabMenus>Menus</DMMB.SettingsTabMenus>
+  <DMMB.SettingsTabHudAndWidgets>HUD &amp; Widgets</DMMB.SettingsTabHudAndWidgets>
+  <DMMB.SettingsTabGizmos>Gizmos</DMMB.SettingsTabGizmos>
+  <DMMB.SettingsTabAdvanced>Advanced</DMMB.SettingsTabAdvanced>
+  <DMMB.SettingsMainButtonVisibilityTitle>Main Button Visibility</DMMB.SettingsMainButtonVisibilityTitle>
+  <DMMB.SettingsMenuBehaviorTitle>Main Buttons Menu</DMMB.SettingsMenuBehaviorTitle>
+  <DMMB.SettingsResetFooterWarning>This resets all Declutter UI settings, including settings on other tabs.</DMMB.SettingsResetFooterWarning>
+  <DMMB.SettingsResetAllButton>Reset all settings to defaults</DMMB.SettingsResetAllButton>
+  <DMMB.SettingsResetConfirmation>Reset all Declutter UI settings to their defaults? This affects every tab and cannot be undone from this window.</DMMB.SettingsResetConfirmation>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
   <DMMB.AdvancedEditMode>Advanced edit mode</DMMB.AdvancedEditMode>
   <DMMB.AdvancedEditModeDesc>In this mode, you can resize buttons and add dropdown menus to each button.</DMMB.AdvancedEditModeDesc>
@@ -63,8 +74,6 @@
   <DMMB.SettingsGizmoScaleMapOnlyDesc>These controls only scale map gizmos which are rendered when you select either a colonist/building on the map.</DMMB.SettingsGizmoScaleMapOnlyDesc>
   <DMMB.SettingsGizmoSpacingXLabel>Gizmo spacing (X): {0}px</DMMB.SettingsGizmoSpacingXLabel>
   <DMMB.SettingsGizmoSpacingYLabel>Gizmo spacing (Y): {0}px</DMMB.SettingsGizmoSpacingYLabel>
-  <DMMB.SettingsResetLabel>Reset</DMMB.SettingsResetLabel>
-  <DMMB.SettingsReset>Reset to defaults</DMMB.SettingsReset>
   <DMMB.SettingsForceShowTitle>Force-show hidden buttons</DMMB.SettingsForceShowTitle>
   <DMMB.SettingsForceShowDesc>Select buttons that should stay available even when their normal visibility worker would hide them. Buttons hidden from the bar are still hidden.</DMMB.SettingsForceShowDesc>
   <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
