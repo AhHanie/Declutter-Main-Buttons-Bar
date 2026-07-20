@@ -98,9 +98,11 @@ namespace Declutter_Main_Buttons_Bar
                 Rect textRect = contentRect;
                 textRect.xMax = starRect.xMin - RowPadding;
 
-                if (def.Icon != null)
+                string effectiveLabel = ModSettings.GetDisplayLabel(def);
+                Texture2D effectiveIcon = ModSettings.GetDisplayIcon(def);
+                if (effectiveIcon != null)
                 {
-                    Widgets.DrawTextureFitted(iconRect, def.Icon, 1f);
+                    Widgets.DrawTextureFitted(iconRect, effectiveIcon, 1f);
                     textRect.xMin = iconRect.xMax + RowPadding;
                 }
 
@@ -121,7 +123,7 @@ namespace Declutter_Main_Buttons_Bar
                 Rect descRect = new Rect(textRect.x, blockY + titleHeight, textRect.width, descHeight);
 
                 Text.Font = GameFont.Small;
-                Widgets.Label(titleRect, def.LabelCap);
+                Widgets.Label(titleRect, effectiveLabel);
                 Text.Font = GameFont.Tiny;
                 GUI.color = enabled ? new Color(1f, 1f, 1f, 0.7f) : new Color(1f, 1f, 1f, 0.35f);
                 Widgets.Label(descRect, def.description ?? string.Empty);
@@ -143,7 +145,7 @@ namespace Declutter_Main_Buttons_Bar
                     def.Worker.InterfaceTryActivate();
                 }
 
-                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, def.description));
                 curY += RowHeight;
             }
 
@@ -179,7 +181,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < visibleDefs.Count; i++)
             {
                 MainButtonDef def = visibleDefs[i];
-                if (quickSearchWidget.filter.Matches(def.LabelCap.ToString()))
+                if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, def))
                 {
                     filtered.Add(def);
                 }
@@ -203,7 +205,7 @@ namespace Declutter_Main_Buttons_Bar
             {
                 for (int i = 0; i < visibleDefs.Count; i++)
                 {
-                    if (quickSearchWidget.filter.Matches(visibleDefs[i].LabelCap.ToString()))
+                    if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, visibleDefs[i]))
                     {
                         anyMatch = true;
                         break;

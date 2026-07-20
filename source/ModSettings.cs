@@ -19,6 +19,7 @@ namespace Declutter_Main_Buttons_Bar
         public static List<MainButtonDef> customOrderDefs = new List<MainButtonDef>();
         public static Dictionary<MainButtonDef, float> freeSizeWidths = new Dictionary<MainButtonDef, float>();
         public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+        public static Dictionary<MainButtonDef, MainButtonAppearanceConfig> mainButtonAppearances = new Dictionary<MainButtonDef, MainButtonAppearanceConfig>();
 
         // Persisted representation of the Def-based collections above. Stored as strings so a
         // missing MainButtonDef (source mod removed) never reaches Scribe_Defs/LookMode.Def and
@@ -30,8 +31,9 @@ namespace Declutter_Main_Buttons_Bar
         private static List<string> customOrderDefNames = new List<string>();
         private static Dictionary<string, float> freeSizeWidthNames = new Dictionary<string, float>();
         private static Dictionary<string, float> freeSizeXPositionNames = new Dictionary<string, float>();
+        private static Dictionary<string, MainButtonAppearanceConfig> mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
 
-        private const int CurrentMainButtonSettingsSchemaVersion = 1;
+        private const int CurrentMainButtonSettingsSchemaVersion = 2;
         private static int mainButtonSettingsSchemaVersion = 0;
         private static bool settingsRewriteRequired = false;
 
@@ -105,6 +107,7 @@ namespace Declutter_Main_Buttons_Bar
                 customOrderDefNames = CaptureDefNames(customOrderDefs);
                 freeSizeWidthNames = CaptureDefDictionary(freeSizeWidths);
                 freeSizeXPositionNames = CaptureDefDictionary(freeSizeXPositions);
+                mainButtonAppearanceNames = CaptureAppearanceDictionary(mainButtonAppearances);
                 mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
             }
 
@@ -156,6 +159,12 @@ namespace Declutter_Main_Buttons_Bar
             if (freeSizeXPositionNames == null)
             {
                 freeSizeXPositionNames = new Dictionary<string, float>();
+            }
+
+            Scribe_Collections.Look(ref mainButtonAppearanceNames, "mainButtonAppearances", LookMode.Value, LookMode.Deep);
+            if (mainButtonAppearanceNames == null)
+            {
+                mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
             }
 
             Scribe_Values.Look(ref useAdvancedEditMode, "useFreeSizeMode", false);
@@ -230,6 +239,7 @@ namespace Declutter_Main_Buttons_Bar
                 customOrderDefs = ResolveDefList(customOrderDefNames, ref anyDropped);
                 freeSizeWidths = ResolveDefDictionary(freeSizeWidthNames, ref anyDropped);
                 freeSizeXPositions = ResolveDefDictionary(freeSizeXPositionNames, ref anyDropped);
+                mainButtonAppearances = ResolveAppearanceDictionary(mainButtonAppearanceNames, ref anyDropped);
 
                 // Nested MainButtonDropdownConfig entries are registered for PostLoadInit before this
                 // (outer) object by RimWorld's Scribe deep-loading order, so their resolved state is
@@ -401,6 +411,70 @@ namespace Declutter_Main_Buttons_Bar
                 if (!result.ContainsKey(def))
                 {
                     result[def] = kvp.Value;
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, MainButtonAppearanceConfig> CaptureAppearanceDictionary(Dictionary<MainButtonDef, MainButtonAppearanceConfig> dict)
+        {
+            Dictionary<string, MainButtonAppearanceConfig> result = new Dictionary<string, MainButtonAppearanceConfig>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, MainButtonAppearanceConfig> kvp in dict)
+            {
+                if (kvp.Key == null || string.IsNullOrEmpty(kvp.Key.defName) || kvp.Value == null || kvp.Value.IsDefault)
+                {
+                    continue;
+                }
+
+                result[kvp.Key.defName] = kvp.Value;
+            }
+
+            return result;
+        }
+
+        private static Dictionary<MainButtonDef, MainButtonAppearanceConfig> ResolveAppearanceDictionary(Dictionary<string, MainButtonAppearanceConfig> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, MainButtonAppearanceConfig> result = new Dictionary<MainButtonDef, MainButtonAppearanceConfig>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, MainButtonAppearanceConfig> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                MainButtonAppearanceConfig config = kvp.Value;
+                if (def == null || config == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (config.iconPath != null && !MainButtonAppearanceCatalog.IsKnownPath(config.iconPath))
+                {
+                    anyDropped = true;
+                    config.iconPath = null;
+                }
+
+                if (config.IsDefault)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = config;
                 }
                 else
                 {
@@ -592,6 +666,97 @@ namespace Declutter_Main_Buttons_Bar
             }
         }
 
+        public static MainButtonAppearanceConfig GetAppearance(MainButtonDef def)
+        {
+            if (def != null && mainButtonAppearances.TryGetValue(def, out MainButtonAppearanceConfig config))
+            {
+                return config;
+            }
+
+            return null;
+        }
+
+        public static string GetDisplayLabel(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return string.Empty;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && config.customLabel != null)
+            {
+                return config.customLabel;
+            }
+
+            return def.LabelCap;
+        }
+
+        public static Texture2D GetDisplayIcon(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return null;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && !config.showIcon)
+            {
+                return null;
+            }
+
+            if (config != null && config.iconPath != null)
+            {
+                // Bar/menu/dropdown rendering treats a failed-to-load icon as absent rather
+                // than showing BaseContent.BadTex; the editor still surfaces BadTex directly
+                // so the player can see and reset a broken selection.
+                Texture2D texture = MainButtonAppearanceCatalog.GetTexture(config.iconPath);
+                return texture == BaseContent.BadTex ? null : texture;
+            }
+
+            return def.Icon;
+        }
+
+        // Bar/dropdown-rendering-only hint: hide the label whenever an icon is shown, instead
+        // of trying to fit both. Menu/dropdown-editor/settings-list labels are unaffected.
+        public static bool GetPreferIconOnly(MainButtonDef def)
+        {
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            return config != null && config.preferIconOnly;
+        }
+
+        public static void SetAppearance(MainButtonDef def, MainButtonAppearanceConfig config)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            if (config == null || config.IsDefault)
+            {
+                mainButtonAppearances.Remove(def);
+                return;
+            }
+
+            config.customLabel = MainButtonAppearanceConfig.NormalizeLabel(config.customLabel);
+            if (config.iconPath != null && !MainButtonAppearanceCatalog.IsKnownPath(config.iconPath))
+            {
+                config.iconPath = null;
+            }
+
+            mainButtonAppearances[def] = config;
+        }
+
+        public static void ResetAppearance(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            mainButtonAppearances.Remove(def);
+        }
+
         public static void SetVanillaResourceReadoutDisabled(bool disabled)
         {
             disableVanillaResourceReadout = disabled;
@@ -620,6 +785,7 @@ namespace Declutter_Main_Buttons_Bar
             customOrderDefs = new List<MainButtonDef>(MainButtonsCache.AllButtonsInOrder);
             freeSizeWidths.Clear();
             freeSizeXPositions.Clear();
+            mainButtonAppearances.Clear();
             editDropdownsMode = false;
             useAdvancedEditMode = false;
             useFixedWidthMode = false;

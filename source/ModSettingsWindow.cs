@@ -27,6 +27,13 @@ namespace Declutter_Main_Buttons_Bar
         private const float ForceShowToggleSize = 24f;
         private const float ForceShowRowPadding = 6f;
 
+        private const float AppearanceListHeight = 260f;
+        private const float AppearanceRowHeight = 58f;
+        private const float AppearanceIconSize = 24f;
+        private const float AppearanceRowPadding = 6f;
+        private const float AppearanceCustomizeButtonWidth = 100f;
+        private const float AppearanceCustomizeButtonHeight = 24f;
+
         private const float PanelOuterPadding = 8f;
         private const float PanelContentPadding = 17f;
 
@@ -46,9 +53,10 @@ namespace Declutter_Main_Buttons_Bar
         private static Vector2 gizmosScrollPosition = Vector2.zero;
         private static Vector2 advancedScrollPosition = Vector2.zero;
         private static Vector2 forceShowScrollPosition = Vector2.zero;
+        private static Vector2 appearanceScrollPosition = Vector2.zero;
 
         private static float mainBarContentHeight = 600f;
-        private static float buttonsContentHeight = 1200f;
+        private static float buttonsContentHeight = 1500f;
         private static float menusContentHeight = 1200f;
         private static float hudAndWidgetsContentHeight = 600f;
         private static float gizmosContentHeight = 400f;
@@ -257,6 +265,15 @@ namespace Declutter_Main_Buttons_Bar
                 listing.Label("DMMB.SettingsForceShowDesc".Translate());
                 listing.Gap(6f);
                 DrawForceShowList(listing.GetRect(ForceShowListHeight));
+
+                listing.GapLine();
+                listing.Gap(20f);
+
+                listing.Label("DMMB.SettingsAppearanceTitle".Translate());
+                listing.Gap(4f);
+                listing.Label("DMMB.SettingsAppearanceDesc".Translate());
+                listing.Gap(6f);
+                DrawAppearanceList(listing.GetRect(AppearanceListHeight));
             });
         }
 
@@ -530,6 +547,90 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             ModSettings.blacklistedFromMenuDefs = newBlacklist;
+        }
+
+        private static void DrawAppearanceList(Rect rect)
+        {
+            List<MainButtonDef> defs = MainButtonsCache.AllButtonsAlphabetical;
+            float contentHeight = defs.Count * AppearanceRowHeight;
+            Rect viewRect = new Rect(0f, 0f, rect.width - 16f, Mathf.Max(contentHeight, rect.height));
+            Widgets.BeginScrollView(rect, ref appearanceScrollPosition, viewRect);
+
+            Text.Font = GameFont.Small;
+            float smallLineHeight = Text.LineHeight;
+            Text.Font = GameFont.Tiny;
+            float tinyLineHeight = Text.LineHeight;
+            Text.Font = GameFont.Small;
+
+            TextAnchor prevAnchor = Text.Anchor;
+            float curY = 0f;
+            for (int i = 0; i < defs.Count; i++)
+            {
+                MainButtonDef def = defs[i];
+                Rect rowRect = new Rect(0f, curY, viewRect.width, AppearanceRowHeight);
+                Widgets.DrawHighlightIfMouseover(rowRect);
+
+                Rect contentRect = rowRect.ContractedBy(AppearanceRowPadding);
+                Rect buttonRect = new Rect(
+                    contentRect.xMax - AppearanceCustomizeButtonWidth,
+                    contentRect.y + (contentRect.height - AppearanceCustomizeButtonHeight) / 2f,
+                    AppearanceCustomizeButtonWidth,
+                    AppearanceCustomizeButtonHeight);
+                Rect iconRect = new Rect(
+                    contentRect.x,
+                    contentRect.y + (contentRect.height - AppearanceIconSize) / 2f,
+                    AppearanceIconSize,
+                    AppearanceIconSize);
+
+                Texture2D icon = ModSettings.GetDisplayIcon(def);
+                if (icon != null)
+                {
+                    Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                }
+
+                Rect labelRect = contentRect;
+                labelRect.xMin = iconRect.xMax + AppearanceRowPadding;
+                labelRect.xMax = buttonRect.xMin - AppearanceRowPadding;
+
+                string effectiveLabel = ModSettings.GetDisplayLabel(def);
+                MainButtonAppearanceConfig config = ModSettings.GetAppearance(def);
+                bool renamed = config != null && config.customLabel != null;
+
+                Text.Anchor = TextAnchor.MiddleLeft;
+                if (renamed)
+                {
+                    float stackHeight = smallLineHeight + tinyLineHeight;
+                    float stackY = labelRect.y + Mathf.Max(0f, (labelRect.height - stackHeight) / 2f);
+                    Rect nameRect = new Rect(labelRect.x, stackY, labelRect.width, smallLineHeight);
+                    Rect hintRect = new Rect(labelRect.x, nameRect.yMax, labelRect.width, tinyLineHeight);
+
+                    Widgets.Label(nameRect, effectiveLabel);
+
+                    Text.Font = GameFont.Tiny;
+                    Color prevColor = GUI.color;
+                    GUI.color = new Color(1f, 1f, 1f, 0.6f);
+                    Widgets.Label(hintRect, "DMMB.AppearanceOriginalNameHint".Translate(def.LabelCap));
+                    GUI.color = prevColor;
+                    Text.Font = GameFont.Small;
+                }
+                else
+                {
+                    Widgets.Label(labelRect, effectiveLabel);
+                }
+
+                Text.Anchor = prevAnchor;
+
+                if (Widgets.ButtonText(buttonRect, "DMMB.AppearanceCustomizeButton".Translate()))
+                {
+                    Find.WindowStack.Add(new MainButtonAppearanceEditorWindow(def));
+                }
+
+                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                curY += AppearanceRowHeight;
+            }
+
+            Text.Anchor = prevAnchor;
+            Widgets.EndScrollView();
         }
 
         private static void DrawForceShowList(Rect rect)

@@ -9,6 +9,22 @@
   <DMMB.SettingsTabGizmos>Gizmos</DMMB.SettingsTabGizmos>
   <DMMB.SettingsTabAdvanced>Advanced</DMMB.SettingsTabAdvanced>
   <DMMB.SettingsMainButtonVisibilityTitle>Main Button Visibility</DMMB.SettingsMainButtonVisibilityTitle>
+  <DMMB.SettingsAppearanceTitle>Button Appearance</DMMB.SettingsAppearanceTitle>
+  <DMMB.SettingsAppearanceDesc>Customize a button's name and icon without changing the mod that adds it. Custom appearance is shown in the bar, the main buttons menu, and dropdowns.</DMMB.SettingsAppearanceDesc>
+  <DMMB.AppearanceCustomizeButton>Customize</DMMB.AppearanceCustomizeButton>
+  <DMMB.AppearanceOriginalNameHint>Originally: {0}</DMMB.AppearanceOriginalNameHint>
+  <DMMB.AppearanceEditorTitle>Customize: {0}</DMMB.AppearanceEditorTitle>
+  <DMMB.AppearancePreviewLabel>Preview</DMMB.AppearancePreviewLabel>
+  <DMMB.AppearanceNameLabel>Name</DMMB.AppearanceNameLabel>
+  <DMMB.AppearanceShowIcon>Show icon</DMMB.AppearanceShowIcon>
+  <DMMB.AppearanceShowIconDesc>Hides the icon without discarding it. The label gets the released space.</DMMB.AppearanceShowIconDesc>
+  <DMMB.AppearanceIconOnly>Icon only</DMMB.AppearanceIconOnly>
+  <DMMB.AppearanceIconOnlyDesc>When an icon is shown, hides the name on the bar instead of showing both together (this is how some vanilla tabs, like History, normally look). The name is unaffected in the main buttons menu, dropdowns, and this settings list.</DMMB.AppearanceIconOnlyDesc>
+  <DMMB.AppearanceRestoreOriginalIcon>Restore original icon</DMMB.AppearanceRestoreOriginalIcon>
+  <DMMB.AppearanceIconGridTitle>Choose an icon</DMMB.AppearanceIconGridTitle>
+  <DMMB.AppearanceResetThisButton>Reset this button</DMMB.AppearanceResetThisButton>
+  <DMMB.AppearanceDone>Done</DMMB.AppearanceDone>
+  <DMMB.AppearanceCompatibilityWarning>This button uses a custom control from another mod, so the bottom bar and its hover dropdown keep their own visuals. The name and icon set here will still appear in the main buttons menu and the dropdown editor list.</DMMB.AppearanceCompatibilityWarning>
   <DMMB.SettingsMenuBehaviorTitle>Main Buttons Menu</DMMB.SettingsMenuBehaviorTitle>
   <DMMB.SettingsResetFooterWarning>This resets all Declutter UI settings, including settings on other tabs.</DMMB.SettingsResetFooterWarning>
   <DMMB.SettingsResetAllButton>Reset all settings to defaults</DMMB.SettingsResetAllButton>

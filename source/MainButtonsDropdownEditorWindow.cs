@@ -56,7 +56,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             Rect titleRect = new Rect(0f, 0f, inRect.width, Text.LineHeight);
-            Widgets.Label(titleRect, "DMMB.DropdownEditorTitle".Translate(parentDef?.LabelCap ?? string.Empty));
+            Widgets.Label(titleRect, "DMMB.DropdownEditorTitle".Translate(parentDef != null ? ModSettings.GetDisplayLabel(parentDef) : string.Empty));
 
             Text.Font = GameFont.Tiny;
             Rect descRect = new Rect(0f, titleRect.yMax + 4f, inRect.width, Text.LineHeight * 2f);
@@ -101,9 +101,11 @@ namespace Declutter_Main_Buttons_Bar
                     ModSettings.SetDropdownEntry(parentDef, def, !inDropdown);
                 }
 
-                if (def.Icon != null)
+                string effectiveLabel = ModSettings.GetDisplayLabel(def);
+                Texture2D effectiveIcon = ModSettings.GetDisplayIcon(def);
+                if (effectiveIcon != null)
                 {
-                    Widgets.DrawTextureFitted(iconRect, def.Icon, 1f);
+                    Widgets.DrawTextureFitted(iconRect, effectiveIcon, 1f);
                 }
 
                 Color prev = GUI.color;
@@ -114,11 +116,11 @@ namespace Declutter_Main_Buttons_Bar
                 }
 
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(textRect, def.LabelCap);
+                Widgets.Label(textRect, effectiveLabel);
                 Text.Anchor = prevAnchor;
                 GUI.color = prev;
 
-                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, def.description));
                 curY += RowHeight;
             }
 
@@ -148,7 +150,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < cachedDefs.Count; i++)
             {
                 MainButtonDef def = cachedDefs[i];
-                if (MatchesFilter(def))
+                if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, def))
                 {
                     filtered.Add(def);
                 }
@@ -168,7 +170,7 @@ namespace Declutter_Main_Buttons_Bar
             {
                 for (int i = 0; i < cachedDefs.Count; i++)
                 {
-                    if (MatchesFilter(cachedDefs[i]))
+                    if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, cachedDefs[i]))
                     {
                         anyMatch = true;
                         break;
@@ -179,10 +181,5 @@ namespace Declutter_Main_Buttons_Bar
             quickSearchWidget.noResultsMatched = !anyMatch;
         }
 
-        private bool MatchesFilter(MainButtonDef def)
-        {
-            return quickSearchWidget.filter.Matches(def.LabelCap.ToString())
-                || quickSearchWidget.filter.Matches(def.defName);
-        }
     }
 }

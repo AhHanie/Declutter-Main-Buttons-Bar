@@ -85,6 +85,11 @@
     <Compile Include="Compat\Compat_BetterTrees_PlaySettingsHUD_Patch.cs" />
     <Compile Include="DMMBTextures.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MainButtonAppearanceCatalog.cs" />
+    <Compile Include="MainButtonAppearanceConfig.cs" />
+    <Compile Include="MainButtonAppearanceEditorWindow.cs" />
+    <Compile Include="MainButtonAppearanceRenderer.cs" />
+    <Compile Include="MainButtonDisplayUtility.cs" />
     <Compile Include="MainButtonDropdownConfig.cs" />
     <Compile Include="MainButtonsCache.cs" />
     <Compile Include="MainButtonsDropdownEditorWindow.cs" />

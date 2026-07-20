@@ -147,7 +147,7 @@ namespace Declutter_Main_Buttons_Bar
             ref Rect hoveredRect,
             bool allowDropdown)
         {
-            def.Worker.DoButton(rect);
+            MainButtonAppearanceRenderer.DrawOrFallback(def, rect);
 
             if (ModSettings.editDropdownsMode)
             {

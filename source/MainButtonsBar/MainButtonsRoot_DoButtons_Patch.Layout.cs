@@ -195,6 +195,57 @@ namespace Declutter_Main_Buttons_Bar
             UpdateAndDrawDropdown(hoveredDef, hoveredRect);
         }
 
+        // Approximates the width this def currently renders at on the bar, for the appearance
+        // editor's live preview. Not an exact replica of the full layout pass (which also
+        // accounts for widget reservations and drag/resize state) -- close enough for preview.
+        public static float GetCurrentButtonWidth(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return 120f;
+            }
+
+            if (ModSettings.useFixedWidthMode)
+            {
+                return Mathf.Clamp(ModSettings.fixedButtonWidth, 50f, 200f);
+            }
+
+            if (ModSettings.useAdvancedEditMode)
+            {
+                if (ModSettings.freeSizeWidths.TryGetValue(def, out float stored))
+                {
+                    return Mathf.Max(MinFreeSizeWidth, stored);
+                }
+
+                return 120f;
+            }
+
+            if (Current.Game == null)
+            {
+                // Dynamic-mode width depends on def.Worker.Visible, which for some workers
+                // (e.g. Ideology's classic-mode check) dereferences game-only state and throws
+                // with no active game -- as when the appearance editor is opened from the main
+                // menu. Nothing meaningful to compute here anyway without a running game.
+                return 120f;
+            }
+
+            List<MainButtonDef> orderedVisible = GetOrderedVisibleDefs(MainButtonsCache.AllButtonsInOrder, includePinnedMenu: true);
+            float visibleUnits = 0f;
+            for (int i = 0; i < orderedVisible.Count; i++)
+            {
+                MainButtonDef visibleDef = orderedVisible[i];
+                visibleUnits += visibleDef.minimized ? 0.5f : 1f;
+            }
+
+            if (visibleUnits <= 0f)
+            {
+                return 120f;
+            }
+
+            float baseWidth = UI.screenWidth / visibleUnits;
+            return def.minimized ? baseWidth / 2f : baseWidth;
+        }
+
         public static void ReconcileFreeSizeAfterChange()
         {
             List<MainButtonDef> orderedVisible = GetOrderedVisibleDefs(MainButtonsCache.AllButtonsInOrder, includePinnedMenu: true);

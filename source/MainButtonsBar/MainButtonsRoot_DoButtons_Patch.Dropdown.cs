@@ -83,7 +83,7 @@ namespace Declutter_Main_Buttons_Bar
             {
                 MainButtonDef def = entries[i];
                 Rect rowRect = new Rect(rect.x, curY, rect.width, DropdownRowHeight);
-                def.Worker.DoButton(rowRect);
+                MainButtonAppearanceRenderer.DrawOrFallback(def, rowRect);
                 curY += DropdownRowHeight;
             }
         }
