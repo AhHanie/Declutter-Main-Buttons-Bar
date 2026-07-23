@@ -17,14 +17,17 @@ namespace Declutter_Main_Buttons_Bar
         private static readonly Color PreviewBg = new Color(0.08f, 0.08f, 0.08f, 1f);
         private static readonly Color SelectedIconBg = new Color(1f, 0.85f, 0.3f, 0.25f);
 
+        private const float DescriptionFieldHeight = 54f;
+
         private readonly MainButtonDef def;
         private string workingLabel;
+        private string workingDescription;
         private string workingIconPath;
         private bool workingShowIcon;
         private bool workingPreferIconOnly;
         private Vector2 scrollPosition;
 
-        public override Vector2 InitialSize => new Vector2(480f, 616f);
+        public override Vector2 InitialSize => new Vector2(480f, 616f + DescriptionFieldHeight + RowGap);
 
         public MainButtonAppearanceEditorWindow(MainButtonDef def)
         {
@@ -46,6 +49,7 @@ namespace Declutter_Main_Buttons_Bar
         {
             MainButtonAppearanceConfig existing = ModSettings.GetAppearance(def);
             workingLabel = existing?.customLabel ?? def.LabelCap.ToString();
+            workingDescription = existing?.customDescription ?? def.description ?? string.Empty;
             workingIconPath = existing?.iconPath;
             workingShowIcon = existing == null || existing.showIcon;
             workingPreferIconOnly = existing != null && existing.preferIconOnly;
@@ -68,6 +72,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             curY = DrawNameField(inRect, curY) + RowGap;
+            curY = DrawDescriptionField(inRect, curY) + RowGap;
             curY = DrawShowIconRow(inRect, curY) + RowGap;
             curY = DrawIconOnlyRow(inRect, curY) + RowGap;
 
@@ -151,6 +156,24 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             workingLabel = newLabel;
+            return fieldRect.yMax;
+        }
+
+        private float DrawDescriptionField(Rect inRect, float curY)
+        {
+            Text.Font = GameFont.Tiny;
+            Rect labelRect = new Rect(0f, curY, inRect.width, Text.LineHeight);
+            Widgets.Label(labelRect, "DMMB.AppearanceDescriptionLabel".Translate());
+            Text.Font = GameFont.Small;
+
+            Rect fieldRect = new Rect(0f, labelRect.yMax + 2f, inRect.width, DescriptionFieldHeight);
+            string newDescription = Widgets.TextArea(fieldRect, workingDescription);
+            if (newDescription.Length > MainButtonAppearanceConfig.MaxDescriptionLength)
+            {
+                newDescription = newDescription.Substring(0, MainButtonAppearanceConfig.MaxDescriptionLength);
+            }
+
+            workingDescription = newDescription;
             return fieldRect.yMax;
         }
 
@@ -269,9 +292,16 @@ namespace Declutter_Main_Buttons_Bar
                 normalizedLabel = null;
             }
 
+            string normalizedDescription = MainButtonAppearanceConfig.NormalizeDescription(workingDescription);
+            if (normalizedDescription == (def.description ?? string.Empty))
+            {
+                normalizedDescription = null;
+            }
+
             MainButtonAppearanceConfig config = new MainButtonAppearanceConfig
             {
                 customLabel = normalizedLabel,
+                customDescription = normalizedDescription,
                 iconPath = workingIconPath,
                 showIcon = workingShowIcon,
                 preferIconOnly = workingPreferIconOnly,

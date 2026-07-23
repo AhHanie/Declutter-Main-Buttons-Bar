@@ -45,18 +45,19 @@ namespace Declutter_Main_Buttons_Bar
         public static void Draw(MainButtonDef def, Rect rect)
         {
             string label = ModSettings.GetDisplayLabel(def) ?? string.Empty;
+            string description = ModSettings.GetDisplayDescription(def);
             Texture2D icon = ModSettings.GetDisplayIcon(def);
             bool forceIconOnly = icon != null && ModSettings.GetPreferIconOnly(def);
-            DrawInternal(def, rect, label, icon, interactive: true, forceIconOnly);
+            DrawInternal(def, rect, label, description, icon, interactive: true, forceIconOnly);
         }
 
         // label is still used for the tooltip title even when forceIconOnly hides it on-button.
         public static void DrawPreview(MainButtonDef def, Rect rect, string label, Texture2D icon, bool forceIconOnly = false)
         {
-            DrawInternal(def, rect, label ?? string.Empty, icon, interactive: false, forceIconOnly);
+            DrawInternal(def, rect, label ?? string.Empty, string.Empty, icon, interactive: false, forceIconOnly);
         }
 
-        private static void DrawInternal(MainButtonDef def, Rect rect, string label, Texture2D icon, bool interactive, bool forceIconOnly = false)
+        private static void DrawInternal(MainButtonDef def, Rect rect, string label, string description, Texture2D icon, bool interactive, bool forceIconOnly = false)
         {
             GameFont prevFont = Text.Font;
             TextAnchor prevAnchor = Text.Anchor;
@@ -153,9 +154,9 @@ namespace Declutter_Main_Buttons_Bar
                     UIHighlighter.HighlightOpportunity(rect, def.cachedHighlightTagClosed);
                 }
 
-                if (Mouse.IsOver(rect) && !def.description.NullOrEmpty())
+                if (Mouse.IsOver(rect) && !description.NullOrEmpty())
                 {
-                    TooltipHandler.TipRegion(rect, label.Colorize(ColorLibrary.Yellow) + "\n\n" + def.description);
+                    TooltipHandler.TipRegion(rect, label.Colorize(ColorLibrary.Yellow) + "\n\n" + description);
                 }
             }
             finally

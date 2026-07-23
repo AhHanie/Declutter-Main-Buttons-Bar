@@ -99,6 +99,7 @@ namespace Declutter_Main_Buttons_Bar
                 textRect.xMax = starRect.xMin - RowPadding;
 
                 string effectiveLabel = ModSettings.GetDisplayLabel(def);
+                string effectiveDescription = ModSettings.GetDisplayDescription(def);
                 Texture2D effectiveIcon = ModSettings.GetDisplayIcon(def);
                 if (effectiveIcon != null)
                 {
@@ -126,7 +127,7 @@ namespace Declutter_Main_Buttons_Bar
                 Widgets.Label(titleRect, effectiveLabel);
                 Text.Font = GameFont.Tiny;
                 GUI.color = enabled ? new Color(1f, 1f, 1f, 0.7f) : new Color(1f, 1f, 1f, 0.35f);
-                Widgets.Label(descRect, def.description ?? string.Empty);
+                Widgets.Label(descRect, effectiveDescription);
                 GUI.color = prevColor;
                 Text.Font = GameFont.Small;
 
@@ -145,7 +146,7 @@ namespace Declutter_Main_Buttons_Bar
                     def.Worker.InterfaceTryActivate();
                 }
 
-                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, def.description));
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, effectiveDescription));
                 curY += RowHeight;
             }
 

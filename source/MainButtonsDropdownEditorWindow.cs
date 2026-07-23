@@ -120,7 +120,7 @@ namespace Declutter_Main_Buttons_Bar
                 Text.Anchor = prevAnchor;
                 GUI.color = prev;
 
-                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, def.description));
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, ModSettings.GetDisplayDescription(def)));
                 curY += RowHeight;
             }
 

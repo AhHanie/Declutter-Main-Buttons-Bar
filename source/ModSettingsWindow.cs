@@ -251,7 +251,7 @@ namespace Declutter_Main_Buttons_Bar
                     MainButtonDef def = MainButtonsCache.AllButtonsAlphabetical[i];
                     bool showOnBar = !ModSettings.IsHiddenFromBar(def);
                     bool newValue = showOnBar;
-                    listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
+                    listing.CheckboxLabeled(def.LabelCap, ref newValue, ModSettings.GetDisplayDescription(def));
                     if (newValue != showOnBar)
                     {
                         ModSettings.SetHiddenFromBar(def, !newValue);
@@ -346,7 +346,7 @@ namespace Declutter_Main_Buttons_Bar
                     MainButtonDef def = MainButtonsCache.AllButtonsAlphabeticalNoDMMBInspectButton[i];
                     bool showInMenu = !ModSettings.IsBlacklistedFromMenu(def);
                     bool newValue = showInMenu;
-                    listing.CheckboxLabeled(def.LabelCap, ref newValue, def.description);
+                    listing.CheckboxLabeled(def.LabelCap, ref newValue, ModSettings.GetDisplayDescription(def));
                     if (newValue != showInMenu)
                     {
                         ModSettings.SetBlacklistedFromMenu(def, !newValue);
@@ -625,7 +625,7 @@ namespace Declutter_Main_Buttons_Bar
                     Find.WindowStack.Add(new MainButtonAppearanceEditorWindow(def));
                 }
 
-                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, ModSettings.GetDisplayDescription(def)));
                 curY += AppearanceRowHeight;
             }
 
@@ -681,7 +681,7 @@ namespace Declutter_Main_Buttons_Bar
                     ModSettings.SetForceShown(def, newValue);
                 }
 
-                TooltipHandler.TipRegion(rowRect, def.description ?? string.Empty);
+                TooltipHandler.TipRegion(rowRect, ModSettings.GetDisplayDescription(def));
                 curY += ForceShowRowHeight;
             }
 

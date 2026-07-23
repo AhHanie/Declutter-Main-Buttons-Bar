@@ -466,6 +466,13 @@ namespace Declutter_Main_Buttons_Bar
                     config.iconPath = null;
                 }
 
+                string normalizedDescription = MainButtonAppearanceConfig.NormalizeDescription(config.customDescription);
+                if (normalizedDescription != config.customDescription)
+                {
+                    anyDropped = true;
+                    config.customDescription = normalizedDescription;
+                }
+
                 if (config.IsDefault)
                 {
                     anyDropped = true;
@@ -692,6 +699,22 @@ namespace Declutter_Main_Buttons_Bar
             return def.LabelCap;
         }
 
+        public static string GetDisplayDescription(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return string.Empty;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && config.customDescription != null)
+            {
+                return config.customDescription;
+            }
+
+            return def.description ?? string.Empty;
+        }
+
         public static Texture2D GetDisplayIcon(MainButtonDef def)
         {
             if (def == null)
@@ -732,13 +755,21 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
-            if (config == null || config.IsDefault)
+            if (config == null)
             {
                 mainButtonAppearances.Remove(def);
                 return;
             }
 
             config.customLabel = MainButtonAppearanceConfig.NormalizeLabel(config.customLabel);
+            config.customDescription = MainButtonAppearanceConfig.NormalizeDescription(config.customDescription);
+
+            if (config.IsDefault)
+            {
+                mainButtonAppearances.Remove(def);
+                return;
+            }
+
             if (config.iconPath != null && !MainButtonAppearanceCatalog.IsKnownPath(config.iconPath))
             {
                 config.iconPath = null;
