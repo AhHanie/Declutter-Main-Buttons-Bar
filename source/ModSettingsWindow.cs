@@ -27,6 +27,8 @@ namespace Declutter_Main_Buttons_Bar
         private const float ForceShowToggleSize = 24f;
         private const float ForceShowRowPadding = 6f;
 
+        private const float ButtonRowColumnGap = 16f;
+
         private const float AppearanceListHeight = 260f;
         private const float AppearanceRowHeight = 58f;
         private const float AppearanceIconSize = 24f;
@@ -249,13 +251,7 @@ namespace Declutter_Main_Buttons_Bar
                 for (int i = 0; i < MainButtonsCache.AllButtonsAlphabetical.Count; i++)
                 {
                     MainButtonDef def = MainButtonsCache.AllButtonsAlphabetical[i];
-                    bool showOnBar = !ModSettings.IsHiddenFromBar(def);
-                    bool newValue = showOnBar;
-                    listing.CheckboxLabeled(def.LabelCap, ref newValue, ModSettings.GetDisplayDescription(def));
-                    if (newValue != showOnBar)
-                    {
-                        ModSettings.SetHiddenFromBar(def, !newValue);
-                    }
+                    DrawButtonVisibilityAndMinimizedRow(listing, def);
                 }
 
                 listing.GapLine();
@@ -631,6 +627,51 @@ namespace Declutter_Main_Buttons_Bar
 
             Text.Anchor = prevAnchor;
             Widgets.EndScrollView();
+        }
+
+        // Two checkboxes per row (visibility, minimized) so both controls are read as applying
+        // to the same MainButtonDef rather than two unrelated lists.
+        private static void DrawButtonVisibilityAndMinimizedRow(Listing_Standard listing, MainButtonDef def)
+        {
+            float columnWidth = (listing.ColumnWidth - ButtonRowColumnGap) / 2f;
+            string visibilityLabel = def.LabelCap;
+            string minimizedLabel = "DMMB.SettingsButtonMinimized".Translate();
+
+            float rowHeight = Mathf.Max(
+                Text.CalcHeight(visibilityLabel, columnWidth),
+                Text.CalcHeight(minimizedLabel, columnWidth));
+
+            Rect rowRect = listing.GetRect(rowHeight);
+            Rect visibilityRect = new Rect(rowRect.x, rowRect.y, columnWidth, rowRect.height);
+            Rect minimizedRect = new Rect(rowRect.xMax - columnWidth, rowRect.y, columnWidth, rowRect.height);
+
+            bool showOnBar = !ModSettings.IsHiddenFromBar(def);
+            bool newShowValue = showOnBar;
+            if (Mouse.IsOver(visibilityRect))
+            {
+                Widgets.DrawHighlight(visibilityRect);
+            }
+            TooltipHandler.TipRegion(visibilityRect, ModSettings.GetDisplayDescription(def));
+            Widgets.CheckboxLabeled(visibilityRect, visibilityLabel, ref newShowValue);
+            if (newShowValue != showOnBar)
+            {
+                ModSettings.SetHiddenFromBar(def, !newShowValue);
+            }
+
+            bool minimized = ModSettings.IsMinimized(def);
+            bool newMinimizedValue = minimized;
+            if (Mouse.IsOver(minimizedRect))
+            {
+                Widgets.DrawHighlight(minimizedRect);
+            }
+            TooltipHandler.TipRegion(minimizedRect, "DMMB.SettingsButtonMinimizedDesc".Translate());
+            Widgets.CheckboxLabeled(minimizedRect, minimizedLabel, ref newMinimizedValue);
+            if (newMinimizedValue != minimized)
+            {
+                ModSettings.SetMinimized(def, newMinimizedValue);
+            }
+
+            listing.Gap(listing.verticalSpacing);
         }
 
         private static void DrawForceShowList(Rect rect)

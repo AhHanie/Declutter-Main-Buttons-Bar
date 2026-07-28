@@ -31,6 +31,8 @@
   <DMMB.SettingsResetAllButton>Reset all settings to defaults</DMMB.SettingsResetAllButton>
   <DMMB.SettingsResetConfirmation>Reset all Declutter UI settings to their defaults? This affects every tab and cannot be undone from this window.</DMMB.SettingsResetConfirmation>
   <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
+  <DMMB.SettingsButtonMinimized>Minimized</DMMB.SettingsButtonMinimized>
+  <DMMB.SettingsButtonMinimizedDesc>Use half width in the adaptive main button bar, so the button takes up less horizontal space. Only affects the adaptive (non-fixed) bar layout; fixed-width mode uses the same width for every button, and advanced edit mode only uses this as the starting width for a button you haven't manually resized yet.</DMMB.SettingsButtonMinimizedDesc>
   <DMMB.AdvancedEditMode>Advanced edit mode</DMMB.AdvancedEditMode>
   <DMMB.AdvancedEditModeDesc>In this mode, you can resize buttons and add dropdown menus to each button.</DMMB.AdvancedEditModeDesc>
   <DMMB.SettingsSnapThresholdLabel>Snap threshold: {0}px</DMMB.SettingsSnapThresholdLabel>

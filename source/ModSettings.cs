@@ -20,6 +20,7 @@ namespace Declutter_Main_Buttons_Bar
         public static Dictionary<MainButtonDef, float> freeSizeWidths = new Dictionary<MainButtonDef, float>();
         public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
         public static Dictionary<MainButtonDef, MainButtonAppearanceConfig> mainButtonAppearances = new Dictionary<MainButtonDef, MainButtonAppearanceConfig>();
+        public static Dictionary<MainButtonDef, bool> minimizedOverrides = new Dictionary<MainButtonDef, bool>();
 
         // Persisted representation of the Def-based collections above. Stored as strings so a
         // missing MainButtonDef (source mod removed) never reaches Scribe_Defs/LookMode.Def and
@@ -32,6 +33,7 @@ namespace Declutter_Main_Buttons_Bar
         private static Dictionary<string, float> freeSizeWidthNames = new Dictionary<string, float>();
         private static Dictionary<string, float> freeSizeXPositionNames = new Dictionary<string, float>();
         private static Dictionary<string, MainButtonAppearanceConfig> mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
+        private static Dictionary<string, bool> minimizedOverrideNames = new Dictionary<string, bool>();
 
         private const int CurrentMainButtonSettingsSchemaVersion = 2;
         private static int mainButtonSettingsSchemaVersion = 0;
@@ -108,6 +110,7 @@ namespace Declutter_Main_Buttons_Bar
                 freeSizeWidthNames = CaptureDefDictionary(freeSizeWidths);
                 freeSizeXPositionNames = CaptureDefDictionary(freeSizeXPositions);
                 mainButtonAppearanceNames = CaptureAppearanceDictionary(mainButtonAppearances);
+                minimizedOverrideNames = CaptureDefDictionary(minimizedOverrides);
                 mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
             }
 
@@ -165,6 +168,12 @@ namespace Declutter_Main_Buttons_Bar
             if (mainButtonAppearanceNames == null)
             {
                 mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
+            }
+
+            Scribe_Collections.Look(ref minimizedOverrideNames, "minimizedOverrides", LookMode.Value, LookMode.Value);
+            if (minimizedOverrideNames == null)
+            {
+                minimizedOverrideNames = new Dictionary<string, bool>();
             }
 
             Scribe_Values.Look(ref useAdvancedEditMode, "useFreeSizeMode", false);
@@ -240,6 +249,7 @@ namespace Declutter_Main_Buttons_Bar
                 freeSizeWidths = ResolveDefDictionary(freeSizeWidthNames, ref anyDropped);
                 freeSizeXPositions = ResolveDefDictionary(freeSizeXPositionNames, ref anyDropped);
                 mainButtonAppearances = ResolveAppearanceDictionary(mainButtonAppearanceNames, ref anyDropped);
+                minimizedOverrides = ResolveDefDictionary(minimizedOverrideNames, ref anyDropped);
 
                 // Nested MainButtonDropdownConfig entries are registered for PostLoadInit before this
                 // (outer) object by RimWorld's Scribe deep-loading order, so their resolved state is
@@ -349,6 +359,55 @@ namespace Declutter_Main_Buttons_Bar
                 if (kvp.Key != null && !string.IsNullOrEmpty(kvp.Key.defName))
                 {
                     result[kvp.Key.defName] = kvp.Value;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, bool> CaptureDefDictionary(Dictionary<MainButtonDef, bool> dict)
+        {
+            Dictionary<string, bool> result = new Dictionary<string, bool>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, bool> kvp in dict)
+            {
+                if (kvp.Key != null && !string.IsNullOrEmpty(kvp.Key.defName))
+                {
+                    result[kvp.Key.defName] = kvp.Value;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<MainButtonDef, bool> ResolveDefDictionary(Dictionary<string, bool> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, bool> result = new Dictionary<MainButtonDef, bool>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, bool> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = kvp.Value;
+                }
+                else
+                {
+                    anyDropped = true;
                 }
             }
 
@@ -641,6 +700,38 @@ namespace Declutter_Main_Buttons_Bar
             MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
         }
 
+        // Per-user layout override: whether def.minimized is honored as-is or overridden by the
+        // player. Not persisted on MainButtonDef itself so the choice never leaks to other
+        // consumers of the shared def.
+        public static bool IsMinimized(MainButtonDef def)
+        {
+            if (def != null && minimizedOverrides.TryGetValue(def, out bool minimized))
+            {
+                return minimized;
+            }
+
+            return def != null && def.minimized;
+        }
+
+        public static void SetMinimized(MainButtonDef def, bool minimized)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            minimizedOverrides[def] = minimized;
+
+            // The stale rect can otherwise anchor a dropdown to the wrong position once the
+            // bar reflows at the new width.
+            MainButtonsRoot_DoButtons_Patch.ClearDropdownState();
+
+            if (useAdvancedEditMode)
+            {
+                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterChange();
+            }
+        }
+
         public static bool IsFavorite(MainButtonDef def)
         {
             return favoriteDefs.Contains(def);
@@ -825,6 +916,7 @@ namespace Declutter_Main_Buttons_Bar
             freeSizeWidths.Clear();
             freeSizeXPositions.Clear();
             mainButtonAppearances.Clear();
+            minimizedOverrides.Clear();
             editDropdownsMode = false;
             useAdvancedEditMode = false;
             useFixedWidthMode = false;

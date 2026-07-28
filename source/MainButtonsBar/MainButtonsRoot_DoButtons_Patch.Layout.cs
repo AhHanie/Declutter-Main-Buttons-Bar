@@ -59,7 +59,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < orderedVisible.Count; i++)
             {
                 MainButtonDef def = orderedVisible[i];
-                visibleUnits += def.minimized ? 0.5f : 1f;
+                visibleUnits += ModSettings.IsMinimized(def) ? 0.5f : 1f;
             }
 
             if (visibleUnits <= 0f)
@@ -73,7 +73,7 @@ namespace Declutter_Main_Buttons_Bar
             float pinnedWidth = 0f;
             if (pinMenuRight)
             {
-                pinnedWidth = pinnedMenuDef.minimized ? miniWidth : baseWidth;
+                pinnedWidth = ModSettings.IsMinimized(pinnedMenuDef) ? miniWidth : baseWidth;
             }
 
             List<string> widgetIds = ModSettings.GetEnabledWidgetIds();
@@ -170,7 +170,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < orderedVisible.Count; i++)
             {
                 MainButtonDef def = orderedVisible[i];
-                visibleUnits += def.minimized ? 0.5f : 1f;
+                visibleUnits += ModSettings.IsMinimized(def) ? 0.5f : 1f;
             }
 
             float baseWidth = visibleUnits > 0f ? UI.screenWidth / visibleUnits : 100f;
@@ -234,7 +234,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < orderedVisible.Count; i++)
             {
                 MainButtonDef visibleDef = orderedVisible[i];
-                visibleUnits += visibleDef.minimized ? 0.5f : 1f;
+                visibleUnits += ModSettings.IsMinimized(visibleDef) ? 0.5f : 1f;
             }
 
             if (visibleUnits <= 0f)
@@ -243,7 +243,7 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             float baseWidth = UI.screenWidth / visibleUnits;
-            return def.minimized ? baseWidth / 2f : baseWidth;
+            return ModSettings.IsMinimized(def) ? baseWidth / 2f : baseWidth;
         }
 
         public static void ReconcileFreeSizeAfterChange()
@@ -259,7 +259,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < orderedVisible.Count; i++)
             {
                 MainButtonDef def = orderedVisible[i];
-                visibleUnits += def.minimized ? 0.5f : 1f;
+                visibleUnits += ModSettings.IsMinimized(def) ? 0.5f : 1f;
             }
 
             float baseWidth = visibleUnits > 0f ? UI.screenWidth / visibleUnits : 100f;
@@ -445,7 +445,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < defs.Count; i++)
             {
                 MainButtonDef def = defs[i];
-                widths[def] = def.minimized ? miniWidth : baseWidth;
+                widths[def] = ModSettings.IsMinimized(def) ? miniWidth : baseWidth;
             }
 
             return widths;
@@ -459,7 +459,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < defs.Count; i++)
             {
                 MainButtonDef def = defs[i];
-                float defaultWidth = def.minimized ? miniWidth : baseWidth;
+                float defaultWidth = ModSettings.IsMinimized(def) ? miniWidth : baseWidth;
                 if (stored.TryGetValue(def, out float value))
                 {
                     widths[def] = value;
