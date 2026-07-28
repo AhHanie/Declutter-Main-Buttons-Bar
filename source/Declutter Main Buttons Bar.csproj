@@ -106,6 +106,7 @@
     <Compile Include="MainButtonsBar\MainButtonsRoot_DoButtons_Patch.Widgets.cs" />
     <Compile Include="MainButtonsBar\MainBarWidgetIds.cs" />
     <Compile Include="Patches\MainButtonsRoot_DoButtons_Patch.cs" />
+    <Compile Include="Patches\MainButtonWorker_Disabled_Patch.cs" />
     <Compile Include="Patches\MainTabWindow_RightAlign_Patch.cs" />
     <Compile Include="Patches\MapControlsTable_Patch.cs" />
     <Compile Include="MapControlsMenuWindow.cs" />

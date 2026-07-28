@@ -26,7 +26,7 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
-            if (!openDropdownDef.Worker.Visible || !ShouldShowOnBar(openDropdownDef))
+            if ((!ModSettings.IsForceShown(openDropdownDef) && !openDropdownDef.Worker.Visible) || !ShouldShowOnBar(openDropdownDef))
             {
                 ClearDropdownState();
                 return;
