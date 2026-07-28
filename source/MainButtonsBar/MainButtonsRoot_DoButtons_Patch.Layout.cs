@@ -398,7 +398,7 @@ namespace Declutter_Main_Buttons_Bar
             for (int i = 0; i < allButtons.Count; i++)
             {
                 MainButtonDef def = allButtons[i];
-                if ((!ModSettings.IsForceShown(def) && !def.Worker.Visible) || !ShouldShowOnBar(def))
+                if (!ModSettings.ShouldDisplayMainButton(def) || !ShouldShowOnBar(def))
                 {
                     continue;
                 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -14,25 +16,59 @@ namespace Declutter_Main_Buttons_Bar
         private const float IconPadding = 6f;
         private const float IconTextGap = 4f;
         private static readonly Texture2D BarFillTex = SolidColorMaterials.NewSolidColorTexture(TexUI.FinishedResearchColorTransparent);
+        private static readonly Dictionary<Type, bool> SupportsCache = new Dictionary<Type, bool>();
 
         public static bool Supports(MainButtonDef def)
         {
-            if (def?.Worker == null)
+            if (def == null)
             {
                 return false;
             }
 
-            Type workerType = def.Worker.GetType();
-            return workerType == typeof(MainButtonWorker)
-                || workerType == typeof(MainButtonWorker_ToggleTab)
-                || workerType == typeof(MainButtonWorker_ToggleWorld)
-                || workerType == typeof(MainButtonWorker_ToggleResearchTab)
-                || workerType == typeof(MainButtonWorker_ToggleMechTab);
+            MainButtonWorker worker = def.Worker;
+            if (worker == null)
+            {
+                return false;
+            }
+
+            Type workerType = worker.GetType();
+            if (SupportsCache.TryGetValue(workerType, out bool supports))
+            {
+                return supports;
+            }
+
+            // Declutter reproduces the base worker's drawing while preserving its virtual
+            // state and activation hooks. A worker that overrides DoButton may have visuals
+            // or interactions we cannot safely reproduce, so it remains on the fallback path.
+            MethodInfo doButton = workerType.GetMethod(
+                nameof(MainButtonWorker.DoButton),
+                BindingFlags.Instance | BindingFlags.Public,
+                null,
+                new[] { typeof(Rect) },
+                null);
+            supports = doButton != null && doButton.DeclaringType == typeof(MainButtonWorker);
+            SupportsCache[workerType] = supports;
+            return supports;
         }
 
         public static void DrawOrFallback(MainButtonDef def, Rect rect)
         {
             if (Supports(def) && ModSettings.GetAppearance(def) != null)
+            {
+                Draw(def, rect);
+            }
+            else
+            {
+                def.Worker.DoButton(rect);
+            }
+        }
+
+        // Dropdown rows should communicate their destination without requiring the player to
+        // first save an appearance override. Compatible workers use Declutter's renderer so an
+        // icon and label can be shown together; custom-drawn workers retain their own visuals.
+        public static void DrawDropdownRowOrFallback(MainButtonDef def, Rect rect)
+        {
+            if (Supports(def))
             {
                 Draw(def, rect);
             }

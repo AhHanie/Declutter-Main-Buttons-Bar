@@ -26,7 +26,7 @@ namespace Declutter_Main_Buttons_Bar
                 return;
             }
 
-            if ((!ModSettings.IsForceShown(openDropdownDef) && !openDropdownDef.Worker.Visible) || !ShouldShowOnBar(openDropdownDef))
+            if (!ModSettings.ShouldDisplayMainButton(openDropdownDef) || !ShouldShowOnBar(openDropdownDef))
             {
                 ClearDropdownState();
                 return;
@@ -83,7 +83,7 @@ namespace Declutter_Main_Buttons_Bar
             {
                 MainButtonDef def = entries[i];
                 Rect rowRect = new Rect(rect.x, curY, rect.width, DropdownRowHeight);
-                MainButtonAppearanceRenderer.DrawOrFallback(def, rowRect);
+                MainButtonAppearanceRenderer.DrawDropdownRowOrFallback(def, rowRect);
                 curY += DropdownRowHeight;
             }
         }

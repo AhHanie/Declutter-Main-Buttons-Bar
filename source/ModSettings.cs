@@ -579,7 +579,7 @@ namespace Declutter_Main_Buttons_Bar
                 }
 
                 List<MainButtonDef> entries = config.entries
-                    .Where(entry => entry != config.parent && entry.Worker.Visible)
+                    .Where(entry => entry != config.parent && ShouldDisplayMainButton(entry))
                     .Distinct()
                     .ToList();
 
@@ -597,6 +597,13 @@ namespace Declutter_Main_Buttons_Bar
         public static bool IsForceShown(MainButtonDef def)
         {
             return forceShowDefs.Contains(def);
+        }
+
+        // Force-show is a Declutter presentation override. Keep this policy in one place so
+        // the bar, menus, and dropdowns do not disagree about which entries are available.
+        public static bool ShouldDisplayMainButton(MainButtonDef def)
+        {
+            return def != null && (IsForceShown(def) || def.Worker.Visible);
         }
 
         public static void SetHiddenFromBar(MainButtonDef def, bool hidden)
@@ -630,6 +637,7 @@ namespace Declutter_Main_Buttons_Bar
                 forceShowDefs.Remove(def);
             }
 
+            dropdownCacheDirty = true;
             MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
         }
 
