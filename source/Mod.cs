@@ -24,8 +24,8 @@ namespace Declutter_Main_Buttons_Bar
             MainButtonsCache.Rebuild();
             Settings = GetSettings<ModSettings>();
             bool settingsChanged = Compat_FernyModConfigs.TryApplyAfterGetSettings(Settings);
-            settingsChanged |= ModSettings.ConsumeSettingsRewriteRequired();
             ModSettings.Init();
+            settingsChanged |= ModSettings.ConsumeSettingsRewriteRequired();
             new Harmony("sk.dmmb").PatchAll();
             settingsChanged |= ModSettings.DetectAndHideNewButtonsFromBarIfNeeded();
             settingsChanged |= ModSettings.EnsureCustomOrderCoverage();

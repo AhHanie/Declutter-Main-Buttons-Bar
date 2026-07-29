@@ -35,7 +35,7 @@ namespace Declutter_Main_Buttons_Bar
         private static Dictionary<string, MainButtonAppearanceConfig> mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
         private static Dictionary<string, bool> minimizedOverrideNames = new Dictionary<string, bool>();
 
-        private const int CurrentMainButtonSettingsSchemaVersion = 2;
+        private const int CurrentMainButtonSettingsSchemaVersion = 3;
         private static int mainButtonSettingsSchemaVersion = 0;
         private static bool settingsRewriteRequired = false;
 
@@ -256,7 +256,7 @@ namespace Declutter_Main_Buttons_Bar
                 // already available here.
                 for (int i = 0; i < dropdownConfigs.Count; i++)
                 {
-                    if (dropdownConfigs[i] != null && dropdownConfigs[i].ResolvedWithDroppedData)
+                    if (dropdownConfigs[i] != null && dropdownConfigs[i].RequiresSettingsRewrite)
                     {
                         anyDropped = true;
                         break;
@@ -570,7 +570,10 @@ namespace Declutter_Main_Buttons_Bar
         public static void Init()
         {
             RebuildCaches();
-            NormalizeDropdownConfigs();
+            if (NormalizeDropdownConfigs())
+            {
+                settingsRewriteRequired = true;
+            }
             enabledWidgetCacheInitialized = false;
         }
 
@@ -637,7 +640,15 @@ namespace Declutter_Main_Buttons_Bar
                     continue;
                 }
 
-                List<MainButtonDef> entries = config.entries
+                // entryOrder is kept in sync with entries by NormalizeDropdownConfigs/SetDropdownEntry;
+                // fall back to entries for a config that has not been normalized yet.
+                IEnumerable<MainButtonDef> orderedSource = config.entryOrder != null && config.entryOrder.Count > 0
+                    ? config.entryOrder
+                    : config.entries;
+
+                // Visibility filtering happens here, after the player's chosen order is
+                // resolved, so a temporarily-hidden entry does not lose its saved position.
+                List<MainButtonDef> entries = orderedSource
                     .Where(entry => entry != config.parent && ShouldDisplayMainButton(entry))
                     .Distinct()
                     .ToList();
@@ -1096,18 +1107,6 @@ namespace Declutter_Main_Buttons_Bar
             return new List<MainButtonDef>();
         }
 
-        public static bool IsInDropdown(MainButtonDef parent, MainButtonDef entry)
-        {
-            MainButtonDropdownConfig config = dropdownConfigs.Find(item => item.parent == parent);
-
-            if (config == null)
-            {
-                return false;
-            }
-
-            return config.entries.Contains(entry);
-        }
-
         public static void SetDropdownEntry(MainButtonDef parent, MainButtonDef entry, bool enabled)
         {
             if (entry == parent)
@@ -1122,10 +1121,21 @@ namespace Declutter_Main_Buttons_Bar
                 {
                     config.entries.Add(entry);
                 }
+
+                if (config.entryOrder == null)
+                {
+                    config.entryOrder = new List<MainButtonDef>();
+                }
+
+                if (!config.entryOrder.Contains(entry))
+                {
+                    config.entryOrder.Add(entry);
+                }
             }
             else
             {
                 config.entries.Remove(entry);
+                config.entryOrder?.Remove(entry);
                 if (config.entries.Count == 0)
                 {
                     dropdownConfigs.Remove(config);
@@ -1133,6 +1143,35 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             dropdownCacheDirty = true;
+        }
+
+        // Bounded reorder within one dropdown's entryOrder. direction is -1 (earlier) or +1 (later);
+        // a move past either end is a no-op rather than wrapping.
+        public static void MoveDropdownEntry(MainButtonDef parent, MainButtonDef entry, int direction)
+        {
+            MainButtonDropdownConfig config = GetDropdownConfig(parent);
+            if (config?.entryOrder == null)
+            {
+                return;
+            }
+
+            int index = config.entryOrder.IndexOf(entry);
+            int targetIndex = index + direction;
+            if (index < 0 || targetIndex < 0 || targetIndex >= config.entryOrder.Count)
+            {
+                return;
+            }
+
+            MainButtonDef moved = config.entryOrder[index];
+            config.entryOrder[index] = config.entryOrder[targetIndex];
+            config.entryOrder[targetIndex] = moved;
+
+            dropdownCacheDirty = true;
+        }
+
+        public static MainButtonDropdownConfig GetDropdownConfig(MainButtonDef parent)
+        {
+            return dropdownConfigs.Find(item => item.parent == parent);
         }
 
         private static MainButtonDropdownConfig GetOrCreateDropdownConfig(MainButtonDef parent)
@@ -1143,7 +1182,8 @@ namespace Declutter_Main_Buttons_Bar
                 config = new MainButtonDropdownConfig
                 {
                     parent = parent,
-                    entries = new List<MainButtonDef>()
+                    entries = new List<MainButtonDef>(),
+                    entryOrder = new List<MainButtonDef>()
                 };
                 dropdownConfigs.Add(config);
             }
@@ -1151,12 +1191,57 @@ namespace Declutter_Main_Buttons_Bar
             return config;
         }
 
-        private static void NormalizeDropdownConfigs()
+        // Deterministic fallback sequence for entries with no saved manual order: vanilla
+        // MainButtonDef.order first, then defName as an ordinal tie-breaker so buttons sharing
+        // an order value (vanilla or modded) still sort the same way on every machine.
+        public static List<MainButtonDef> GetStableDefaultDropdownOrder(IEnumerable<MainButtonDef> defs)
+        {
+            if (defs == null)
+            {
+                return new List<MainButtonDef>();
+            }
+
+            return defs
+                .Where(def => def != null)
+                .Distinct()
+                .OrderBy(def => def.order)
+                .ThenBy(def => def.defName, StringComparer.Ordinal)
+                .ToList();
+        }
+
+        private static bool DropdownDefListsEqual(List<MainButtonDef> a, List<MainButtonDef> b)
+        {
+            if (a == null || b == null)
+            {
+                return a == b;
+            }
+
+            if (a.Count != b.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Returns true when membership or order changed, so callers can trigger a settings
+        // rewrite and cache invalidation.
+        private static bool NormalizeDropdownConfigs()
         {
             if (dropdownConfigs == null)
             {
                 dropdownConfigs = new List<MainButtonDropdownConfig>();
             }
+
+            bool changed = false;
 
             for (int i = dropdownConfigs.Count - 1; i >= 0; i--)
             {
@@ -1164,24 +1249,56 @@ namespace Declutter_Main_Buttons_Bar
                 if (config == null || config.parent == null)
                 {
                     dropdownConfigs.RemoveAt(i);
+                    changed = true;
                     continue;
                 }
 
-                if (config.entries == null)
-                {
-                    config.entries = new List<MainButtonDef>();
-                }
-
-                config.entries = config.entries
+                List<MainButtonDef> normalizedEntries = (config.entries ?? new List<MainButtonDef>())
                     .Where(entry => entry != null && entry != config.parent)
                     .Distinct()
                     .ToList();
 
+                if (!DropdownDefListsEqual(config.entries, normalizedEntries))
+                {
+                    changed = true;
+                }
+
+                config.entries = normalizedEntries;
+
                 if (config.entries.Count == 0)
                 {
                     dropdownConfigs.RemoveAt(i);
+                    changed = true;
+                    continue;
                 }
+
+                HashSet<MainButtonDef> memberSet = new HashSet<MainButtonDef>(config.entries);
+                List<MainButtonDef> normalizedOrder = (config.entryOrder ?? new List<MainButtonDef>())
+                    .Where(entry => entry != null && memberSet.Contains(entry))
+                    .Distinct()
+                    .ToList();
+
+                if (normalizedOrder.Count != config.entries.Count)
+                {
+                    HashSet<MainButtonDef> seenOrder = new HashSet<MainButtonDef>(normalizedOrder);
+                    List<MainButtonDef> missing = config.entries.Where(entry => !seenOrder.Contains(entry)).ToList();
+                    normalizedOrder.AddRange(GetStableDefaultDropdownOrder(missing));
+                }
+
+                if (!DropdownDefListsEqual(config.entryOrder, normalizedOrder))
+                {
+                    changed = true;
+                }
+
+                config.entryOrder = normalizedOrder;
             }
+
+            if (changed)
+            {
+                dropdownCacheDirty = true;
+            }
+
+            return changed;
         }
     }
 }

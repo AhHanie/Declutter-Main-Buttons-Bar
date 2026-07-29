@@ -285,8 +285,7 @@ namespace Declutter_Main_Buttons_Bar
                     ref ModSettings.pinMainButtonsMenuWindowRight,
                     "DMMB.SettingsPinMainButtonsMenuWindowRightDesc".Translate());
 
-                CheckboxLabeledWithNewBadge(
-                    listing,
+                listing.CheckboxLabeled(
                     "DMMB.SettingsFocusMainButtonsMenuSearch".Translate(),
                     ref ModSettings.focusMainButtonsMenuSearch,
                     "DMMB.SettingsFocusMainButtonsMenuSearchDesc".Translate());
