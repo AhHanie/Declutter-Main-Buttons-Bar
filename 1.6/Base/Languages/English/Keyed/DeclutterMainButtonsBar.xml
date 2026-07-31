@@ -40,6 +40,8 @@
   <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
   <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
   <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
+  <DMMB.SettingsRenderDropdownsAboveWindows>Render dropdowns above windows</DMMB.SettingsRenderDropdownsAboveWindows>
+  <DMMB.SettingsRenderDropdownsAboveWindowsDesc>When enabled, main-button dropdowns draw above open main-tab windows instead of beneath them.</DMMB.SettingsRenderDropdownsAboveWindowsDesc>
   <DMMB.SettingsPinMainButtonsMenuWindowRight>Open main buttons menu on the far right</DMMB.SettingsPinMainButtonsMenuWindowRight>
   <DMMB.SettingsPinMainButtonsMenuWindowRightDesc>Windows opened from this menu will also open on the far right.</DMMB.SettingsPinMainButtonsMenuWindowRightDesc>
   <DMMB.SettingsFocusMainButtonsMenuSearch>Focus search when opening main buttons menu</DMMB.SettingsFocusMainButtonsMenuSearch>

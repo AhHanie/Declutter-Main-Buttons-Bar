@@ -41,7 +41,25 @@ namespace Declutter_Main_Buttons_Bar
 
             Rect dropdownRect = CalculateDropdownRect(openDropdownButtonRect, entries.Count);
             openDropdownRect = dropdownRect;
-            DrawDropdownList(dropdownRect, entries);
+
+            if (ModSettings.renderDropdownsAboveWindows)
+            {
+                Find.WindowStack.ImmediateWindow(
+                    DropdownWindowId,
+                    dropdownRect,
+                    WindowLayer.Super,
+                    delegate
+                    {
+                        DrawDropdownList(dropdownRect.AtZero(), entries);
+                    },
+                    doBackground: false,
+                    absorbInputAroundWindow: false,
+                    shadowAlpha: 0f);
+            }
+            else
+            {
+                DrawDropdownList(dropdownRect, entries);
+            }
 
             if (!IsMouseOverDropdownArea(openDropdownButtonRect, dropdownRect))
             {
@@ -65,15 +83,17 @@ namespace Declutter_Main_Buttons_Bar
 
         private static bool IsMouseOverDropdownArea(Rect buttonRect, Rect dropdownRect)
         {
-            if (Mouse.IsOver(buttonRect) || Mouse.IsOver(dropdownRect))
-            {
-                return true;
-            }
-
             float gapYMin = Mathf.Min(buttonRect.yMin, dropdownRect.yMin);
             float gapYMax = Mathf.Max(buttonRect.yMax, dropdownRect.yMax);
             Rect bridgeRect = new Rect(dropdownRect.x, gapYMin, dropdownRect.width, gapYMax - gapYMin);
-            return Mouse.IsOver(bridgeRect);
+
+            if (ModSettings.renderDropdownsAboveWindows)
+            {
+                Vector2 mousePosition = Event.current.mousePosition;
+                return buttonRect.Contains(mousePosition) || dropdownRect.Contains(mousePosition) || bridgeRect.Contains(mousePosition);
+            }
+
+            return Mouse.IsOver(buttonRect) || Mouse.IsOver(dropdownRect) || Mouse.IsOver(bridgeRect);
         }
 
         private static void DrawDropdownList(Rect rect, List<MainButtonDef> entries)

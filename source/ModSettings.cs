@@ -46,6 +46,7 @@ namespace Declutter_Main_Buttons_Bar
         public static float fixedButtonWidth = 120f;
         public static bool centerFixedWidthButtons = false;
         public static bool pinMenuButtonRight = false;
+        public static bool renderDropdownsAboveWindows = false;
         public static bool pinMainButtonsMenuWindowRight = false;
         public static bool focusMainButtonsMenuSearch = true;
         public static bool useSearchablePlaySettingsMenu = true;
@@ -182,6 +183,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref snapThreshold, "snapThreshold", 8f);
             Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
             Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
+            Scribe_Values.Look(ref renderDropdownsAboveWindows, "renderDropdownsAboveWindows", false);
             Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
             Scribe_Values.Look(ref focusMainButtonsMenuSearch, "focusMainButtonsMenuSearch", true);
             Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
@@ -935,6 +937,7 @@ namespace Declutter_Main_Buttons_Bar
             snapThreshold = 8f;
             centerFixedWidthButtons = false;
             pinMenuButtonRight = false;
+            renderDropdownsAboveWindows = false;
             pinMainButtonsMenuWindowRight = false;
             focusMainButtonsMenuSearch = true;
             useSearchablePlaySettingsMenu = true;

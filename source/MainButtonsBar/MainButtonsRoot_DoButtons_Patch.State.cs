@@ -14,6 +14,8 @@ namespace Declutter_Main_Buttons_Bar
         private const float ResizeHandleSize = 12f;
         private const float MinFreeSizeWidth = 16f;
 
+        private const int DropdownWindowId = 918273645;
+
         private static MainButtonDef openDropdownDef;
         private static Rect openDropdownButtonRect;
         private static Rect openDropdownRect;

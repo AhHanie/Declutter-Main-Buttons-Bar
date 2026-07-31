@@ -223,6 +223,11 @@ namespace Declutter_Main_Buttons_Bar
                 listing.CheckboxLabeled("DMMB.SettingsPinMenuRight".Translate(), ref ModSettings.pinMenuButtonRight);
 
                 listing.CheckboxLabeled(
+                    "DMMB.SettingsRenderDropdownsAboveWindows".Translate(),
+                    ref ModSettings.renderDropdownsAboveWindows,
+                    "DMMB.SettingsRenderDropdownsAboveWindowsDesc".Translate());
+
+                listing.CheckboxLabeled(
                     "DMMB.SettingsDefaultNewButtonsHidden".Translate(),
                     ref ModSettings.defaultNewButtonsToHidden,
                     "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
