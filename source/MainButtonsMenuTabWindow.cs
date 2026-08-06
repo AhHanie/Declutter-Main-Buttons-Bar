@@ -95,11 +95,13 @@ namespace Declutter_Main_Buttons_Bar
                 GUI.color = prev;
 
                 Rect contentRect = rowRect.ContractedBy(RowPadding);
-                Rect starRect = new Rect(contentRect.xMax - StarSize, contentRect.y + (contentRect.height - StarSize) / 2f, StarSize, StarSize);
-                Rect barActionRect = new Rect(starRect.xMin - ControlGap - BarActionSize, contentRect.y + (contentRect.height - BarActionSize) / 2f, BarActionSize, BarActionSize);
+                float controlGroupHeight = BarActionSize + ControlGap + StarSize;
+                float controlGroupY = contentRect.y + (contentRect.height - controlGroupHeight) / 2f;
+                Rect barActionRect = new Rect(contentRect.xMax - BarActionSize, controlGroupY, BarActionSize, BarActionSize);
+                Rect starRect = new Rect(contentRect.xMax - StarSize, controlGroupY + BarActionSize + ControlGap, StarSize, StarSize);
                 Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
                 Rect textRect = contentRect;
-                textRect.xMax = barActionRect.xMin - RowPadding;
+                textRect.xMax = starRect.xMin - RowPadding;
 
                 string effectiveLabel = ModSettings.GetDisplayLabel(def);
                 string effectiveDescription = ModSettings.GetDisplayDescription(def);
