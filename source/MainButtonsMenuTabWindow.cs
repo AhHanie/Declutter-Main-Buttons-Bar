@@ -13,10 +13,8 @@ namespace Declutter_Main_Buttons_Bar
         private const float IconSize = 28f;
         private const float RowPadding = 6f;
         private const float StarSize = 22f;
-        private const float AddToBarSize = 22f;
-        private const float RemoveFromBarSize = 22f;
-        private const float ControlRowGap = 4f;
-        private const float AddRemoveGap = 4f;
+        private const float BarActionSize = 22f;
+        private const float ControlGap = 4f;
         private static readonly Color PanelBg = new Color(0.11f, 0.11f, 0.11f, 1f);
         private static readonly Color RowLine = new Color(1f, 1f, 1f, 0.08f);
 
@@ -97,15 +95,11 @@ namespace Declutter_Main_Buttons_Bar
                 GUI.color = prev;
 
                 Rect contentRect = rowRect.ContractedBy(RowPadding);
-                float controlGroupHeight = StarSize + ControlRowGap + Mathf.Max(AddToBarSize, RemoveFromBarSize);
-                float controlGroupY = contentRect.y + (contentRect.height - controlGroupHeight) / 2f;
-                Rect starRect = new Rect(contentRect.xMax - StarSize, controlGroupY, StarSize, StarSize);
-                float secondControlRowY = controlGroupY + StarSize + ControlRowGap;
-                Rect addToBarRect = new Rect(contentRect.xMax - AddToBarSize, secondControlRowY, AddToBarSize, AddToBarSize);
-                Rect removeFromBarRect = new Rect(addToBarRect.xMin - AddRemoveGap - RemoveFromBarSize, secondControlRowY, RemoveFromBarSize, RemoveFromBarSize);
+                Rect starRect = new Rect(contentRect.xMax - StarSize, contentRect.y + (contentRect.height - StarSize) / 2f, StarSize, StarSize);
+                Rect barActionRect = new Rect(starRect.xMin - ControlGap - BarActionSize, contentRect.y + (contentRect.height - BarActionSize) / 2f, BarActionSize, BarActionSize);
                 Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
                 Rect textRect = contentRect;
-                textRect.xMax = removeFromBarRect.xMin - RowPadding;
+                textRect.xMax = barActionRect.xMin - RowPadding;
 
                 string effectiveLabel = ModSettings.GetDisplayLabel(def);
                 string effectiveDescription = ModSettings.GetDisplayDescription(def);
@@ -149,21 +143,28 @@ namespace Declutter_Main_Buttons_Bar
                     Mod.Settings.Write();
                 }
 
-                bool addToBarClicked = Widgets.ButtonImage(addToBarRect, TexButton.Plus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuShowOnBarTooltip".Translate());
-                if (addToBarClicked && ModSettings.IsHiddenFromBar(def))
+                bool hiddenFromBar = ModSettings.IsHiddenFromBar(def);
+                bool barActionClicked;
+                if (hiddenFromBar)
                 {
-                    ModSettings.SetHiddenFromBar(def, hidden: false);
-                    Mod.Settings.Write();
+                    barActionClicked = Widgets.ButtonImage(barActionRect, TexButton.Plus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuShowOnBarTooltip".Translate());
+                    if (barActionClicked)
+                    {
+                        ModSettings.SetHiddenFromBar(def, hidden: false);
+                        Mod.Settings.Write();
+                    }
+                }
+                else
+                {
+                    barActionClicked = Widgets.ButtonImage(barActionRect, TexButton.Minus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuHideFromBarTooltip".Translate());
+                    if (barActionClicked)
+                    {
+                        ModSettings.SetHiddenFromBar(def, hidden: true);
+                        Mod.Settings.Write();
+                    }
                 }
 
-                bool removeFromBarClicked = Widgets.ButtonImage(removeFromBarRect, TexButton.Minus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuHideFromBarTooltip".Translate());
-                if (removeFromBarClicked && !ModSettings.IsHiddenFromBar(def))
-                {
-                    ModSettings.SetHiddenFromBar(def, hidden: true);
-                    Mod.Settings.Write();
-                }
-
-                if (enabled && !starClicked && !addToBarClicked && !removeFromBarClicked && Widgets.ButtonInvisible(rowRect))
+                if (enabled && !starClicked && !barActionClicked && Widgets.ButtonInvisible(rowRect))
                 {
                     MainTabWindow_RightAlign_Eligibility.NotifyMainButtonOpenedFromMenu(def);
                     def.Worker.InterfaceTryActivate();
