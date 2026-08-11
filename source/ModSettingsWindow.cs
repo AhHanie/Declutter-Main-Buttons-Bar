@@ -232,6 +232,11 @@ namespace Declutter_Main_Buttons_Bar
                     ref ModSettings.defaultNewButtonsToHidden,
                     "DMMB.SettingsDefaultNewButtonsHiddenDesc".Translate());
 
+                listing.CheckboxLabeled(
+                    "DMMB.SettingsPlaceShownButtonsBeforeMenu".Translate(),
+                    ref ModSettings.placeShownButtonsBeforeMenuButton,
+                    "DMMB.SettingsPlaceShownButtonsBeforeMenuDesc".Translate());
+
                 bool oldExperimentalAtlasOptimization = ModSettings.experimentalMainButtonsAtlasOptimization;
                 listing.CheckboxLabeled(
                     "DMMB.SettingsExperimentalAtlasOptimization".Translate(),

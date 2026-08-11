@@ -57,6 +57,8 @@
   <DMMB.SettingsHidePlaySettingsEditModeButtonDesc>Only applies when searchable play settings menu is disabled.</DMMB.SettingsHidePlaySettingsEditModeButtonDesc>
   <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>
   <DMMB.SettingsDefaultNewButtonsHiddenDesc>When enabled, newly added main buttons (from new or updated mods) are automatically hidden from the bottom bar.</DMMB.SettingsDefaultNewButtonsHiddenDesc>
+  <DMMB.SettingsPlaceShownButtonsBeforeMenu>Place shown buttons before the Main Buttons Menu button</DMMB.SettingsPlaceShownButtonsBeforeMenu>
+  <DMMB.SettingsPlaceShownButtonsBeforeMenuDesc>When enabled, showing a previously hidden main button (via the +/- control or the checkbox list) moves it immediately before this mod's Main Buttons Menu button instead of leaving it at its previous position. Falls back to normal ordering if the Main Buttons Menu button is hidden from the bottom bar.</DMMB.SettingsPlaceShownButtonsBeforeMenuDesc>
   <DMMB.SettingsWidgetsTitle>Widgets</DMMB.SettingsWidgetsTitle>
   <DMMB.SettingsWidgetTime>Show in-game time/date widget</DMMB.SettingsWidgetTime>
   <DMMB.SettingsWidgetTimeDesc>Shows the vanilla in-game date and time readout as a bar widget.</DMMB.SettingsWidgetTimeDesc>

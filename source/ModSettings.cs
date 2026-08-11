@@ -54,6 +54,7 @@ namespace Declutter_Main_Buttons_Bar
         public static bool reservePlaySettingsHoverSpace = false;
         public static bool hideEditModePlaySettingsButton = false;
         public static bool defaultNewButtonsToHidden = false;
+        public static bool placeShownButtonsBeforeMenuButton = false;
         public static bool showTimeWidget = false;
         public static bool showTimeIrlWidget = false;
         public static bool showTimeSpeedWidget = false;
@@ -191,6 +192,7 @@ namespace Declutter_Main_Buttons_Bar
             Scribe_Values.Look(ref reservePlaySettingsHoverSpace, "reservePlaySettingsHoverSpace", false);
             Scribe_Values.Look(ref hideEditModePlaySettingsButton, "hideEditModePlaySettingsButton", false);
             Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
+            Scribe_Values.Look(ref placeShownButtonsBeforeMenuButton, "placeShownButtonsBeforeMenuButton", false);
             Scribe_Values.Look(ref showTimeWidget, "showTimeWidget", false);
             Scribe_Values.Look(ref showTimeIrlWidget, "showTimeIrlWidget", false);
             Scribe_Values.Look(ref showTimeSpeedWidget, "showTimeSpeedWidget", false);
@@ -690,8 +692,13 @@ namespace Declutter_Main_Buttons_Bar
             }
             else
             {
-                hiddenFromBarDefs.Remove(def);
+                bool wasHidden = hiddenFromBarDefs.Remove(def);
                 hiddenFromBarSet.Remove(def);
+
+                if (wasHidden && placeShownButtonsBeforeMenuButton)
+                {
+                    InsertDefsBeforeMenuButton(new List<MainButtonDef> { def });
+                }
             }
 
             dropdownCacheDirty = true;
@@ -945,6 +952,7 @@ namespace Declutter_Main_Buttons_Bar
             reservePlaySettingsHoverSpace = false;
             hideEditModePlaySettingsButton = false;
             defaultNewButtonsToHidden = false;
+            placeShownButtonsBeforeMenuButton = false;
             showTimeWidget = false;
             showTimeIrlWidget = false;
             showTimeSpeedWidget = false;
@@ -998,7 +1006,6 @@ namespace Declutter_Main_Buttons_Bar
             HashSet<string> knownDefs = new HashSet<string>(knownMainButtonDefNames);
             bool settingsChanged = false;
 
-           
             for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
             {
                 MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
@@ -1021,6 +1028,60 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             return settingsChanged;
+        }
+
+        private static void InsertDefsBeforeMenuButton(List<MainButtonDef> defsToInsert)
+        {
+            MainButtonDef menuDef = MainButtonsMenuDefOf.DMMB_MainButtonsMenu;
+            if (menuDef == null || IsHiddenFromBar(menuDef))
+            {
+                return;
+            }
+
+            HashSet<MainButtonDef> newSet = new HashSet<MainButtonDef>(defsToInsert);
+            List<MainButtonDef> allButtons = MainButtonsCache.AllButtonsInOrder;
+            HashSet<MainButtonDef> allButtonsSet = new HashSet<MainButtonDef>(allButtons);
+
+            List<MainButtonDef> normalized = new List<MainButtonDef>(allButtons.Count);
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+
+            if (customOrderDefs != null)
+            {
+                for (int i = 0; i < customOrderDefs.Count; i++)
+                {
+                    MainButtonDef def = customOrderDefs[i];
+                    if (def == null || newSet.Contains(def) || !allButtonsSet.Contains(def))
+                    {
+                        continue;
+                    }
+
+                    if (seen.Add(def))
+                    {
+                        normalized.Add(def);
+                    }
+                }
+            }
+
+            for (int i = 0; i < allButtons.Count; i++)
+            {
+                MainButtonDef def = allButtons[i];
+                if (newSet.Contains(def) || !seen.Add(def))
+                {
+                    continue;
+                }
+
+                normalized.Add(def);
+            }
+
+            int menuIndex = normalized.IndexOf(menuDef);
+            if (menuIndex < 0)
+            {
+                return;
+            }
+
+            normalized.InsertRange(menuIndex, defsToInsert);
+            customOrderDefs = normalized;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
         }
 
         public static bool IsWidgetEnabled(string widgetId)
