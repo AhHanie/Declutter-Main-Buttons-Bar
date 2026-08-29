@@ -84,6 +84,7 @@
     <Compile Include="Patches\Dialog_ModSettings_Open_Patch.cs" />
     <Compile Include="Compat\Compat_CompositeLoadouts_PlaySettings_Patch.cs" />
     <Compile Include="Compat\Compat_BetterTrees_PlaySettingsHUD_Patch.cs" />
+    <Compile Include="Compat\Compat_QualityJobs_PlaySettings_Patch.cs" />
     <Compile Include="DMMBTextures.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainButtonAppearanceCatalog.cs" />
