@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using RimWorld;
 using Verse;
 
 namespace Declutter_Main_Buttons_Bar.Compat
@@ -44,6 +46,10 @@ namespace Declutter_Main_Buttons_Bar.Compat
                 // but we preserve it explicitly in case a future preset version includes the field.
                 bool savedOptOut = ModSettings.autoLoadFernyModConfigs;
 
+                // Favorites are player-owned and must never be overwritten by a Ferny preset, so snapshot
+                // them before the load and restore them only after FinalizeLoading's post-load init runs.
+                List<MainButtonDef> savedFavoriteDefs = new List<MainButtonDef>(ModSettings.favoriteDefs ?? new List<MainButtonDef>());
+
                 // Use RimWorld's own Scribe machinery to deserialize the preset into the static fields.
                 // This mirrors LoadedModManager.ReadModSettings exactly, and the PostLoadInit pass
                 // in FinalizeLoading runs ExposeData's cleanup/invariant block automatically.
@@ -59,6 +65,7 @@ namespace Declutter_Main_Buttons_Bar.Compat
                 }
 
                 ModSettings.autoLoadFernyModConfigs = savedOptOut;
+                ModSettings.favoriteDefs = new List<MainButtonDef>(savedFavoriteDefs);
 
                 if (preset != null)
                 {
