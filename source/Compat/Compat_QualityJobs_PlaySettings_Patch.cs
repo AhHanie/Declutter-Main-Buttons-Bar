@@ -9,6 +9,7 @@ using Verse;
 namespace Declutter_Main_Buttons_Bar
 {
     [HarmonyPatch]
+    [StaticConstructorOnStartup]
     public static class Compat_QualityJobs_PlaySettings_Patch
     {
         private const string PackageId = "EPrime.QualityJobs";
@@ -30,7 +31,9 @@ namespace Declutter_Main_Buttons_Bar
         private static Func<object, bool> showToolbarButtonGetter;
         private static Func<Mod> instanceGetter;
 
-        private static Texture2D icon;
+        // Loaded via the static constructor (StaticConstructorOnStartup) rather than
+        // lazily, since Texture2D/asset loading must happen on the main thread.
+        private static readonly Texture2D icon = ContentFinder<Texture2D>.Get(IconPath, false);
 
         static bool Prepare()
         {
@@ -194,11 +197,6 @@ namespace Declutter_Main_Buttons_Bar
 
         private static bool TryGetIcon(out Texture2D texture)
         {
-            if (icon == null)
-            {
-                icon = ContentFinder<Texture2D>.Get(IconPath, false);
-            }
-
             texture = icon;
             return icon != null;
         }
