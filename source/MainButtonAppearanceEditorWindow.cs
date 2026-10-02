@@ -13,6 +13,7 @@ namespace Declutter_Main_Buttons_Bar
         private const float IconThumbnailSize = 32f;
         private const float RowGap = 8f;
         private const float FooterHeight = 34f;
+        private const float SectionHeaderPadding = 4f;
 
         private static readonly Color PreviewBg = new Color(0.08f, 0.08f, 0.08f, 1f);
         private static readonly Color SelectedIconBg = new Color(1f, 0.85f, 0.3f, 0.25f);
@@ -81,6 +82,7 @@ namespace Declutter_Main_Buttons_Bar
             Widgets.Label(gridLabelRect, "DMMB.AppearanceIconGridTitle".Translate());
             Text.Font = GameFont.Small;
             curY = gridLabelRect.yMax + 2f;
+            curY = DrawUnavailableSelectionNote(inRect, curY);
 
             Rect footerRect = new Rect(0f, inRect.height - FooterHeight, inRect.width, FooterHeight);
             Rect gridRect = new Rect(0f, curY, inRect.width, footerRect.y - RowGap - curY);
@@ -133,7 +135,13 @@ namespace Declutter_Main_Buttons_Bar
 
             if (workingIconPath != null)
             {
-                return MainButtonAppearanceCatalog.GetTexture(workingIconPath);
+                // Unavailable optional-pack choices preview the original icon, matching
+                // ModSettings.GetDisplayIcon; the editor still surfaces BadTex for built-ins.
+                Texture2D texture = MainButtonAppearanceCatalog.GetTexture(workingIconPath);
+                if (texture != null)
+                {
+                    return texture;
+                }
             }
 
             return def.Icon;
@@ -202,30 +210,82 @@ namespace Declutter_Main_Buttons_Bar
             return rowRect.yMax;
         }
 
+        private float DrawUnavailableSelectionNote(Rect inRect, float curY)
+        {
+            if (workingIconPath == null
+                || MainButtonAppearanceCatalog.GetTexture(workingIconPath) != null
+                || !MainButtonAppearanceCatalog.TryDescribe(workingIconPath, out string sourceLabel, out string leafName))
+            {
+                return curY;
+            }
+
+            Text.Font = GameFont.Tiny;
+            string note = "DMMB.AppearanceSelectionUnavailable".Translate(leafName, sourceLabel);
+            float height = Text.CalcHeight(note, inRect.width);
+            Rect noteRect = new Rect(0f, curY, inRect.width, height);
+
+            Color prevColor = GUI.color;
+            GUI.color = new Color(1f, 0.8f, 0.4f, 1f);
+            Widgets.Label(noteRect, note);
+            GUI.color = prevColor;
+            Text.Font = GameFont.Small;
+
+            return noteRect.yMax + 2f;
+        }
+
         private void DrawIconGrid(Rect outRect)
         {
-            IReadOnlyList<string> paths = MainButtonAppearanceCatalog.IconPaths;
+            IReadOnlyList<MainButtonIconSource> sources = MainButtonAppearanceCatalog.GetSources();
             float viewWidth = outRect.width - 16f;
             int columns = Mathf.Max(1, Mathf.FloorToInt(viewWidth / IconCellSize));
-            int rows = Mathf.CeilToInt(paths.Count / (float)columns);
-            float viewHeight = Mathf.Max(outRect.height, rows * IconCellSize);
-            Rect viewRect = new Rect(0f, 0f, viewWidth, viewHeight);
+
+            // Section headers are only needed when more than one source is available.
+            bool showHeaders = sources.Count > 1;
+            float headerHeight = showHeaders ? Text.LineHeightOf(GameFont.Tiny) + SectionHeaderPadding : 0f;
+
+            float contentHeight = 0f;
+            for (int s = 0; s < sources.Count; s++)
+            {
+                int rows = Mathf.CeilToInt(sources[s].Entries.Count / (float)columns);
+                contentHeight += headerHeight + rows * IconCellSize;
+            }
+
+            Rect viewRect = new Rect(0f, 0f, viewWidth, Mathf.Max(outRect.height, contentHeight));
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
 
-            for (int i = 0; i < paths.Count; i++)
+            float curY = 0f;
+            for (int s = 0; s < sources.Count; s++)
             {
-                int col = i % columns;
-                int row = i / columns;
-                Rect cellRect = new Rect(col * IconCellSize, row * IconCellSize, IconCellSize, IconCellSize);
-                DrawIconCell(cellRect, paths[i]);
+                MainButtonIconSource source = sources[s];
+                if (showHeaders)
+                {
+                    Text.Font = GameFont.Tiny;
+                    Rect headerRect = new Rect(0f, curY, viewWidth, headerHeight);
+                    GUI.color = Color.gray;
+                    Widgets.Label(headerRect, source.LabelKey.Translate() + " (" + source.Entries.Count + ")");
+                    GUI.color = Color.white;
+                    Text.Font = GameFont.Small;
+                    curY += headerHeight;
+                }
+
+                for (int i = 0; i < source.Entries.Count; i++)
+                {
+                    int col = i % columns;
+                    int row = i / columns;
+                    Rect cellRect = new Rect(col * IconCellSize, curY + row * IconCellSize, IconCellSize, IconCellSize);
+                    DrawIconCell(cellRect, source.Entries[i]);
+                }
+
+                curY += Mathf.CeilToInt(source.Entries.Count / (float)columns) * IconCellSize;
             }
 
             Widgets.EndScrollView();
         }
 
-        private void DrawIconCell(Rect cellRect, string path)
+        private void DrawIconCell(Rect cellRect, MainButtonIconEntry entry)
         {
+            string path = entry.Key;
             bool selected = path == workingIconPath;
             bool hovered = Mouse.IsOver(cellRect);
 
@@ -255,8 +315,7 @@ namespace Declutter_Main_Buttons_Bar
                 Widgets.DrawBox(cellRect, 2);
             }
 
-            string fileName = path.Substring(path.LastIndexOf('/') + 1);
-            TooltipHandler.TipRegion(cellRect, fileName);
+            TooltipHandler.TipRegion(cellRect, entry.Name + "\n" + entry.SourceLabelKey.Translate());
 
             if (Widgets.ButtonInvisible(cellRect))
             {

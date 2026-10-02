@@ -23,6 +23,9 @@
   <DMMB.AppearanceIconOnlyDesc>When an icon is shown, hides the name on the bar instead of showing both together (this is how some vanilla tabs, like History, normally look). The name is unaffected in the main buttons menu, dropdowns, and this settings list.</DMMB.AppearanceIconOnlyDesc>
   <DMMB.AppearanceRestoreOriginalIcon>Restore original icon</DMMB.AppearanceRestoreOriginalIcon>
   <DMMB.AppearanceIconGridTitle>Choose an icon</DMMB.AppearanceIconGridTitle>
+  <DMMB.AppearanceSourceBuiltIn>Declutter UI</DMMB.AppearanceSourceBuiltIn>
+  <DMMB.AppearanceSourceBradson>Bradson's Main Button Icons</DMMB.AppearanceSourceBradson>
+  <DMMB.AppearanceSelectionUnavailable>"{0}" from {1} is unavailable. The original icon is shown; your choice is kept.</DMMB.AppearanceSelectionUnavailable>
   <DMMB.AppearanceResetThisButton>Reset this button</DMMB.AppearanceResetThisButton>
   <DMMB.AppearanceDone>Done</DMMB.AppearanceDone>
   <DMMB.AppearanceCompatibilityWarning>This button uses a custom control from another mod, so the bottom bar and its hover dropdown keep their own visuals and tooltip. The name, description, and icon set here will still appear in the main buttons menu and the dropdown editor list.</DMMB.AppearanceCompatibilityWarning>

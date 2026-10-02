@@ -523,7 +523,8 @@ namespace Declutter_Main_Buttons_Bar
                     continue;
                 }
 
-                if (config.iconPath != null && !MainButtonAppearanceCatalog.IsKnownPath(config.iconPath))
+                // Only malformed keys are dropped; a valid key from an inactive icon pack is kept.
+                if (config.iconPath != null && !MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
                 {
                     anyDropped = true;
                     config.iconPath = null;
@@ -853,7 +854,20 @@ namespace Declutter_Main_Buttons_Bar
                 // than showing BaseContent.BadTex; the editor still surfaces BadTex directly
                 // so the player can see and reset a broken selection.
                 Texture2D texture = MainButtonAppearanceCatalog.GetTexture(config.iconPath);
-                return texture == BaseContent.BadTex ? null : texture;
+                if (texture != null)
+                {
+                    return texture == BaseContent.BadTex ? null : texture;
+                }
+
+                // A valid optional-pack selection whose mod or texture is unavailable falls
+                // back to the original icon; the saved choice is retained.
+                if (MainButtonAppearanceCatalog.IsExternalKey(config.iconPath)
+                    && MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
+                {
+                    return def.Icon;
+                }
+
+                return null;
             }
 
             return def.Icon;
@@ -883,15 +897,15 @@ namespace Declutter_Main_Buttons_Bar
             config.customLabel = MainButtonAppearanceConfig.NormalizeLabel(config.customLabel);
             config.customDescription = MainButtonAppearanceConfig.NormalizeDescription(config.customDescription);
 
+            if (config.iconPath != null && !MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
+            {
+                config.iconPath = null;
+            }
+
             if (config.IsDefault)
             {
                 mainButtonAppearances.Remove(def);
                 return;
-            }
-
-            if (config.iconPath != null && !MainButtonAppearanceCatalog.IsKnownPath(config.iconPath))
-            {
-                config.iconPath = null;
             }
 
             mainButtonAppearances[def] = config;
