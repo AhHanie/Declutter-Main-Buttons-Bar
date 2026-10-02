@@ -108,11 +108,19 @@ namespace Declutter_Main_Buttons_Bar
                 Folder = "UI/Buttons/MainButtons/",
                 LabelKey = "DMMB.AppearanceSourceBradson",
             },
+            new Provider
+            {
+                PackageId = "vanillaexpanded.vtexe",
+                Folder = "UI/Buttons/MainButtons/",
+                LabelKey = "DMMB.AppearanceSourceVTE",
+            },
         };
 
         private sealed class ProviderState
         {
             public Provider Provider;
+            public ModContentPack Pack;
+            public int PackIndex = -1;
             public ModContentHolder<Texture2D> Holder;
             public int HolderCount;
             public MainButtonIconSource Source;
@@ -128,8 +136,8 @@ namespace Declutter_Main_Buttons_Bar
         private static List<ModContentPack> lastRunningMods;
         private static int lastRunningModsCount;
 
-        // Fixed order: built-in, Bradson's, Architect Icons. Optional groups appear only while
-        // their mod is active and has loaded textures in its icon folder.
+        // Fixed order: built-in, Bradson's Main Button Icons, Vanilla Textures Expanded. Optional
+        // groups appear only while their mod is active and has loaded textures in its icon folder.
         public static IReadOnlyList<MainButtonIconSource> GetSources()
         {
             EnsureProviderState();
@@ -223,6 +231,15 @@ namespace Declutter_Main_Buttons_Bar
 
         private static Texture2D GetExternalTexture(string key)
         {
+            if (!TryParseExternalKey(key, out Provider provider, out string path))
+            {
+                return null;
+            }
+
+            // Refresh first: a rebuild clears the cache, so a texture from a provider that has
+            // since gone away or reloaded is never returned. This is cheap enough for IMGUI.
+            EnsureProviderState();
+
             // A destroyed Unity object compares equal to null, so a stale entry is re-resolved.
             if (TextureCache.TryGetValue(key, out Texture2D cached) && cached != null)
             {
@@ -230,12 +247,6 @@ namespace Declutter_Main_Buttons_Bar
             }
 
             TextureCache.Remove(key);
-            if (!TryParseExternalKey(key, out Provider provider, out string path))
-            {
-                return null;
-            }
-
-            EnsureProviderState();
             for (int i = 0; i < providerStates.Length; i++)
             {
                 ProviderState state = providerStates[i];
@@ -341,7 +352,7 @@ namespace Declutter_Main_Buttons_Bar
             if (providerStates != null
                 && ReferenceEquals(running, lastRunningMods)
                 && running.Count == lastRunningModsCount
-                && ProviderStatesCurrent())
+                && ProviderStatesCurrent(running))
             {
                 return;
             }
@@ -365,12 +376,22 @@ namespace Declutter_Main_Buttons_Bar
             sources = result;
         }
 
-        private static bool ProviderStatesCurrent()
+        private static bool ProviderStatesCurrent(List<ModContentPack> running)
         {
             for (int i = 0; i < providerStates.Length; i++)
             {
                 ProviderState state = providerStates[i];
-                if (state.Holder != null && state.Holder.contentList.Count != state.HolderCount)
+                if (state.Holder == null)
+                {
+                    continue;
+                }
+
+                // The list can be reused with the same count while its contents change, and a
+                // reloaded pack swaps its holder contents.
+                if (state.PackIndex >= running.Count
+                    || running[state.PackIndex] != state.Pack
+                    || state.Pack.GetContentHolder<Texture2D>() != state.Holder
+                    || state.Holder.contentList.Count != state.HolderCount)
                 {
                     return false;
                 }
@@ -390,6 +411,8 @@ namespace Declutter_Main_Buttons_Bar
                     continue;
                 }
 
+                state.Pack = pack;
+                state.PackIndex = i;
                 state.Holder = pack.GetContentHolder<Texture2D>();
                 break;
             }

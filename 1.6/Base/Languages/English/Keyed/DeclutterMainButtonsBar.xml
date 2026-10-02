@@ -25,6 +25,7 @@
   <DMMB.AppearanceIconGridTitle>Choose an icon</DMMB.AppearanceIconGridTitle>
   <DMMB.AppearanceSourceBuiltIn>Declutter UI</DMMB.AppearanceSourceBuiltIn>
   <DMMB.AppearanceSourceBradson>Bradson's Main Button Icons</DMMB.AppearanceSourceBradson>
+  <DMMB.AppearanceSourceVTE>Vanilla Textures Expanded</DMMB.AppearanceSourceVTE>
   <DMMB.AppearanceSelectionUnavailable>"{0}" from {1} is unavailable. The original icon is shown; your choice is kept.</DMMB.AppearanceSelectionUnavailable>
   <DMMB.AppearanceResetThisButton>Reset this button</DMMB.AppearanceResetThisButton>
   <DMMB.AppearanceDone>Done</DMMB.AppearanceDone>
