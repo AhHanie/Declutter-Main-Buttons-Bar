@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <DMMB.LoadingLabel>Decluttering UI ...</DMMB.LoadingLabel>
+  <DMMB.SettingsTitle>Declutter UI</DMMB.SettingsTitle>
+  <DMMB.SettingsTabMainBar>Main Bar</DMMB.SettingsTabMainBar>
+  <DMMB.SettingsTabButtons>Buttons</DMMB.SettingsTabButtons>
+  <DMMB.SettingsTabMenus>Menus</DMMB.SettingsTabMenus>
+  <DMMB.SettingsTabHudAndWidgets>HUD &amp; Widgets</DMMB.SettingsTabHudAndWidgets>
+  <DMMB.SettingsTabGizmos>Gizmos</DMMB.SettingsTabGizmos>
+  <DMMB.SettingsTabAdvanced>Advanced</DMMB.SettingsTabAdvanced>
+  <DMMB.SettingsMainButtonVisibilityTitle>Main Button Visibility</DMMB.SettingsMainButtonVisibilityTitle>
+  <DMMB.SettingsAppearanceTitle>Button Appearance</DMMB.SettingsAppearanceTitle>
+  <DMMB.SettingsAppearanceDesc>Customize a button's name, description, and icon without changing the mod that adds it. The result appears in the bar, the main buttons menu, and dropdowns wherever Declutter UI renders the button.</DMMB.SettingsAppearanceDesc>
+  <DMMB.AppearanceCustomizeButton>Customize</DMMB.AppearanceCustomizeButton>
+  <DMMB.AppearanceOriginalNameHint>Originally: {0}</DMMB.AppearanceOriginalNameHint>
+  <DMMB.AppearanceEditorTitle>Customize: {0}</DMMB.AppearanceEditorTitle>
+  <DMMB.AppearancePreviewLabel>Preview</DMMB.AppearancePreviewLabel>
+  <DMMB.AppearanceNameLabel>Name</DMMB.AppearanceNameLabel>
+  <DMMB.AppearanceDescriptionLabel>Description</DMMB.AppearanceDescriptionLabel>
+  <DMMB.AppearanceShowIcon>Show icon</DMMB.AppearanceShowIcon>
+  <DMMB.AppearanceShowIconDesc>Hides the icon without discarding it. The label gets the released space.</DMMB.AppearanceShowIconDesc>
+  <DMMB.AppearanceIconOnly>Icon only</DMMB.AppearanceIconOnly>
+  <DMMB.AppearanceIconOnlyDesc>When an icon is shown, hides the name on the bar instead of showing both together (this is how some vanilla tabs, like History, normally look). The name is unaffected in the main buttons menu, dropdowns, and this settings list.</DMMB.AppearanceIconOnlyDesc>
+  <DMMB.AppearanceRestoreOriginalIcon>Restore original icon</DMMB.AppearanceRestoreOriginalIcon>
+  <DMMB.AppearanceIconGridTitle>Choose an icon</DMMB.AppearanceIconGridTitle>
+  <DMMB.AppearanceSourceBuiltIn>Declutter UI</DMMB.AppearanceSourceBuiltIn>
+  <DMMB.AppearanceSourceBradson>Bradson's Main Button Icons</DMMB.AppearanceSourceBradson>
+  <DMMB.AppearanceSourceVTE>Vanilla Textures Expanded</DMMB.AppearanceSourceVTE>
+  <DMMB.AppearanceSelectionUnavailable>"{0}" from {1} is unavailable. The original icon is shown; your choice is kept.</DMMB.AppearanceSelectionUnavailable>
+  <DMMB.AppearanceResetThisButton>Reset this button</DMMB.AppearanceResetThisButton>
+  <DMMB.AppearanceDone>Done</DMMB.AppearanceDone>
+  <DMMB.AppearanceCompatibilityWarning>This button uses a custom control from another mod, so the bottom bar and its hover dropdown keep their own visuals and tooltip. The name, description, and icon set here will still appear in the main buttons menu and the dropdown editor list.</DMMB.AppearanceCompatibilityWarning>
+  <DMMB.SettingsMenuBehaviorTitle>Main Buttons Menu</DMMB.SettingsMenuBehaviorTitle>
+  <DMMB.SettingsResetFooterWarning>This resets all Declutter UI settings, including settings on other tabs.</DMMB.SettingsResetFooterWarning>
+  <DMMB.SettingsResetAllButton>Reset all settings to defaults</DMMB.SettingsResetAllButton>
+  <DMMB.SettingsResetConfirmation>Reset all Declutter UI settings to their defaults? This affects every tab and cannot be undone from this window.</DMMB.SettingsResetConfirmation>
+  <DMMB.SettingsDesc>Select which main buttons stay on the bottom bar.</DMMB.SettingsDesc>
+  <DMMB.SettingsButtonMinimized>Minimized</DMMB.SettingsButtonMinimized>
+  <DMMB.SettingsButtonMinimizedDesc>Use half width in the adaptive main button bar, so the button takes up less horizontal space. Only affects the adaptive (non-fixed) bar layout; fixed-width mode uses the same width for every button, and advanced edit mode only uses this as the starting width for a button you haven't manually resized yet.</DMMB.SettingsButtonMinimizedDesc>
+  <DMMB.AdvancedEditMode>Advanced edit mode</DMMB.AdvancedEditMode>
+  <DMMB.AdvancedEditModeDesc>In this mode, you can resize buttons and add dropdown menus to each button.</DMMB.AdvancedEditModeDesc>
+  <DMMB.SettingsSnapThresholdLabel>Snap threshold: {0}px</DMMB.SettingsSnapThresholdLabel>
+  <DMMB.SettingsFixedWidthToggle>Use fixed-width main buttons</DMMB.SettingsFixedWidthToggle>
+  <DMMB.SettingsFixedWidthLabel>Fixed button width: {0}</DMMB.SettingsFixedWidthLabel>
+  <DMMB.SettingsFixedWidthCenter>Center fixed-width buttons when there is extra space</DMMB.SettingsFixedWidthCenter>
+  <DMMB.SettingsPinMenuRight>Pin vanilla menu button to the right</DMMB.SettingsPinMenuRight>
+  <DMMB.SettingsRenderDropdownsAboveWindows>Render dropdowns above windows</DMMB.SettingsRenderDropdownsAboveWindows>
+  <DMMB.SettingsRenderDropdownsAboveWindowsDesc>When enabled, main-button dropdowns draw above open main-tab windows instead of beneath them.</DMMB.SettingsRenderDropdownsAboveWindowsDesc>
+  <DMMB.SettingsPinMainButtonsMenuWindowRight>Open main buttons menu on the far right</DMMB.SettingsPinMainButtonsMenuWindowRight>
+  <DMMB.SettingsPinMainButtonsMenuWindowRightDesc>Windows opened from this menu will also open on the far right.</DMMB.SettingsPinMainButtonsMenuWindowRightDesc>
+  <DMMB.SettingsFocusMainButtonsMenuSearch>Focus search when opening main buttons menu</DMMB.SettingsFocusMainButtonsMenuSearch>
+  <DMMB.SettingsFocusMainButtonsMenuSearchDesc>When enabled, opening the main buttons menu automatically places keyboard focus in the search box.</DMMB.SettingsFocusMainButtonsMenuSearchDesc>
+  <DMMB.MainButtonsMenuShowOnBarTooltip>Show this button on the bottom bar.</DMMB.MainButtonsMenuShowOnBarTooltip>
+  <DMMB.MainButtonsMenuHideFromBarTooltip>Hide this button from the bottom bar.</DMMB.MainButtonsMenuHideFromBarTooltip>
+  <DMMB.SettingsPlaySettingsMenuToggle>Enable searchable play settings menu</DMMB.SettingsPlaySettingsMenuToggle>
+  <DMMB.SettingsPlaySettingsHoverToggle>Reveal play settings on hover (hides the menu button)</DMMB.SettingsPlaySettingsHoverToggle>
+  <DMMB.SettingsPlaySettingsHoverToggleDesc>Shows play settings only while your mouse is over the bottom-right UI widgets (date, time, speed, etc.).</DMMB.SettingsPlaySettingsHoverToggleDesc>
+  <DMMB.SettingsPlaySettingsHoverReserveSpaceToggle>Reserve space for hidden play settings</DMMB.SettingsPlaySettingsHoverReserveSpaceToggle>
+  <DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc>When reveal on hover is enabled, keeps the play settings row's vertical space reserved while the buttons are hidden.</DMMB.SettingsPlaySettingsHoverReserveSpaceToggleDesc>
+  <DMMB.SettingsHidePlaySettingsEditModeButton>Hide edit mode button</DMMB.SettingsHidePlaySettingsEditModeButton>
+  <DMMB.SettingsHidePlaySettingsEditModeButtonDesc>Only applies when searchable play settings menu is disabled.</DMMB.SettingsHidePlaySettingsEditModeButtonDesc>
+  <DMMB.SettingsDefaultNewButtonsHidden>Default new buttons to hidden</DMMB.SettingsDefaultNewButtonsHidden>
+  <DMMB.SettingsDefaultNewButtonsHiddenDesc>When enabled, newly added main buttons (from new or updated mods) are automatically hidden from the bottom bar.</DMMB.SettingsDefaultNewButtonsHiddenDesc>
+  <DMMB.SettingsPlaceShownButtonsBeforeMenu>Place shown buttons before the Main Buttons Menu button</DMMB.SettingsPlaceShownButtonsBeforeMenu>
+  <DMMB.SettingsPlaceShownButtonsBeforeMenuDesc>When enabled, showing a previously hidden main button (via the +/- control or the checkbox list) moves it immediately before this mod's Main Buttons Menu button instead of leaving it at its previous position. Falls back to normal ordering if the Main Buttons Menu button is hidden from the bottom bar.</DMMB.SettingsPlaceShownButtonsBeforeMenuDesc>
+  <DMMB.SettingsWidgetsTitle>Widgets</DMMB.SettingsWidgetsTitle>
+  <DMMB.SettingsWidgetTime>Show in-game time/date widget</DMMB.SettingsWidgetTime>
+  <DMMB.SettingsWidgetTimeDesc>Shows the vanilla in-game date and time readout as a bar widget.</DMMB.SettingsWidgetTimeDesc>
+  <DMMB.SettingsWidgetTimeIrl>Show IRL time widget</DMMB.SettingsWidgetTimeIrl>
+  <DMMB.SettingsWidgetTimeIrlDesc>Shows your real local clock time in the bar.</DMMB.SettingsWidgetTimeIrlDesc>
+  <DMMB.SettingsWidgetTimeSpeed>Show time speed widget</DMMB.SettingsWidgetTimeSpeed>
+  <DMMB.SettingsWidgetTimeSpeedDesc>Shows pause/speed controls in the bar.</DMMB.SettingsWidgetTimeSpeedDesc>
+  <DMMB.SettingsWidgetWeather>Show weather widget</DMMB.SettingsWidgetWeather>
+  <DMMB.SettingsWidgetWeatherDesc>Shows current map weather and outdoor temperature in the bar.</DMMB.SettingsWidgetWeatherDesc>
+  <DMMB.SettingsWidgetFpsTps>Show FPS/TPS widget</DMMB.SettingsWidgetFpsTps>
+  <DMMB.SettingsWidgetFpsTpsDesc>Shows current FPS and TPS in the bar.</DMMB.SettingsWidgetFpsTpsDesc>
+  <DMMB.SettingsWidgetBattery>Show battery widget</DMMB.SettingsWidgetBattery>
+  <DMMB.SettingsWidgetBatteryDesc>Shows laptop battery charge and charging status.</DMMB.SettingsWidgetBatteryDesc>
+  <DMMB.SettingsWidgetDisableVanillaDateReadout>Disable vanilla date readout</DMMB.SettingsWidgetDisableVanillaDateReadout>
+  <DMMB.SettingsWidgetDisableVanillaDateReadoutDesc>Hides RimWorld's default date/time UI on the right side so only widget-based date/time is shown.</DMMB.SettingsWidgetDisableVanillaDateReadoutDesc>
+  <DMMB.SettingsWidgetDisableVanillaTimeControls>Disable vanilla time controls</DMMB.SettingsWidgetDisableVanillaTimeControls>
+  <DMMB.SettingsWidgetDisableVanillaTimeControlsDesc>Hides RimWorld's default pause/speed controls so only widget-based controls are shown.</DMMB.SettingsWidgetDisableVanillaTimeControlsDesc>
+  <DMMB.SettingsWidgetDisableVanillaWeatherWidget>Disable vanilla weather widget</DMMB.SettingsWidgetDisableVanillaWeatherWidget>
+  <DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>Hides RimWorld's default weather readout on the right side so only widget-based weather is shown.</DMMB.SettingsWidgetDisableVanillaWeatherWidgetDesc>
+  <DMMB.SettingsWidgetDisableVanillaConditionsWidget>Disable vanilla conditions widget</DMMB.SettingsWidgetDisableVanillaConditionsWidget>
+  <DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>Hides the game condition readout list on the right side.</DMMB.SettingsWidgetDisableVanillaConditionsWidgetDesc>
+  <DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover>Reveal vanilla resource readout on hover</DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHover>
+  <DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc>Shows the resource list only while the mouse is within the resource readout width on the left side of the screen.</DMMB.SettingsWidgetRevealVanillaResourceReadoutOnHoverDesc>
+  <DMMB.SettingsWidgetDisableVanillaResourceReadout>Disable vanilla resource readout</DMMB.SettingsWidgetDisableVanillaResourceReadout>
+  <DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc>Hides the resource list on the left side.</DMMB.SettingsWidgetDisableVanillaResourceReadoutDesc>
+  <DMMB.SettingsWidgetDisableVanillaMouseoverReadout>Disable vanilla mouseover readout</DMMB.SettingsWidgetDisableVanillaMouseoverReadout>
+  <DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc>Hides the mouseover readout text near the bottom-left.</DMMB.SettingsWidgetDisableVanillaMouseoverReadoutDesc>
+  <DMMB.SettingsWidgetDisableVanillaTemperatureWidget>Disable vanilla temperature widget</DMMB.SettingsWidgetDisableVanillaTemperatureWidget>
+  <DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>Hides the vanilla outdoors/indoors temperature text by returning an empty string.</DMMB.SettingsWidgetDisableVanillaTemperatureWidgetDesc>
+  <DMMB.SettingsHideAllGizmoLabels>Hide all gizmo labels</DMMB.SettingsHideAllGizmoLabels>
+  <DMMB.SettingsHideAllGizmoLabelsDesc>Hides gizmo label text, extra label text, and cooldown text. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideAllGizmoLabelsDesc>
+  <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>Hide gizmo labels for selected colonists only</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnly>
+  <DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>Hides label text, extra label text, and cooldown text only when every selected object is a colonist. Gizmos with missing/bad icons, such as dev gizmos, are excluded.</DMMB.SettingsHideGizmoLabelsForSelectedColonistsOnlyDesc>
+  <DMMB.SettingsExperimentalAtlasOptimization>Optimization: cache main button atlas drawing. Improves render performance of the bottom bar buttons.</DMMB.SettingsExperimentalAtlasOptimization>
+  <DMMB.SettingsExperimentalAtlasOptimizationDesc>Only applies while this mod draws the main button bar. Caches stitched atlas textures to reduce repeated per-slice draw calls.</DMMB.SettingsExperimentalAtlasOptimizationDesc>
+  <DMMB.SettingsGizmoScaleLabel>Gizmo scale: {0}%</DMMB.SettingsGizmoScaleLabel>
+  <DMMB.SettingsGizmoScaleMapOnly>Scale Map Gizmos</DMMB.SettingsGizmoScaleMapOnly>
+  <DMMB.SettingsGizmoScaleMapOnlyDesc>These controls only scale map gizmos which are rendered when you select either a colonist/building on the map.</DMMB.SettingsGizmoScaleMapOnlyDesc>
+  <DMMB.SettingsGizmoSpacingXLabel>Gizmo spacing (X): {0}px</DMMB.SettingsGizmoSpacingXLabel>
+  <DMMB.SettingsGizmoSpacingYLabel>Gizmo spacing (Y): {0}px</DMMB.SettingsGizmoSpacingYLabel>
+  <DMMB.SettingsForceShowTitle>Force-show hidden buttons</DMMB.SettingsForceShowTitle>
+  <DMMB.SettingsForceShowDesc>Select buttons that should stay available even when their normal visibility worker would hide them. Buttons hidden from the bar are still hidden.</DMMB.SettingsForceShowDesc>
+  <DMMB.SettingsMenuBlacklistDesc>Select which main buttons appear in the menu list.</DMMB.SettingsMenuBlacklistDesc>
+  <DMMB.SettingsMenuBlacklistUseHidden>Show only disabled buttons in the menu</DMMB.SettingsMenuBlacklistUseHidden>
+  <DMMB.SettingsAdvancedTitle>Advanced Settings</DMMB.SettingsAdvancedTitle>
+  <DMMB.SettingsAdvancedDesc>These settings control whether specific Harmony patch groups are applied at startup. Changing them requires a game restart. Disabling patch groups you are not using can provide a tiny performance improvement.</DMMB.SettingsAdvancedDesc>
+  <DMMB.SettingsEnableCommandGizmoSizePatches>Enable gizmo size patches</DMMB.SettingsEnableCommandGizmoSizePatches>
+  <DMMB.SettingsEnableCommandGizmoSizePatchesDesc>Controls patches that adjust command gizmo width and height for the gizmo scale and spacing settings. Requires restart.</DMMB.SettingsEnableCommandGizmoSizePatchesDesc>
+  <DMMB.SettingsEnableGizmoLabelVisibilityPatches>Enable gizmo label visibility patches</DMMB.SettingsEnableGizmoLabelVisibilityPatches>
+  <DMMB.SettingsEnableGizmoLabelVisibilityPatchesDesc>Controls patches that hide command gizmo labels, extra labels, and ability cooldown text. Requires restart.</DMMB.SettingsEnableGizmoLabelVisibilityPatchesDesc>
+  <DMMB.SettingsEnableSelectorSelectionStatePatches>Enable selector selection state patches</DMMB.SettingsEnableSelectorSelectionStatePatches>
+  <DMMB.SettingsEnableSelectorSelectionStatePatchesDesc>Controls Selector patches that cache whether all selected map objects are colonists for the selected-colonists-only gizmo label setting. Requires restart.</DMMB.SettingsEnableSelectorSelectionStatePatchesDesc>
+  <DMMB.SettingsEnableVanillaWidgetPatches>Enable vanilla widget patches</DMMB.SettingsEnableVanillaWidgetPatches>
+  <DMMB.SettingsEnableVanillaWidgetPatchesDesc>Controls patches that hide or reveal vanilla date, time controls, weather, conditions, resource readout, mouseover readout, and temperature UI. Requires restart.</DMMB.SettingsEnableVanillaWidgetPatchesDesc>
+  <DMMB.SettingsEnableAtlasOptimizationPatch>Enable atlas optimization patch</DMMB.SettingsEnableAtlasOptimizationPatch>
+  <DMMB.SettingsEnableAtlasOptimizationPatchDesc>Controls the Widgets.DrawAtlas hook used by the experimental main button atlas optimization. Requires restart.</DMMB.SettingsEnableAtlasOptimizationPatchDesc>
+  <DMMB.PlaySettingsEditDropdowns>Edit main buttons (move, resize, and set dropdowns)</DMMB.PlaySettingsEditDropdowns>
+  <DMMB.PlaySettingsMenuButton>Open play settings</DMMB.PlaySettingsMenuButton>
+  <DMMB.PlaySettingsMenuTitle>Play settings</DMMB.PlaySettingsMenuTitle>
+  <DMMB.PlaySettingsMenuCollecting>Collecting play settings...</DMMB.PlaySettingsMenuCollecting>
+  <DMMB.PlaySettingsMenuUnknown>Unknown</DMMB.PlaySettingsMenuUnknown>
+  <DMMB.DropdownEditButton>Edit dropdown</DMMB.DropdownEditButton>
+  <DMMB.WidgetTimeIrlTooltip>Current real time</DMMB.WidgetTimeIrlTooltip>
+  <DMMB.WidgetWeatherTooltip>Current map weather and outdoor temperature</DMMB.WidgetWeatherTooltip>
+  <DMMB.WidgetFpsTpsTooltip>Current FPS and TPS</DMMB.WidgetFpsTpsTooltip>
+  <DMMB.WidgetBatteryTooltip>Laptop battery status</DMMB.WidgetBatteryTooltip>
+  <DMMB.WidgetBatteryStateNoBattery>No battery detected</DMMB.WidgetBatteryStateNoBattery>
+  <DMMB.WidgetBatteryStateCharging>Charging</DMMB.WidgetBatteryStateCharging>
+  <DMMB.WidgetBatteryStateFull>Full</DMMB.WidgetBatteryStateFull>
+  <DMMB.WidgetBatteryStateDischarging>Discharging</DMMB.WidgetBatteryStateDischarging>
+  <DMMB.WidgetBatteryStateNotCharging>Not charging</DMMB.WidgetBatteryStateNotCharging>
+  <DMMB.ResetEditModeWidths>Reset widths</DMMB.ResetEditModeWidths>
+  <DMMB.ExitEditMode>Exit UI edit mode</DMMB.ExitEditMode>
+  <DMMB.GizmoPreviewTitle>Gizmo bar (drag to move)</DMMB.GizmoPreviewTitle>
+  <DMMB.DropdownEditorTitle>Configure dropdown: {0}</DMMB.DropdownEditorTitle>
+  <DMMB.DropdownEditorDesc>Select which buttons should appear when you hover a main button, and drag their order below with the move controls.</DMMB.DropdownEditorDesc>
+  <DMMB.DropdownOrderSectionTitle>Dropdown order ({0} selected)</DMMB.DropdownOrderSectionTitle>
+  <DMMB.DropdownOrderSectionEmpty>No buttons selected yet. Add some from the list below.</DMMB.DropdownOrderSectionEmpty>
+  <DMMB.DropdownAvailableSectionTitle>Available buttons</DMMB.DropdownAvailableSectionTitle>
+  <DMMB.DropdownAddTooltip>Add to this dropdown.</DMMB.DropdownAddTooltip>
+  <DMMB.DropdownRemoveTooltip>Remove from this dropdown.</DMMB.DropdownRemoveTooltip>
+  <DMMB.DropdownMoveEarlierTooltip>Move earlier in the dropdown.</DMMB.DropdownMoveEarlierTooltip>
+  <DMMB.DropdownMoveLaterTooltip>Move later in the dropdown.</DMMB.DropdownMoveLaterTooltip>
+  <DMMB.SettingsAutoLoadFernyModConfigs>Use Ferny's Mod Configs preset when installed</DMMB.SettingsAutoLoadFernyModConfigs>
+  <DMMB.SettingsAutoLoadFernyModConfigsDesc>When Ferny's Mod Configs is active, Declutter UI reloads Ferny's latest preset at startup and ignores local Declutter UI changes while this is enabled. Disable it, restart, then customize Declutter UI manually.</DMMB.SettingsAutoLoadFernyModConfigsDesc>
+  <DMMB.SettingsFernyPresetStatus>Ferny's preset applied: {0} v{1}</DMMB.SettingsFernyPresetStatus>
+</LanguageData>

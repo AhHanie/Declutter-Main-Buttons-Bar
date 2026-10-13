@@ -1,0 +1,567 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
+using RimWorld;
+using UnityEngine;
+using Verse;
+
+namespace Declutter_Main_Buttons_Bar
+{
+    public static class MapControlsTableContext
+    {
+        public static bool Active;
+        public static bool Measuring;
+        public static string SearchText = string.Empty;
+        public static float RowHeight;
+        public static float MinRowHeight;
+        public static float MaxRowHeight;
+        public static float ViewWidth;
+        public static float CurY;
+        public static int TotalRows;
+        public static Rect LastRowRect;
+        public static bool SuppressExternal;
+
+        public static void BeginMeasure(string searchText, float minRowHeight, float viewWidth)
+        {
+            Active = true;
+            Measuring = true;
+            SearchText = searchText ?? string.Empty;
+            MinRowHeight = minRowHeight;
+            MaxRowHeight = minRowHeight;
+            ViewWidth = viewWidth;
+            CurY = 0f;
+            TotalRows = 0;
+            LastRowRect = default;
+        }
+
+        public static void BeginRender(string searchText, float rowHeight, float viewWidth)
+        {
+            Active = true;
+            Measuring = false;
+            SearchText = searchText ?? string.Empty;
+            RowHeight = rowHeight;
+            ViewWidth = viewWidth;
+            CurY = 0f;
+            LastRowRect = default;
+        }
+
+        public static void End()
+        {
+            Active = false;
+            Measuring = false;
+        }
+
+        public static bool MatchesFilter(string tooltip)
+        {
+            if (string.IsNullOrEmpty(SearchText))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(tooltip))
+            {
+                return false;
+            }
+
+            return tooltip.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        public static Rect NextRowRect()
+        {
+            return new Rect(0f, CurY, ViewWidth, RowHeight);
+        }
+
+        public static void AdvanceRow()
+        {
+            CurY += RowHeight;
+        }
+    }
+
+    public static class PlaySettingsHoverContext
+    {
+        public static bool Active;
+        public static bool Hovered;
+        private static int dateFrame = -1;
+        private static float dateTopY;
+        private static float dateLeftX;
+        private static float dateWidth;
+        private static int playSettingsFrame = -1;
+        private static float playSettingsTopY;
+        private static float playSettingsBottomY;
+
+        public static void SetDateBounds(float topY, float leftX, float width)
+        {
+            dateFrame = Time.frameCount;
+            dateTopY = topY;
+            dateLeftX = leftX;
+            dateWidth = width;
+        }
+
+        public static bool TryGetDateBounds(out float topY, out float leftX, out float width)
+        {
+            int frame = Time.frameCount;
+            if (dateFrame == frame || dateFrame == frame - 1)
+            {
+                topY = dateTopY;
+                leftX = dateLeftX;
+                width = dateWidth;
+                return true;
+            }
+
+            topY = 0f;
+            leftX = 0f;
+            width = 0f;
+            return false;
+        }
+
+        public static void SetPlaySettingsBounds(float topY, float bottomY)
+        {
+            playSettingsFrame = Time.frameCount;
+            playSettingsTopY = topY;
+            playSettingsBottomY = bottomY;
+        }
+
+        public static bool TryGetPlaySettingsBounds(out float topY, out float bottomY)
+        {
+            int frame = Time.frameCount;
+            if (playSettingsFrame == frame || playSettingsFrame == frame - 1)
+            {
+                topY = playSettingsTopY;
+                bottomY = playSettingsBottomY;
+                return true;
+            }
+
+            topY = 0f;
+            bottomY = 0f;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalControlsUtility), "DoDate")]
+    public static class GlobalControlsUtility_DoDate_Patch
+    {
+        [HarmonyPriority(Priority.Last)]
+        public static void Postfix(float leftX, float width, ref float curBaseY)
+        {
+            if (!ModSettings.revealPlaySettingsOnHover)
+            {
+                return;
+            }
+
+            float topY = curBaseY;
+            PlaySettingsHoverContext.SetDateBounds(topY, leftX, width);
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalControlsUtility), "DoPlaySettings")]
+    public static class GlobalControlsUtility_DoPlaySettings_Patch
+    {
+        private const float HoverAreaWidth = 250f;
+        private const float FallbackMinHoverHeight = 36f;
+
+        [HarmonyPriority(Priority.First)]
+        public static void Prefix(ref float curBaseY, out PlaySettingsHoverState __state)
+        {
+            __state = default;
+            if (!ModSettings.revealPlaySettingsOnHover)
+            {
+                return;
+            }
+
+            __state.Active = true;
+            __state.PrevBaseY = curBaseY;
+            Rect hoverRect;
+            if (PlaySettingsHoverContext.TryGetDateBounds(out float topY, out float leftX, out float width))
+            {
+                float minX = leftX;
+                float maxX = leftX + width;
+                float minY = Mathf.Min(topY, curBaseY);
+                float maxY = Mathf.Max(topY, curBaseY);
+                hoverRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            }
+            else if (PlaySettingsHoverContext.TryGetPlaySettingsBounds(out float cachedTopY, out float cachedBottomY))
+            {
+                float minY = Mathf.Min(cachedTopY, cachedBottomY);
+                float maxY = Mathf.Max(cachedTopY, cachedBottomY);
+                hoverRect = Rect.MinMaxRect(UI.screenWidth - HoverAreaWidth, minY, UI.screenWidth, maxY);
+            }
+            else
+            {
+                float hoverHeight = TimeControls.TimeButSize.y;
+                if (hoverHeight < FallbackMinHoverHeight)
+                {
+                    hoverHeight = FallbackMinHoverHeight;
+                }
+
+                float y = curBaseY - hoverHeight;
+                hoverRect = new Rect(UI.screenWidth - HoverAreaWidth, y, HoverAreaWidth, hoverHeight);
+            }
+            PlaySettingsHoverContext.Active = true;
+            PlaySettingsHoverContext.Hovered = Mouse.IsOver(hoverRect);
+        }
+
+        [HarmonyPriority(Priority.Last)]
+        public static void Postfix(ref float curBaseY, PlaySettingsHoverState __state)
+        {
+            if (!__state.Active)
+            {
+                return;
+            }
+
+            if (ModSettings.reservePlaySettingsHoverSpace && !PlaySettingsHoverContext.Hovered)
+            {
+                curBaseY = __state.PrevBaseY - GetReservedHeight();
+            }
+
+            float topY = Mathf.Min(curBaseY, __state.PrevBaseY);
+            float bottomY = Mathf.Max(curBaseY, __state.PrevBaseY);
+            if (bottomY - topY > 1f)
+            {
+                PlaySettingsHoverContext.SetPlaySettingsBounds(topY, bottomY);
+            }
+
+            PlaySettingsHoverContext.Active = false;
+            PlaySettingsHoverContext.Hovered = false;
+        }
+
+        private static float GetReservedHeight()
+        {
+            if (PlaySettingsHoverContext.TryGetPlaySettingsBounds(out float cachedTopY, out float cachedBottomY))
+            {
+                return Mathf.Max(FallbackMinHoverHeight, Mathf.Abs(cachedBottomY - cachedTopY));
+            }
+
+            return Mathf.Max(FallbackMinHoverHeight, TimeControls.TimeButSize.y);
+        }
+    }
+
+    public struct PlaySettingsHoverState
+    {
+        public bool Active;
+        public float PrevBaseY;
+    }
+
+    [HarmonyPatch(typeof(PlaySettings), "DoPlaySettingsGlobalControls")]
+    public static class MapControlsTable_DoPlaySettingsGlobalControls_Patch
+    {
+        [HarmonyPriority(Priority.First)]
+        public static bool Prefix()
+        {
+            if ((ModSettings.useSearchablePlaySettingsMenu || ModSettings.revealPlaySettingsOnHover) && !MapControlsTableContext.Active)
+            {
+                if (ModSettings.revealPlaySettingsOnHover)
+                {
+                    MapControlsTableContext.SuppressExternal = !PlaySettingsHoverContext.Hovered;
+                }
+                else
+                {
+                    MapControlsTableContext.SuppressExternal = true;
+                }
+            }
+
+            return true;
+        }
+
+        [HarmonyPriority(Priority.Last)]
+        public static void Postfix()
+        {
+            MapControlsTableContext.SuppressExternal = false;
+        }
+    }
+
+    [HarmonyPatch]
+    public static class MapControlsTable_ToggleableIcon_Patch
+    {
+        public static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+        {
+            return AccessTools.GetDeclaredMethods(typeof(WidgetRow))
+                .Where(method => method.Name == "ToggleableIcon")
+                .Where(method =>
+                {
+                    var parameters = method.GetParameters();
+                    return parameters.Length >= 3
+                        && parameters[0].ParameterType == typeof(bool).MakeByRefType();
+                });
+        }
+
+        public static bool Prefix(ref bool toggleable, Texture2D tex, string tooltip)
+        {
+            if (!MapControlsTableContext.Active)
+            {
+                if (MapControlsTableContext.SuppressExternal)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            if (!MapControlsTableContext.MatchesFilter(tooltip))
+            {
+                return false;
+            }
+
+            if (MapControlsTableContext.Measuring)
+            {
+                MapControlsTableRenderer.MeasureRowHeight(tooltip, true);
+                MapControlsTableContext.TotalRows++;
+                return false;
+            }
+
+            MapControlsTableRenderer.DrawToggleRow(ref toggleable, tex, tooltip);
+            return false;
+        }
+    }
+
+    [HarmonyPatch]
+    public static class MapControlsTable_ButtonIcon_Patch
+    {
+        public static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+        {
+            return AccessTools.GetDeclaredMethods(typeof(WidgetRow))
+                .Where(method => method.Name == "ButtonIcon")
+                .Where(method =>
+                {
+                    var parameters = method.GetParameters();
+                    return parameters.Length >= 2
+                        && parameters[0].ParameterType == typeof(Texture2D)
+                        && parameters[1].ParameterType == typeof(string);
+                });
+        }
+
+        public static bool Prefix(Texture2D tex, string tooltip, ref bool __result)
+        {
+            if (!MapControlsTableContext.Active)
+            {
+                return !MapControlsTableContext.SuppressExternal;
+            }
+
+            if (!MapControlsTableContext.MatchesFilter(tooltip))
+            {
+                __result = false;
+                return false;
+            }
+
+            if (MapControlsTableContext.Measuring)
+            {
+                MapControlsTableRenderer.MeasureRowHeight(tooltip, false);
+                MapControlsTableContext.TotalRows++;
+                __result = false;
+                return false;
+            }
+
+            __result = MapControlsTableRenderer.DrawButtonRow(tex, tooltip);
+            return false;
+        }
+    }
+
+    [HarmonyPatch]
+    public static class MapControlsTable_ButtonIconRect_Patch
+    {
+        public static System.Reflection.MethodBase TargetMethod()
+        {
+            return AccessTools.Method(typeof(WidgetRow), "ButtonIconRect");
+        }
+
+        public static bool Prefix(ref Rect __result)
+        {
+            if (!MapControlsTableContext.Active || MapControlsTableContext.Measuring)
+            {
+                return true;
+            }
+
+            __result = MapControlsTableContext.NextRowRect();
+            return false;
+        }
+    }
+
+    public static class MapControlsTableRenderer
+    {
+        private const float IconSize = 24f;
+        private const float ToggleSize = 20f;
+        private const float RowPadding = 6f;
+        private static readonly Color RowLine = new Color(1f, 1f, 1f, 0.08f);
+
+        public static void MeasureRowHeight(string tooltip, bool hasToggle)
+        {
+            string label = MapControlsTableWindow.GetDisplayLabel(tooltip);
+            float textWidth = GetTextWidth(hasToggle);
+            float textHeight;
+            GameFont prevFont = Text.Font;
+            Text.Font = GameFont.Small;
+            textHeight = Text.CalcHeight(label ?? string.Empty, textWidth);
+            Text.Font = prevFont;
+
+            float baseHeight = Mathf.Max(IconSize, hasToggle ? ToggleSize : IconSize) + RowPadding * 2f;
+            float desiredHeight = Mathf.Max(baseHeight, textHeight + RowPadding * 2f);
+            if (desiredHeight > MapControlsTableContext.MaxRowHeight)
+            {
+                MapControlsTableContext.MaxRowHeight = desiredHeight;
+            }
+        }
+
+        public static void DrawToggleRow(ref bool toggleable, Texture2D icon, string tooltip)
+        {
+            Rect rowRect = MapControlsTableContext.NextRowRect();
+            MapControlsTableContext.LastRowRect = rowRect;
+
+            Widgets.DrawHighlightIfMouseover(rowRect);
+            Color prev = GUI.color;
+            GUI.color = RowLine;
+            Widgets.DrawLineHorizontal(rowRect.x + RowPadding, rowRect.yMax - 1f, rowRect.width - RowPadding * 2f);
+            GUI.color = prev;
+
+            Rect contentRect = rowRect.ContractedBy(RowPadding);
+            Rect toggleRect = new Rect(contentRect.xMax - ToggleSize, contentRect.y + (contentRect.height - ToggleSize) / 2f, ToggleSize, ToggleSize);
+            Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
+            Rect textRect = contentRect;
+            textRect.xMax = toggleRect.xMin - RowPadding;
+
+            if (icon != null)
+            {
+                Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                textRect.xMin = iconRect.xMax + RowPadding;
+            }
+
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(textRect, MapControlsTableWindow.GetDisplayLabel(tooltip));
+            Text.Anchor = prevAnchor;
+
+            bool value = toggleable;
+            bool newValue = value;
+            Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ToggleSize, paintable: false);
+            bool rowClicked = Widgets.ButtonInvisible(new Rect(rowRect.x, rowRect.y, toggleRect.xMin - rowRect.x, rowRect.height));
+            if (!rowClicked && rowRect.xMax > toggleRect.xMax)
+            {
+                rowClicked = Widgets.ButtonInvisible(new Rect(toggleRect.xMax, rowRect.y, rowRect.xMax - toggleRect.xMax, rowRect.height));
+            }
+
+            if (rowClicked)
+            {
+                newValue = !newValue;
+            }
+
+            if (newValue != value)
+            {
+                toggleable = newValue;
+            }
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(rowRect, tooltip);
+            }
+
+            MapControlsTableContext.AdvanceRow();
+        }
+
+        public static void DrawCustomToggleRow(ref bool toggleable, Texture2D icon, string tooltip)
+        {
+            Rect rowRect = MapControlsTableContext.NextRowRect();
+            MapControlsTableContext.LastRowRect = rowRect;
+
+            Widgets.DrawHighlightIfMouseover(rowRect);
+            Color prev = GUI.color;
+            GUI.color = RowLine;
+            Widgets.DrawLineHorizontal(rowRect.x + RowPadding, rowRect.yMax - 1f, rowRect.width - RowPadding * 2f);
+            GUI.color = prev;
+
+            Rect contentRect = rowRect.ContractedBy(RowPadding);
+            Rect toggleRect = new Rect(contentRect.xMax - ToggleSize, contentRect.y + (contentRect.height - ToggleSize) / 2f, ToggleSize, ToggleSize);
+            Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
+            Rect textRect = contentRect;
+            textRect.xMax = toggleRect.xMin - RowPadding;
+
+            if (icon != null)
+            {
+                Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                textRect.xMin = iconRect.xMax + RowPadding;
+            }
+
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(textRect, MapControlsTableWindow.GetDisplayLabel(tooltip));
+            Text.Anchor = prevAnchor;
+
+            bool value = toggleable;
+            bool newValue = value;
+            Widgets.Checkbox(toggleRect.x, toggleRect.y, ref newValue, ToggleSize, paintable: false);
+            bool rowClicked = Widgets.ButtonInvisible(new Rect(rowRect.x, rowRect.y, toggleRect.xMin - rowRect.x, rowRect.height));
+            if (!rowClicked && rowRect.xMax > toggleRect.xMax)
+            {
+                rowClicked = Widgets.ButtonInvisible(new Rect(toggleRect.xMax, rowRect.y, rowRect.xMax - toggleRect.xMax, rowRect.height));
+            }
+
+            if (rowClicked)
+            {
+                newValue = !newValue;
+            }
+
+            if (newValue != value)
+            {
+                toggleable = newValue;
+            }
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(rowRect, tooltip);
+            }
+
+            MapControlsTableContext.AdvanceRow();
+        }
+
+        public static bool DrawButtonRow(Texture2D icon, string tooltip)
+        {
+            Rect rowRect = MapControlsTableContext.NextRowRect();
+            MapControlsTableContext.LastRowRect = rowRect;
+
+            Widgets.DrawHighlightIfMouseover(rowRect);
+            Color prev = GUI.color;
+            GUI.color = RowLine;
+            Widgets.DrawLineHorizontal(rowRect.x + RowPadding, rowRect.yMax - 1f, rowRect.width - RowPadding * 2f);
+            GUI.color = prev;
+
+            Rect contentRect = rowRect.ContractedBy(RowPadding);
+            Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
+            Rect textRect = contentRect;
+
+            if (icon != null)
+            {
+                Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                textRect.xMin = iconRect.xMax + RowPadding;
+            }
+
+            TextAnchor prevAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(textRect, MapControlsTableWindow.GetDisplayLabel(tooltip));
+            Text.Anchor = prevAnchor;
+
+            bool clicked = Widgets.ButtonInvisible(rowRect);
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(rowRect, tooltip);
+            }
+
+            MapControlsTableContext.AdvanceRow();
+            return clicked;
+        }
+
+        private static float GetTextWidth(bool hasToggle)
+        {
+            float width = MapControlsTableContext.ViewWidth - RowPadding * 2f;
+            if (width <= 0f)
+            {
+                return 0f;
+            }
+
+            width -= IconSize + RowPadding;
+            if (hasToggle)
+            {
+                width -= ToggleSize + RowPadding;
+            }
+
+            return Mathf.Max(0f, width);
+        }
+    }
+}

@@ -1,0 +1,1385 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using RimWorld;
+using UnityEngine;
+using Verse;
+
+namespace Declutter_Main_Buttons_Bar
+{
+    public class ModSettings : Verse.ModSettings
+    {
+        public static List<MainButtonDef> hiddenFromBarDefs = new List<MainButtonDef>();
+        public static HashSet<MainButtonDef> forceShowDefs = new HashSet<MainButtonDef>();
+        public static List<MainButtonDef> favoriteDefs = new List<MainButtonDef>();
+        public static List<MainButtonDef> blacklistedFromMenuDefs = new List<MainButtonDef>();
+        public static List<MainButtonDropdownConfig> dropdownConfigs = new List<MainButtonDropdownConfig>();
+        public static List<MainButtonDef> customOrderDefs = new List<MainButtonDef>();
+        public static Dictionary<MainButtonDef, float> freeSizeWidths = new Dictionary<MainButtonDef, float>();
+        public static Dictionary<MainButtonDef, float> freeSizeXPositions = new Dictionary<MainButtonDef, float>();
+        public static Dictionary<MainButtonDef, MainButtonAppearanceConfig> mainButtonAppearances = new Dictionary<MainButtonDef, MainButtonAppearanceConfig>();
+        public static Dictionary<MainButtonDef, bool> minimizedOverrides = new Dictionary<MainButtonDef, bool>();
+
+        // Persisted representation of the Def-based collections above. Stored as strings so a
+        // missing MainButtonDef (source mod removed) never reaches Scribe_Defs/LookMode.Def and
+        // never triggers RimWorld's "Could not load reference" error.
+        private static List<string> hiddenFromBarDefNames = new List<string>();
+        private static List<string> forceShowDefNames = new List<string>();
+        private static List<string> favoriteDefNames = new List<string>();
+        private static List<string> blacklistedFromMenuDefNames = new List<string>();
+        private static List<string> customOrderDefNames = new List<string>();
+        private static Dictionary<string, float> freeSizeWidthNames = new Dictionary<string, float>();
+        private static Dictionary<string, float> freeSizeXPositionNames = new Dictionary<string, float>();
+        private static Dictionary<string, MainButtonAppearanceConfig> mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
+        private static Dictionary<string, bool> minimizedOverrideNames = new Dictionary<string, bool>();
+
+        private const int CurrentMainButtonSettingsSchemaVersion = 3;
+        private static int mainButtonSettingsSchemaVersion = 0;
+        private static bool settingsRewriteRequired = false;
+
+        public static float snapThreshold = 8f;
+        public static bool editDropdownsMode = false;
+        public static bool useAdvancedEditMode = false;
+        public static bool useFixedWidthMode = false;
+        public static float fixedButtonWidth = 120f;
+        public static bool centerFixedWidthButtons = false;
+        public static bool pinMenuButtonRight = false;
+        public static bool renderDropdownsAboveWindows = false;
+        public static bool pinMainButtonsMenuWindowRight = false;
+        public static bool focusMainButtonsMenuSearch = true;
+        public static bool useSearchablePlaySettingsMenu = true;
+        public static bool revealPlaySettingsOnHover = false;
+        public static bool reservePlaySettingsHoverSpace = false;
+        public static bool hideEditModePlaySettingsButton = false;
+        public static bool defaultNewButtonsToHidden = false;
+        public static bool placeShownButtonsBeforeMenuButton = false;
+        public static bool showTimeWidget = false;
+        public static bool showTimeIrlWidget = false;
+        public static bool showTimeSpeedWidget = false;
+        public static bool showWeatherWidget = false;
+        public static bool showFpsTpsWidget = false;
+        public static bool showBatteryWidget = false;
+        public static bool disableVanillaDateReadout = false;
+        public static bool disableVanillaTimeControls = false;
+        public static bool disableVanillaWeatherWidget = false;
+        public static bool disableVanillaConditionsWidget = false;
+        public static bool revealVanillaResourceReadoutOnHover = false;
+        public static bool disableVanillaResourceReadout = false;
+        public static bool disableVanillaMouseoverReadout = false;
+        public static bool disableVanillaTemperatureWidget = false;
+        public static bool hideAllGizmoLabels = false;
+        public static bool hideGizmoLabelsForSelectedColonistsOnly = false;
+        // The cached atlas draws into a RenderTexture. On 1.7 (Waylith) that path is unverified in game; if it
+        // renders differently from vanilla, change this default back to false. The saved key name is unchanged.
+        private const bool DefaultExperimentalMainButtonsAtlasOptimization = true;
+        public static bool experimentalMainButtonsAtlasOptimization = DefaultExperimentalMainButtonsAtlasOptimization;
+        public static bool enableCommandGizmoSizePatches = true;
+        public static bool enableGizmoLabelVisibilityPatches = true;
+        public static bool enableSelectorSelectionStatePatches = true;
+        public static bool enableVanillaWidgetPatches = true;
+        public static bool enableAtlasOptimizationPatch = true;
+        public static Dictionary<string, float> widgetWidths = new Dictionary<string, float>();
+        public static Dictionary<string, float> widgetXPositions = new Dictionary<string, float>();
+        public static List<string> knownMainButtonDefNames = new List<string>();
+        public static float gizmoDrawerOffsetX = 0f;
+        public static float gizmoDrawerOffsetY = 0f;
+        public static float gizmoDrawerScale = 1f;
+        public static float gizmoSpacingX = 5f;
+        public static float gizmoSpacingY = 14f;
+        public static bool gizmoScaleMapOnly = false;
+        public static bool autoLoadFernyModConfigs = true;
+        public static string lastFernyPresetName = null;
+        public static string lastFernyPresetVersion = null;
+        public static string lastFernyPresetAppliedUtc = null;
+
+        private static HashSet<MainButtonDef> hiddenFromBarSet;
+        private static Dictionary<MainButtonDef, List<MainButtonDef>> dropdownEntriesCache;
+        private static bool dropdownCacheDirty = true;
+        private static readonly List<string> enabledWidgetIdsCache = new List<string>();
+        private static bool enabledWidgetCacheInitialized;
+        private static int enabledWidgetCacheFlags = -1;
+
+        public override void ExposeData()
+        {
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                // Canonical cleanup point: project the live Def-based runtime state down to
+                // names right before it is written, so a null/stale ref is never serialized.
+                hiddenFromBarDefNames = CaptureDefNames(hiddenFromBarDefs);
+                forceShowDefNames = CaptureDefNames(forceShowDefs);
+                favoriteDefNames = CaptureDefNames(favoriteDefs);
+                blacklistedFromMenuDefNames = CaptureDefNames(blacklistedFromMenuDefs);
+                customOrderDefNames = CaptureDefNames(customOrderDefs);
+                freeSizeWidthNames = CaptureDefDictionary(freeSizeWidths);
+                freeSizeXPositionNames = CaptureDefDictionary(freeSizeXPositions);
+                mainButtonAppearanceNames = CaptureAppearanceDictionary(mainButtonAppearances);
+                minimizedOverrideNames = CaptureDefDictionary(minimizedOverrides);
+                mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
+            }
+
+            Scribe_Values.Look(ref mainButtonSettingsSchemaVersion, "mainButtonSettingsSchemaVersion", 0);
+
+            Scribe_Collections.Look(ref hiddenFromBarDefNames, "hiddenFromBarDefs", LookMode.Value);
+            if (hiddenFromBarDefNames == null)
+            {
+                hiddenFromBarDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref forceShowDefNames, "forceShowDefs", LookMode.Value);
+            if (forceShowDefNames == null)
+            {
+                forceShowDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref favoriteDefNames, "favoriteDefs", LookMode.Value);
+            if (favoriteDefNames == null)
+            {
+                favoriteDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref blacklistedFromMenuDefNames, "blacklistedFromMenuDefs", LookMode.Value);
+            if (blacklistedFromMenuDefNames == null)
+            {
+                blacklistedFromMenuDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref dropdownConfigs, "dropdownConfigs", LookMode.Deep);
+            if (dropdownConfigs == null)
+            {
+                dropdownConfigs = new List<MainButtonDropdownConfig>();
+            }
+
+            Scribe_Collections.Look(ref customOrderDefNames, "customOrderDefs", LookMode.Value);
+            if (customOrderDefNames == null)
+            {
+                customOrderDefNames = new List<string>();
+            }
+
+            Scribe_Collections.Look(ref freeSizeWidthNames, "freeSizeWidths", LookMode.Value, LookMode.Value);
+            if (freeSizeWidthNames == null)
+            {
+                freeSizeWidthNames = new Dictionary<string, float>();
+            }
+
+            Scribe_Collections.Look(ref freeSizeXPositionNames, "freeSizeXPositions", LookMode.Value, LookMode.Value);
+            if (freeSizeXPositionNames == null)
+            {
+                freeSizeXPositionNames = new Dictionary<string, float>();
+            }
+
+            Scribe_Collections.Look(ref mainButtonAppearanceNames, "mainButtonAppearances", LookMode.Value, LookMode.Deep);
+            if (mainButtonAppearanceNames == null)
+            {
+                mainButtonAppearanceNames = new Dictionary<string, MainButtonAppearanceConfig>();
+            }
+
+            Scribe_Collections.Look(ref minimizedOverrideNames, "minimizedOverrides", LookMode.Value, LookMode.Value);
+            if (minimizedOverrideNames == null)
+            {
+                minimizedOverrideNames = new Dictionary<string, bool>();
+            }
+
+            Scribe_Values.Look(ref useAdvancedEditMode, "useFreeSizeMode", false);
+            Scribe_Values.Look(ref useFixedWidthMode, "useFixedWidthMode", false);
+            Scribe_Values.Look(ref fixedButtonWidth, "fixedButtonWidth", 120f);
+            Scribe_Values.Look(ref snapThreshold, "snapThreshold", 8f);
+            Scribe_Values.Look(ref centerFixedWidthButtons, "centerFixedWidthButtons", false);
+            Scribe_Values.Look(ref pinMenuButtonRight, "pinMenuButtonRight", false);
+            Scribe_Values.Look(ref renderDropdownsAboveWindows, "renderDropdownsAboveWindows", false);
+            Scribe_Values.Look(ref pinMainButtonsMenuWindowRight, "pinMainButtonsMenuWindowRight", false);
+            Scribe_Values.Look(ref focusMainButtonsMenuSearch, "focusMainButtonsMenuSearch", true);
+            Scribe_Values.Look(ref useSearchablePlaySettingsMenu, "useSearchablePlaySettingsMenu", true);
+            Scribe_Values.Look(ref revealPlaySettingsOnHover, "revealPlaySettingsOnHover", false);
+            Scribe_Values.Look(ref reservePlaySettingsHoverSpace, "reservePlaySettingsHoverSpace", false);
+            Scribe_Values.Look(ref hideEditModePlaySettingsButton, "hideEditModePlaySettingsButton", false);
+            Scribe_Values.Look(ref defaultNewButtonsToHidden, "defaultNewButtonsToHidden", false);
+            Scribe_Values.Look(ref placeShownButtonsBeforeMenuButton, "placeShownButtonsBeforeMenuButton", false);
+            Scribe_Values.Look(ref showTimeWidget, "showTimeWidget", false);
+            Scribe_Values.Look(ref showTimeIrlWidget, "showTimeIrlWidget", false);
+            Scribe_Values.Look(ref showTimeSpeedWidget, "showTimeSpeedWidget", false);
+            Scribe_Values.Look(ref showWeatherWidget, "showWeatherWidget", false);
+            Scribe_Values.Look(ref showFpsTpsWidget, "showFpsTpsWidget", false);
+            Scribe_Values.Look(ref showBatteryWidget, "showBatteryWidget", false);
+            Scribe_Values.Look(ref disableVanillaDateReadout, "disableVanillaDateReadout", false);
+            Scribe_Values.Look(ref disableVanillaTimeControls, "disableVanillaTimeControls", false);
+            Scribe_Values.Look(ref disableVanillaWeatherWidget, "disableVanillaWeatherWidget", false);
+            Scribe_Values.Look(ref disableVanillaConditionsWidget, "disableVanillaConditionsWidget", false);
+            Scribe_Values.Look(ref revealVanillaResourceReadoutOnHover, "revealVanillaResourceReadoutOnHover", false);
+            Scribe_Values.Look(ref disableVanillaResourceReadout, "disableVanillaResourceReadout", false);
+            Scribe_Values.Look(ref disableVanillaMouseoverReadout, "disableVanillaMouseoverReadout", false);
+            Scribe_Values.Look(ref disableVanillaTemperatureWidget, "disableVanillaTemperatureWidget", false);
+            Scribe_Values.Look(ref hideAllGizmoLabels, "hideAllGizmoLabels", false);
+            Scribe_Values.Look(ref hideGizmoLabelsForSelectedColonistsOnly, "hideGizmoLabelsForSelectedColonistsOnly", false);
+            Scribe_Values.Look(ref experimentalMainButtonsAtlasOptimization, "experimentalMainButtonsAtlasOptimization", DefaultExperimentalMainButtonsAtlasOptimization);
+            Scribe_Values.Look(ref enableCommandGizmoSizePatches, "enableCommandGizmoSizePatches", true);
+            Scribe_Values.Look(ref enableGizmoLabelVisibilityPatches, "enableGizmoLabelVisibilityPatches", true);
+            Scribe_Values.Look(ref enableSelectorSelectionStatePatches, "enableSelectorSelectionStatePatches", true);
+            Scribe_Values.Look(ref enableVanillaWidgetPatches, "enableVanillaWidgetPatches", true);
+            Scribe_Values.Look(ref enableAtlasOptimizationPatch, "enableAtlasOptimizationPatch", true);
+            Scribe_Collections.Look(ref widgetWidths, "widgetWidths", LookMode.Value, LookMode.Value);
+            if (widgetWidths == null)
+            {
+                widgetWidths = new Dictionary<string, float>();
+            }
+            Scribe_Collections.Look(ref widgetXPositions, "widgetXPositions", LookMode.Value, LookMode.Value);
+            if (widgetXPositions == null)
+            {
+                widgetXPositions = new Dictionary<string, float>();
+            }
+            Scribe_Collections.Look(ref knownMainButtonDefNames, "knownMainButtonDefNames", LookMode.Value);
+            Scribe_Values.Look(ref gizmoDrawerOffsetX, "gizmoDrawerOffsetX", 0f);
+            Scribe_Values.Look(ref gizmoDrawerOffsetY, "gizmoDrawerOffsetY", 0f);
+            Scribe_Values.Look(ref gizmoDrawerScale, "gizmoDrawerScale", 1f);
+            Scribe_Values.Look(ref gizmoSpacingX, "gizmoSpacingX", 5f);
+            Scribe_Values.Look(ref gizmoSpacingY, "gizmoSpacingY", 14f);
+            Scribe_Values.Look(ref gizmoScaleMapOnly, "gizmoScaleMapOnly", false);
+            Scribe_Values.Look(ref autoLoadFernyModConfigs, "autoLoadFernyModConfigs", true);
+            Scribe_Values.Look(ref lastFernyPresetName, "lastFernyPresetName");
+            Scribe_Values.Look(ref lastFernyPresetVersion, "lastFernyPresetVersion");
+            Scribe_Values.Look(ref lastFernyPresetAppliedUtc, "lastFernyPresetAppliedUtc");
+            fixedButtonWidth = Mathf.Clamp(fixedButtonWidth, 50f, 200f);
+            gizmoDrawerScale = Mathf.Clamp(gizmoDrawerScale, 0.5f, 1.5f);
+            gizmoSpacingX = Mathf.Clamp(gizmoSpacingX, 0f, 20f);
+            gizmoSpacingY = Mathf.Clamp(gizmoSpacingY, -10f, 30f);
+            
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                bool anyDropped = mainButtonSettingsSchemaVersion < CurrentMainButtonSettingsSchemaVersion;
+
+                hiddenFromBarDefs = ResolveDefList(hiddenFromBarDefNames, ref anyDropped);
+                forceShowDefs = ResolveDefSet(forceShowDefNames, ref anyDropped);
+                favoriteDefs = ResolveDefList(favoriteDefNames, ref anyDropped);
+                blacklistedFromMenuDefs = ResolveDefList(blacklistedFromMenuDefNames, ref anyDropped);
+                customOrderDefs = ResolveDefList(customOrderDefNames, ref anyDropped);
+                freeSizeWidths = ResolveDefDictionary(freeSizeWidthNames, ref anyDropped);
+                freeSizeXPositions = ResolveDefDictionary(freeSizeXPositionNames, ref anyDropped);
+                mainButtonAppearances = ResolveAppearanceDictionary(mainButtonAppearanceNames, ref anyDropped);
+                minimizedOverrides = ResolveDefDictionary(minimizedOverrideNames, ref anyDropped);
+
+                // Nested MainButtonDropdownConfig entries are registered for PostLoadInit before this
+                // (outer) object by RimWorld's Scribe deep-loading order, so their resolved state is
+                // already available here.
+                for (int i = 0; i < dropdownConfigs.Count; i++)
+                {
+                    if (dropdownConfigs[i] != null && dropdownConfigs[i].RequiresSettingsRewrite)
+                    {
+                        anyDropped = true;
+                        break;
+                    }
+                }
+
+                // Filter knownMainButtonDefNames with the same safe resolver before
+                // DetectAndHideNewButtonsFromBarIfNeeded runs, so a reinstalled def is treated as new.
+                if (knownMainButtonDefNames == null)
+                {
+                    knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+                }
+                else
+                {
+                    List<string> filteredKnownNames = new List<string>();
+                    HashSet<string> seenKnownNames = new HashSet<string>();
+                    for (int i = 0; i < knownMainButtonDefNames.Count; i++)
+                    {
+                        string defName = knownMainButtonDefNames[i];
+                        if (string.IsNullOrEmpty(defName) || ResolveMainButtonDef(defName) == null)
+                        {
+                            anyDropped = true;
+                            continue;
+                        }
+
+                        if (seenKnownNames.Add(defName))
+                        {
+                            filteredKnownNames.Add(defName);
+                        }
+                        else
+                        {
+                            anyDropped = true;
+                        }
+                    }
+
+                    knownMainButtonDefNames = filteredKnownNames;
+                }
+
+                widgetWidths = widgetWidths
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Key) && MainBarWidgetIds.IsKnown(kvp.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                widgetXPositions = widgetXPositions
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Key) && MainBarWidgetIds.IsKnown(kvp.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+                if (useSearchablePlaySettingsMenu && revealPlaySettingsOnHover)
+                {
+                    revealPlaySettingsOnHover = false;
+                }
+
+                if (revealVanillaResourceReadoutOnHover && disableVanillaResourceReadout)
+                {
+                    disableVanillaResourceReadout = false;
+                }
+
+                mainButtonSettingsSchemaVersion = CurrentMainButtonSettingsSchemaVersion;
+                settingsRewriteRequired = anyDropped;
+            }
+        }
+
+        internal static MainButtonDef ResolveMainButtonDef(string defName)
+        {
+            if (string.IsNullOrWhiteSpace(defName))
+            {
+                return null;
+            }
+
+            return DefDatabase<MainButtonDef>.GetNamedSilentFail(defName);
+        }
+
+        private static List<string> CaptureDefNames(IEnumerable<MainButtonDef> defs)
+        {
+            List<string> result = new List<string>();
+            if (defs == null)
+            {
+                return result;
+            }
+
+            foreach (MainButtonDef def in defs)
+            {
+                if (def != null && !string.IsNullOrEmpty(def.defName))
+                {
+                    result.Add(def.defName);
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, float> CaptureDefDictionary(Dictionary<MainButtonDef, float> dict)
+        {
+            Dictionary<string, float> result = new Dictionary<string, float>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, float> kvp in dict)
+            {
+                if (kvp.Key != null && !string.IsNullOrEmpty(kvp.Key.defName))
+                {
+                    result[kvp.Key.defName] = kvp.Value;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, bool> CaptureDefDictionary(Dictionary<MainButtonDef, bool> dict)
+        {
+            Dictionary<string, bool> result = new Dictionary<string, bool>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, bool> kvp in dict)
+            {
+                if (kvp.Key != null && !string.IsNullOrEmpty(kvp.Key.defName))
+                {
+                    result[kvp.Key.defName] = kvp.Value;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<MainButtonDef, bool> ResolveDefDictionary(Dictionary<string, bool> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, bool> result = new Dictionary<MainButtonDef, bool>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, bool> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = kvp.Value;
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        private static List<MainButtonDef> ResolveDefList(List<string> names, ref bool anyDropped)
+        {
+            List<MainButtonDef> result = new List<MainButtonDef>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+            for (int i = 0; i < names.Count; i++)
+            {
+                MainButtonDef def = ResolveMainButtonDef(names[i]);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (seen.Add(def))
+                {
+                    result.Add(def);
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        private static HashSet<MainButtonDef> ResolveDefSet(List<string> names, ref bool anyDropped)
+        {
+            return new HashSet<MainButtonDef>(ResolveDefList(names, ref anyDropped));
+        }
+
+        private static Dictionary<MainButtonDef, float> ResolveDefDictionary(Dictionary<string, float> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, float> result = new Dictionary<MainButtonDef, float>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, float> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                if (def == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = kvp.Value;
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, MainButtonAppearanceConfig> CaptureAppearanceDictionary(Dictionary<MainButtonDef, MainButtonAppearanceConfig> dict)
+        {
+            Dictionary<string, MainButtonAppearanceConfig> result = new Dictionary<string, MainButtonAppearanceConfig>();
+            if (dict == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<MainButtonDef, MainButtonAppearanceConfig> kvp in dict)
+            {
+                if (kvp.Key == null || string.IsNullOrEmpty(kvp.Key.defName) || kvp.Value == null || kvp.Value.IsDefault)
+                {
+                    continue;
+                }
+
+                result[kvp.Key.defName] = kvp.Value;
+            }
+
+            return result;
+        }
+
+        private static Dictionary<MainButtonDef, MainButtonAppearanceConfig> ResolveAppearanceDictionary(Dictionary<string, MainButtonAppearanceConfig> names, ref bool anyDropped)
+        {
+            Dictionary<MainButtonDef, MainButtonAppearanceConfig> result = new Dictionary<MainButtonDef, MainButtonAppearanceConfig>();
+            if (names == null)
+            {
+                return result;
+            }
+
+            foreach (KeyValuePair<string, MainButtonAppearanceConfig> kvp in names)
+            {
+                MainButtonDef def = ResolveMainButtonDef(kvp.Key);
+                MainButtonAppearanceConfig config = kvp.Value;
+                if (def == null || config == null)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                // Only malformed keys are dropped; a valid key from an inactive icon pack is kept.
+                if (config.iconPath != null && !MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
+                {
+                    anyDropped = true;
+                    config.iconPath = null;
+                }
+
+                string normalizedDescription = MainButtonAppearanceConfig.NormalizeDescription(config.customDescription);
+                if (normalizedDescription != config.customDescription)
+                {
+                    anyDropped = true;
+                    config.customDescription = normalizedDescription;
+                }
+
+                if (config.IsDefault)
+                {
+                    anyDropped = true;
+                    continue;
+                }
+
+                if (!result.ContainsKey(def))
+                {
+                    result[def] = config;
+                }
+                else
+                {
+                    anyDropped = true;
+                }
+            }
+
+            return result;
+        }
+
+        public static bool ConsumeSettingsRewriteRequired()
+        {
+            bool result = settingsRewriteRequired;
+            settingsRewriteRequired = false;
+            return result;
+        }
+
+        private static void RebuildCaches()
+        {
+            // Rebuild hidden set
+            hiddenFromBarSet = new HashSet<MainButtonDef>(hiddenFromBarDefs);
+
+            // Mark dropdown cache as dirty so it rebuilds on next access
+            dropdownCacheDirty = true;
+        }
+
+        public static void Init()
+        {
+            RebuildCaches();
+            if (NormalizeDropdownConfigs())
+            {
+                settingsRewriteRequired = true;
+            }
+            enabledWidgetCacheInitialized = false;
+        }
+
+        public static bool EnsureCustomOrderCoverage()
+        {
+            if (customOrderDefs == null)
+            {
+                customOrderDefs = new List<MainButtonDef>();
+            }
+
+            List<MainButtonDef> allButtons = MainButtonsCache.AllButtonsInOrder;
+            List<MainButtonDef> normalized = new List<MainButtonDef>(allButtons.Count);
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+
+            for (int i = 0; i < customOrderDefs.Count; i++)
+            {
+                MainButtonDef def = customOrderDefs[i];
+                if (seen.Add(def))
+                {
+                    normalized.Add(def);
+                }
+            }
+
+            for (int i = 0; i < allButtons.Count; i++)
+            {
+                MainButtonDef def = allButtons[i];
+                if (seen.Add(def))
+                {
+                    normalized.Add(def);
+                }
+            }
+
+            bool changed = normalized.Count != customOrderDefs.Count;
+            if (!changed)
+            {
+                for (int i = 0; i < normalized.Count; i++)
+                {
+                    if (normalized[i] != customOrderDefs[i])
+                    {
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+
+            if (changed)
+            {
+                customOrderDefs = normalized;
+                MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+            }
+
+            return changed;
+        }
+
+        private static void RebuildDropdownCache()
+        {
+            dropdownEntriesCache = new Dictionary<MainButtonDef, List<MainButtonDef>>();
+
+            for (int i = 0; i < dropdownConfigs.Count; i++)
+            {
+                MainButtonDropdownConfig config = dropdownConfigs[i];
+                if (config == null || config.parent == null)
+                {
+                    continue;
+                }
+
+                // entryOrder is kept in sync with entries by NormalizeDropdownConfigs/SetDropdownEntry;
+                // fall back to entries for a config that has not been normalized yet.
+                IEnumerable<MainButtonDef> orderedSource = config.entryOrder != null && config.entryOrder.Count > 0
+                    ? config.entryOrder
+                    : config.entries;
+
+                // Visibility filtering happens here, after the player's chosen order is
+                // resolved, so a temporarily-hidden entry does not lose its saved position.
+                List<MainButtonDef> entries = orderedSource
+                    .Where(entry => entry != config.parent && ShouldDisplayMainButton(entry))
+                    .Distinct()
+                    .ToList();
+
+                dropdownEntriesCache[config.parent] = entries;
+            }
+
+            dropdownCacheDirty = false;
+        }
+
+        public static bool IsHiddenFromBar(MainButtonDef def)
+        {
+            return hiddenFromBarSet.Contains(def);
+        }
+
+        public static bool IsForceShown(MainButtonDef def)
+        {
+            return forceShowDefs.Contains(def);
+        }
+
+        // Force-show is a Declutter presentation override. Keep this policy in one place so
+        // the bar, menus, and dropdowns do not disagree about which entries are available.
+        public static bool ShouldDisplayMainButton(MainButtonDef def)
+        {
+            return def != null && (IsForceShown(def) || def.Worker.Visible);
+        }
+
+        public static void SetHiddenFromBar(MainButtonDef def, bool hidden)
+        {
+            if (hidden)
+            {
+                if (!hiddenFromBarDefs.Contains(def))
+                {
+                    hiddenFromBarDefs.Add(def);
+                    hiddenFromBarSet.Add(def);
+                }
+            }
+            else
+            {
+                bool wasHidden = hiddenFromBarDefs.Remove(def);
+                hiddenFromBarSet.Remove(def);
+
+                if (wasHidden && placeShownButtonsBeforeMenuButton)
+                {
+                    InsertDefsBeforeMenuButton(new List<MainButtonDef> { def });
+                }
+            }
+
+            dropdownCacheDirty = true;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+        }
+
+        public static void SetForceShown(MainButtonDef def, bool forceShown)
+        {
+            if (forceShown)
+            {
+                forceShowDefs.Add(def);
+            }
+            else
+            {
+                forceShowDefs.Remove(def);
+            }
+
+            dropdownCacheDirty = true;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+        }
+
+        // Per-user layout override: whether def.minimized is honored as-is or overridden by the
+        // player. Not persisted on MainButtonDef itself so the choice never leaks to other
+        // consumers of the shared def.
+        public static bool IsMinimized(MainButtonDef def)
+        {
+            if (def != null && minimizedOverrides.TryGetValue(def, out bool minimized))
+            {
+                return minimized;
+            }
+
+            return def != null && def.minimized;
+        }
+
+        public static void SetMinimized(MainButtonDef def, bool minimized)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            minimizedOverrides[def] = minimized;
+
+            // The stale rect can otherwise anchor a dropdown to the wrong position once the
+            // bar reflows at the new width.
+            MainButtonsRoot_DoButtons_Patch.ClearDropdownState();
+
+            if (useAdvancedEditMode)
+            {
+                MainButtonsRoot_DoButtons_Patch.ReconcileFreeSizeAfterChange();
+            }
+        }
+
+        public static bool IsFavorite(MainButtonDef def)
+        {
+            return favoriteDefs.Contains(def);
+        }
+
+        public static void SetFavorite(MainButtonDef def, bool favorite)
+        {
+            if (favorite)
+            {
+                if (!favoriteDefs.Contains(def))
+                {
+                    favoriteDefs.Add(def);
+                }
+            }
+            else
+            {
+                favoriteDefs.Remove(def);
+            }
+        }
+
+        public static bool IsBlacklistedFromMenu(MainButtonDef def)
+        {
+            return blacklistedFromMenuDefs.Contains(def);
+        }
+
+        public static void SetBlacklistedFromMenu(MainButtonDef def, bool blacklisted)
+        {
+            if (blacklisted)
+            {
+                if (!blacklistedFromMenuDefs.Contains(def))
+                {
+                    blacklistedFromMenuDefs.Add(def);
+                }
+            }
+            else
+            {
+                blacklistedFromMenuDefs.Remove(def);
+            }
+        }
+
+        public static MainButtonAppearanceConfig GetAppearance(MainButtonDef def)
+        {
+            if (def != null && mainButtonAppearances.TryGetValue(def, out MainButtonAppearanceConfig config))
+            {
+                return config;
+            }
+
+            return null;
+        }
+
+        public static string GetDisplayLabel(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return string.Empty;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && config.customLabel != null)
+            {
+                return config.customLabel;
+            }
+
+            return def.LabelCap;
+        }
+
+        public static string GetDisplayDescription(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return string.Empty;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && config.customDescription != null)
+            {
+                return config.customDescription;
+            }
+
+            return def.description ?? string.Empty;
+        }
+
+        public static Texture2D GetDisplayIcon(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return null;
+            }
+
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            if (config != null && !config.showIcon)
+            {
+                return null;
+            }
+
+            if (config != null && config.iconPath != null)
+            {
+                // Bar/menu/dropdown rendering treats a failed-to-load icon as absent rather
+                // than showing BaseContent.BadTex; the editor still surfaces BadTex directly
+                // so the player can see and reset a broken selection.
+                Texture2D texture = MainButtonAppearanceCatalog.GetTexture(config.iconPath);
+                if (texture != null)
+                {
+                    return texture == BaseContent.BadTex ? null : texture;
+                }
+
+                // A valid optional-pack selection whose mod or texture is unavailable falls
+                // back to the original icon; the saved choice is retained.
+                if (MainButtonAppearanceCatalog.IsExternalKey(config.iconPath)
+                    && MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
+                {
+                    return def.Icon;
+                }
+
+                return null;
+            }
+
+            return def.Icon;
+        }
+
+        // Bar/dropdown-rendering-only hint: hide the label whenever an icon is shown, instead
+        // of trying to fit both. Menu/dropdown-editor/settings-list labels are unaffected.
+        public static bool GetPreferIconOnly(MainButtonDef def)
+        {
+            MainButtonAppearanceConfig config = GetAppearance(def);
+            return config != null && config.preferIconOnly;
+        }
+
+        public static void SetAppearance(MainButtonDef def, MainButtonAppearanceConfig config)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            if (config == null)
+            {
+                mainButtonAppearances.Remove(def);
+                return;
+            }
+
+            config.customLabel = MainButtonAppearanceConfig.NormalizeLabel(config.customLabel);
+            config.customDescription = MainButtonAppearanceConfig.NormalizeDescription(config.customDescription);
+
+            if (config.iconPath != null && !MainButtonAppearanceCatalog.IsPersistableKey(config.iconPath))
+            {
+                config.iconPath = null;
+            }
+
+            if (config.IsDefault)
+            {
+                mainButtonAppearances.Remove(def);
+                return;
+            }
+
+            mainButtonAppearances[def] = config;
+        }
+
+        public static void ResetAppearance(MainButtonDef def)
+        {
+            if (def == null)
+            {
+                return;
+            }
+
+            mainButtonAppearances.Remove(def);
+        }
+
+        public static void SetVanillaResourceReadoutDisabled(bool disabled)
+        {
+            disableVanillaResourceReadout = disabled;
+            if (disabled)
+            {
+                revealVanillaResourceReadoutOnHover = false;
+            }
+        }
+
+        public static void SetVanillaResourceReadoutHover(bool revealOnHover)
+        {
+            revealVanillaResourceReadoutOnHover = revealOnHover;
+            if (revealOnHover)
+            {
+                disableVanillaResourceReadout = false;
+            }
+        }
+
+        public static void ResetToDefaults()
+        {
+            hiddenFromBarDefs.Clear();
+            forceShowDefs.Clear();
+            favoriteDefs.Clear();
+            blacklistedFromMenuDefs.Clear();
+            dropdownConfigs.Clear();
+            customOrderDefs = new List<MainButtonDef>(MainButtonsCache.AllButtonsInOrder);
+            freeSizeWidths.Clear();
+            freeSizeXPositions.Clear();
+            mainButtonAppearances.Clear();
+            minimizedOverrides.Clear();
+            editDropdownsMode = false;
+            useAdvancedEditMode = false;
+            useFixedWidthMode = false;
+            fixedButtonWidth = 120f;
+            snapThreshold = 8f;
+            centerFixedWidthButtons = false;
+            pinMenuButtonRight = false;
+            renderDropdownsAboveWindows = false;
+            pinMainButtonsMenuWindowRight = false;
+            focusMainButtonsMenuSearch = true;
+            useSearchablePlaySettingsMenu = true;
+            revealPlaySettingsOnHover = false;
+            reservePlaySettingsHoverSpace = false;
+            hideEditModePlaySettingsButton = false;
+            defaultNewButtonsToHidden = false;
+            placeShownButtonsBeforeMenuButton = false;
+            showTimeWidget = false;
+            showTimeIrlWidget = false;
+            showTimeSpeedWidget = false;
+            showWeatherWidget = false;
+            showFpsTpsWidget = false;
+            showBatteryWidget = false;
+            disableVanillaDateReadout = false;
+            disableVanillaTimeControls = false;
+            disableVanillaWeatherWidget = false;
+            disableVanillaConditionsWidget = false;
+            revealVanillaResourceReadoutOnHover = false;
+            disableVanillaResourceReadout = false;
+            disableVanillaMouseoverReadout = false;
+            disableVanillaTemperatureWidget = false;
+            hideAllGizmoLabels = false;
+            hideGizmoLabelsForSelectedColonistsOnly = false;
+            experimentalMainButtonsAtlasOptimization = DefaultExperimentalMainButtonsAtlasOptimization;
+            enableCommandGizmoSizePatches = true;
+            enableGizmoLabelVisibilityPatches = true;
+            enableSelectorSelectionStatePatches = true;
+            enableVanillaWidgetPatches = true;
+            enableAtlasOptimizationPatch = true;
+            MainButtonsAtlasTextureCache.ClearCache();
+            widgetWidths.Clear();
+            widgetXPositions.Clear();
+            enabledWidgetIdsCache.Clear();
+            enabledWidgetCacheInitialized = false;
+            enabledWidgetCacheFlags = -1;
+            knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+            gizmoDrawerOffsetX = 0f;
+            gizmoDrawerOffsetY = 0f;
+            gizmoDrawerScale = 1f;
+            gizmoSpacingX = 5f;
+            gizmoSpacingY = 14f;
+            gizmoScaleMapOnly = false;
+            autoLoadFernyModConfigs = true;
+            lastFernyPresetName = null;
+            lastFernyPresetVersion = null;
+            lastFernyPresetAppliedUtc = null;
+            RebuildCaches();
+            EnsureCustomOrderCoverage();
+        }
+
+        public static bool DetectAndHideNewButtonsFromBarIfNeeded()
+        {
+            if (knownMainButtonDefNames.Count == 0)
+            {
+                knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+            }
+
+            HashSet<string> knownDefs = new HashSet<string>(knownMainButtonDefNames);
+            bool settingsChanged = false;
+
+            for (int i = 0; i < MainButtonsCache.AllButtonsInOrder.Count; i++)
+            {
+                MainButtonDef def = MainButtonsCache.AllButtonsInOrder[i];
+                if (knownDefs.Contains(def.defName))
+                {
+                    continue;
+                }
+
+                if (defaultNewButtonsToHidden && !IsHiddenFromBar(def))
+                {
+                    SetHiddenFromBar(def, hidden: true);
+                }
+
+                settingsChanged = true;
+            }
+
+            if (settingsChanged)
+            {
+                knownMainButtonDefNames = MainButtonsCache.AllButtonsInOrder.Select(def => def.defName).ToList();
+            }
+
+            return settingsChanged;
+        }
+
+        private static void InsertDefsBeforeMenuButton(List<MainButtonDef> defsToInsert)
+        {
+            MainButtonDef menuDef = MainButtonsMenuDefOf.DMMB_MainButtonsMenu;
+            if (menuDef == null || IsHiddenFromBar(menuDef))
+            {
+                return;
+            }
+
+            HashSet<MainButtonDef> newSet = new HashSet<MainButtonDef>(defsToInsert);
+            List<MainButtonDef> allButtons = MainButtonsCache.AllButtonsInOrder;
+            HashSet<MainButtonDef> allButtonsSet = new HashSet<MainButtonDef>(allButtons);
+
+            List<MainButtonDef> normalized = new List<MainButtonDef>(allButtons.Count);
+            HashSet<MainButtonDef> seen = new HashSet<MainButtonDef>();
+
+            if (customOrderDefs != null)
+            {
+                for (int i = 0; i < customOrderDefs.Count; i++)
+                {
+                    MainButtonDef def = customOrderDefs[i];
+                    if (def == null || newSet.Contains(def) || !allButtonsSet.Contains(def))
+                    {
+                        continue;
+                    }
+
+                    if (seen.Add(def))
+                    {
+                        normalized.Add(def);
+                    }
+                }
+            }
+
+            for (int i = 0; i < allButtons.Count; i++)
+            {
+                MainButtonDef def = allButtons[i];
+                if (newSet.Contains(def) || !seen.Add(def))
+                {
+                    continue;
+                }
+
+                normalized.Add(def);
+            }
+
+            int menuIndex = normalized.IndexOf(menuDef);
+            if (menuIndex < 0)
+            {
+                return;
+            }
+
+            normalized.InsertRange(menuIndex, defsToInsert);
+            customOrderDefs = normalized;
+            MainButtonsRoot_DoButtons_Patch.InvalidateOrderedVisibleCache();
+        }
+
+        public static bool IsWidgetEnabled(string widgetId)
+        {
+            if (widgetId == MainBarWidgetIds.Time)
+            {
+                return showTimeWidget;
+            }
+            if (widgetId == MainBarWidgetIds.TimeIrl)
+            {
+                return showTimeIrlWidget;
+            }
+            if (widgetId == MainBarWidgetIds.TimeSpeed)
+            {
+                return showTimeSpeedWidget;
+            }
+            if (widgetId == MainBarWidgetIds.Weather)
+            {
+                return showWeatherWidget;
+            }
+            if (widgetId == MainBarWidgetIds.FpsTps)
+            {
+                return showFpsTpsWidget;
+            }
+            if (widgetId == MainBarWidgetIds.Battery)
+            {
+                return showBatteryWidget;
+            }
+
+            return false;
+        }
+
+        public static List<string> GetEnabledWidgetIds()
+        {
+            int currentFlags = BuildEnabledWidgetFlags();
+            if (!enabledWidgetCacheInitialized || enabledWidgetCacheFlags != currentFlags)
+            {
+                RebuildEnabledWidgetIdsCache();
+                enabledWidgetCacheFlags = currentFlags;
+                enabledWidgetCacheInitialized = true;
+            }
+
+            return enabledWidgetIdsCache;
+        }
+
+        private static int BuildEnabledWidgetFlags()
+        {
+            int flags = 0;
+            if (showTimeWidget) flags |= 1 << 0;
+            if (showTimeIrlWidget) flags |= 1 << 1;
+            if (showTimeSpeedWidget) flags |= 1 << 2;
+            if (showWeatherWidget) flags |= 1 << 3;
+            if (showFpsTpsWidget) flags |= 1 << 4;
+            if (showBatteryWidget) flags |= 1 << 5;
+            return flags;
+        }
+
+        private static void RebuildEnabledWidgetIdsCache()
+        {
+            enabledWidgetIdsCache.Clear();
+
+            if (showTimeWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Time);
+            if (showTimeIrlWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.TimeIrl);
+            if (showTimeSpeedWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.TimeSpeed);
+            if (showWeatherWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Weather);
+            if (showFpsTpsWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.FpsTps);
+            if (showBatteryWidget) enabledWidgetIdsCache.Add(MainBarWidgetIds.Battery);
+        }
+
+        public static bool HasDropdown(MainButtonDef def)
+        {
+            return GetDropdownEntries(def).Count > 0;
+        }
+
+        public static List<MainButtonDef> GetDropdownEntries(MainButtonDef def)
+        {
+            if (dropdownCacheDirty || dropdownEntriesCache == null)
+            {
+                RebuildDropdownCache();
+            }
+
+            if (dropdownEntriesCache.TryGetValue(def, out List<MainButtonDef> cached))
+            {
+                return cached;
+            }
+
+            return new List<MainButtonDef>();
+        }
+
+        public static void SetDropdownEntry(MainButtonDef parent, MainButtonDef entry, bool enabled)
+        {
+            if (entry == parent)
+            {
+                return;
+            }
+
+            MainButtonDropdownConfig config = GetOrCreateDropdownConfig(parent);
+            if (enabled)
+            {
+                if (!config.entries.Contains(entry))
+                {
+                    config.entries.Add(entry);
+                }
+
+                if (config.entryOrder == null)
+                {
+                    config.entryOrder = new List<MainButtonDef>();
+                }
+
+                if (!config.entryOrder.Contains(entry))
+                {
+                    config.entryOrder.Add(entry);
+                }
+            }
+            else
+            {
+                config.entries.Remove(entry);
+                config.entryOrder?.Remove(entry);
+                if (config.entries.Count == 0)
+                {
+                    dropdownConfigs.Remove(config);
+                }
+            }
+
+            dropdownCacheDirty = true;
+        }
+
+        // Bounded reorder within one dropdown's entryOrder. direction is -1 (earlier) or +1 (later);
+        // a move past either end is a no-op rather than wrapping.
+        public static void MoveDropdownEntry(MainButtonDef parent, MainButtonDef entry, int direction)
+        {
+            MainButtonDropdownConfig config = GetDropdownConfig(parent);
+            if (config?.entryOrder == null)
+            {
+                return;
+            }
+
+            int index = config.entryOrder.IndexOf(entry);
+            int targetIndex = index + direction;
+            if (index < 0 || targetIndex < 0 || targetIndex >= config.entryOrder.Count)
+            {
+                return;
+            }
+
+            MainButtonDef moved = config.entryOrder[index];
+            config.entryOrder[index] = config.entryOrder[targetIndex];
+            config.entryOrder[targetIndex] = moved;
+
+            dropdownCacheDirty = true;
+        }
+
+        public static MainButtonDropdownConfig GetDropdownConfig(MainButtonDef parent)
+        {
+            return dropdownConfigs.Find(item => item.parent == parent);
+        }
+
+        private static MainButtonDropdownConfig GetOrCreateDropdownConfig(MainButtonDef parent)
+        {
+            MainButtonDropdownConfig config = dropdownConfigs.Find(item => item.parent == parent);
+            if (config == null)
+            {
+                config = new MainButtonDropdownConfig
+                {
+                    parent = parent,
+                    entries = new List<MainButtonDef>(),
+                    entryOrder = new List<MainButtonDef>()
+                };
+                dropdownConfigs.Add(config);
+            }
+
+            return config;
+        }
+
+        // Deterministic fallback sequence for entries with no saved manual order: vanilla
+        // MainButtonDef.order first, then defName as an ordinal tie-breaker so buttons sharing
+        // an order value (vanilla or modded) still sort the same way on every machine.
+        public static List<MainButtonDef> GetStableDefaultDropdownOrder(IEnumerable<MainButtonDef> defs)
+        {
+            if (defs == null)
+            {
+                return new List<MainButtonDef>();
+            }
+
+            return defs
+                .Where(def => def != null)
+                .Distinct()
+                .OrderBy(def => def.order)
+                .ThenBy(def => def.defName, StringComparer.Ordinal)
+                .ToList();
+        }
+
+        private static bool DropdownDefListsEqual(List<MainButtonDef> a, List<MainButtonDef> b)
+        {
+            if (a == null || b == null)
+            {
+                return a == b;
+            }
+
+            if (a.Count != b.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Returns true when membership or order changed, so callers can trigger a settings
+        // rewrite and cache invalidation.
+        private static bool NormalizeDropdownConfigs()
+        {
+            if (dropdownConfigs == null)
+            {
+                dropdownConfigs = new List<MainButtonDropdownConfig>();
+            }
+
+            bool changed = false;
+
+            for (int i = dropdownConfigs.Count - 1; i >= 0; i--)
+            {
+                MainButtonDropdownConfig config = dropdownConfigs[i];
+                if (config == null || config.parent == null)
+                {
+                    dropdownConfigs.RemoveAt(i);
+                    changed = true;
+                    continue;
+                }
+
+                List<MainButtonDef> normalizedEntries = (config.entries ?? new List<MainButtonDef>())
+                    .Where(entry => entry != null && entry != config.parent)
+                    .Distinct()
+                    .ToList();
+
+                if (!DropdownDefListsEqual(config.entries, normalizedEntries))
+                {
+                    changed = true;
+                }
+
+                config.entries = normalizedEntries;
+
+                if (config.entries.Count == 0)
+                {
+                    dropdownConfigs.RemoveAt(i);
+                    changed = true;
+                    continue;
+                }
+
+                HashSet<MainButtonDef> memberSet = new HashSet<MainButtonDef>(config.entries);
+                List<MainButtonDef> normalizedOrder = (config.entryOrder ?? new List<MainButtonDef>())
+                    .Where(entry => entry != null && memberSet.Contains(entry))
+                    .Distinct()
+                    .ToList();
+
+                if (normalizedOrder.Count != config.entries.Count)
+                {
+                    HashSet<MainButtonDef> seenOrder = new HashSet<MainButtonDef>(normalizedOrder);
+                    List<MainButtonDef> missing = config.entries.Where(entry => !seenOrder.Contains(entry)).ToList();
+                    normalizedOrder.AddRange(GetStableDefaultDropdownOrder(missing));
+                }
+
+                if (!DropdownDefListsEqual(config.entryOrder, normalizedOrder))
+                {
+                    changed = true;
+                }
+
+                config.entryOrder = normalizedOrder;
+            }
+
+            if (changed)
+            {
+                dropdownCacheDirty = true;
+            }
+
+            return changed;
+        }
+    }
+}

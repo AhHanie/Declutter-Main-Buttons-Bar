@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <MainButtonDef>
+    <defName>DMMB_MainButtonsMenu</defName>
+    <label>menus</label>
+    <description>Open a searchable list of all main buttons.</description>
+    <tabWindowClass>Declutter_Main_Buttons_Bar.MainTabWindow_MainButtonsMenu</tabWindowClass>
+    <order>0</order>
+    <iconPath>DMMB/UI/Hamburger</iconPath>
+  </MainButtonDef>
+  <MainButtonDef>
+    <defName>DMMB_PlaySettingsMenu</defName>
+    <label>Play Settings</label>
+    <description>Open a searchable list of play settings.</description>
+    <workerClass>Declutter_Main_Buttons_Bar.MainButtonWorker_PlaySettingsMenu</workerClass>
+    <order>499</order>
+    <iconPath>DMMB/UI/PlaySettings</iconPath>
+    <minimized>true</minimized>
+  </MainButtonDef>
+</Defs>

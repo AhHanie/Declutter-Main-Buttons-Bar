@@ -1,0 +1,287 @@
+using System.Collections.Generic;
+using System.Linq;
+using RimWorld;
+using UnityEngine;
+using Verse;
+
+namespace Declutter_Main_Buttons_Bar
+{
+    public class MainTabWindow_MainButtonsMenu : MainTabWindow
+    {
+        private const float RowHeight = 64f;
+        private const float SearchHeight = 26f;
+        private const float IconSize = 28f;
+        private const float RowPadding = 6f;
+        private const float StarSize = 22f;
+        private const float BarActionSize = 22f;
+        private const float ControlGap = 4f;
+        private static readonly Color PanelBg = new Color(0.11f, 0.11f, 0.11f, 1f);
+        private static readonly Color RowLine = new Color(1f, 1f, 1f, 0.08f);
+
+        private readonly QuickSearchWidget quickSearchWidget = new QuickSearchWidget();
+        private Vector2 scrollPosition = Vector2.zero;
+        private List<MainButtonDef> cachedDefs;
+        private List<MainButtonDef> cachedMenuDefs;
+        private bool triedToFocus;
+        private int openFrames;
+
+        public override Vector2 RequestedTabSize
+        {
+            get
+            {
+                float height = Mathf.Min(480f, UI.screenHeight - 35f);
+                return new Vector2(380f, height);
+            }
+        }
+
+        protected override float Margin => 6f;
+
+        public MainTabWindow_MainButtonsMenu()
+        {
+            closeOnAccept = false;
+            cachedDefs = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton;
+        }
+
+        public override void PreOpen()
+        {
+            base.PreOpen();
+            AlignWindowToRightIfNeeded();
+            RebuildMenuCache();
+            quickSearchWidget.Reset();
+            CacheSearchState();
+            triedToFocus = false;
+            openFrames = 0;
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            Text.Font = GameFont.Small;
+
+            if (!triedToFocus && openFrames == 2)
+            {
+                if (ModSettings.focusMainButtonsMenuSearch)
+                {
+                    quickSearchWidget.Focus();
+                }
+                triedToFocus = true;
+            }
+
+            Rect topBarRect = new Rect(0f, 0f, inRect.width, SearchHeight + 4f);
+            Widgets.DrawBoxSolid(topBarRect, PanelBg);
+
+            Rect searchRect = new Rect(6f, 4f, inRect.width - 12f, SearchHeight);
+            Rect listRect = new Rect(0f, topBarRect.height, inRect.width, inRect.height - topBarRect.height);
+            Widgets.DrawBoxSolid(listRect, PanelBg);
+
+            quickSearchWidget.OnGUI(searchRect, CacheSearchState);
+
+            List<MainButtonDef> filteredDefs = GetFilteredDefs();
+            float viewHeight = filteredDefs.Count * RowHeight;
+            Rect viewRect = new Rect(0f, 0f, listRect.width - 16f, Mathf.Max(viewHeight, listRect.height));
+
+            Widgets.BeginScrollView(listRect, ref scrollPosition, viewRect);
+
+            float curY = 0f;
+            for (int i = 0; i < filteredDefs.Count; i++)
+            {
+                MainButtonDef def = filteredDefs[i];
+                Rect rowRect = new Rect(0f, curY, viewRect.width, RowHeight);
+                bool enabled = !def.Worker.Disabled;
+
+                Widgets.DrawHighlightIfMouseover(rowRect);
+                Color prev = GUI.color;
+                GUI.color = RowLine;
+                Widgets.DrawLineHorizontal(rowRect.x + RowPadding, rowRect.yMax - 1f, rowRect.width - RowPadding * 2f);
+                GUI.color = prev;
+
+                Rect contentRect = rowRect.ContractedBy(RowPadding);
+                float controlGroupHeight = BarActionSize + ControlGap + StarSize;
+                float controlGroupY = contentRect.y + (contentRect.height - controlGroupHeight) / 2f;
+                Rect barActionRect = new Rect(contentRect.xMax - BarActionSize, controlGroupY, BarActionSize, BarActionSize);
+                Rect starRect = new Rect(contentRect.xMax - StarSize, controlGroupY + BarActionSize + ControlGap, StarSize, StarSize);
+                Rect iconRect = new Rect(contentRect.x, contentRect.y + (contentRect.height - IconSize) / 2f, IconSize, IconSize);
+                Rect textRect = contentRect;
+                textRect.xMax = starRect.xMin - RowPadding;
+
+                string effectiveLabel = ModSettings.GetDisplayLabel(def);
+                string effectiveDescription = ModSettings.GetDisplayDescription(def);
+                Texture2D effectiveIcon = ModSettings.GetDisplayIcon(def);
+                if (effectiveIcon != null)
+                {
+                    Widgets.DrawTextureFitted(iconRect, effectiveIcon, 1f);
+                    textRect.xMin = iconRect.xMax + RowPadding;
+                }
+
+                Color prevColor = GUI.color;
+                if (!enabled)
+                {
+                    GUI.color = new Color(1f, 1f, 1f, 0.5f);
+                }
+
+                Text.Font = GameFont.Small;
+                float titleHeight = Text.LineHeight;
+                Text.Font = GameFont.Tiny;
+                float descLineHeight = Text.LineHeight;
+                float descHeight = descLineHeight * 2f;
+                float blockHeight = titleHeight + descHeight;
+                float blockY = textRect.y + Mathf.Max(0f, (textRect.height - blockHeight) / 2f);
+                Rect titleRect = new Rect(textRect.x, blockY, textRect.width, titleHeight);
+                Rect descRect = new Rect(textRect.x, blockY + titleHeight, textRect.width, descHeight);
+
+                Text.Font = GameFont.Small;
+                Widgets.Label(titleRect, effectiveLabel);
+                Text.Font = GameFont.Tiny;
+                GUI.color = enabled ? new Color(1f, 1f, 1f, 0.7f) : new Color(1f, 1f, 1f, 0.35f);
+                Widgets.Label(descRect, effectiveDescription);
+                GUI.color = prevColor;
+                Text.Font = GameFont.Small;
+
+                bool favorite = ModSettings.IsFavorite(def);
+                Texture2D starTex = favorite ? DMMBTextures.StarFilled.Texture : DMMBTextures.StarOutline.Texture;
+                bool starClicked = Widgets.ButtonImage(starRect, starTex);
+                if (starClicked)
+                {
+                    ModSettings.SetFavorite(def, !favorite);
+                    Mod.Settings.Write();
+                }
+
+                bool hiddenFromBar = ModSettings.IsHiddenFromBar(def);
+                bool barActionClicked;
+                if (hiddenFromBar)
+                {
+                    barActionClicked = Widgets.ButtonImage(barActionRect, TexButton.Plus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuShowOnBarTooltip".Translate());
+                    if (barActionClicked)
+                    {
+                        ModSettings.SetHiddenFromBar(def, hidden: false);
+                        Mod.Settings.Write();
+                    }
+                }
+                else
+                {
+                    barActionClicked = Widgets.ButtonImage(barActionRect, TexButton.Minus, doMouseoverSound: true, tooltip: "DMMB.MainButtonsMenuHideFromBarTooltip".Translate());
+                    if (barActionClicked)
+                    {
+                        ModSettings.SetHiddenFromBar(def, hidden: true);
+                        Mod.Settings.Write();
+                    }
+                }
+
+                if (enabled && !starClicked && !barActionClicked && Widgets.ButtonInvisible(rowRect))
+                {
+                    MainTabWindow_RightAlign_Eligibility.NotifyMainButtonOpenedFromMenu(def);
+                    def.Worker.InterfaceTryActivate();
+                }
+
+                TooltipHandler.TipRegion(rowRect, MainButtonDisplayUtility.BuildTooltip(effectiveLabel, effectiveDescription));
+                curY += RowHeight;
+            }
+
+            Widgets.EndScrollView();
+        }
+
+        public override void WindowUpdate()
+        {
+            base.WindowUpdate();
+            openFrames++;
+        }
+
+        public override void Notify_ClickOutsideWindow()
+        {
+            base.Notify_ClickOutsideWindow();
+            quickSearchWidget.Unfocus();
+        }
+
+        private List<MainButtonDef> GetFilteredDefs()
+        {
+            List<MainButtonDef> visibleDefs = GetVisibleMenuDefs();
+            List<MainButtonDef> source;
+            if (!quickSearchWidget.filter.Active)
+            {
+                source = visibleDefs;
+                return source
+                    .OrderByDescending(def => ModSettings.IsFavorite(def))
+                    .ThenBy(def => def.order)
+                    .ToList();
+            }
+
+            List<MainButtonDef> filtered = new List<MainButtonDef>();
+            for (int i = 0; i < visibleDefs.Count; i++)
+            {
+                MainButtonDef def = visibleDefs[i];
+                if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, def))
+                {
+                    filtered.Add(def);
+                }
+            }
+
+            return filtered
+                .OrderByDescending(def => ModSettings.IsFavorite(def))
+                .ThenBy(def => def.order)
+                .ToList();
+        }
+
+        private void CacheSearchState()
+        {
+            bool anyMatch = false;
+            List<MainButtonDef> visibleDefs = GetVisibleMenuDefs();
+            if (!quickSearchWidget.filter.Active)
+            {
+                anyMatch = visibleDefs.Count > 0;
+            }
+            else
+            {
+                for (int i = 0; i < visibleDefs.Count; i++)
+                {
+                    if (MainButtonDisplayUtility.MatchesFilter(quickSearchWidget.filter, visibleDefs[i]))
+                    {
+                        anyMatch = true;
+                        break;
+                    }
+                }
+            }
+
+            quickSearchWidget.noResultsMatched = !anyMatch;
+        }
+
+        private void RebuildMenuCache()
+        {
+            cachedDefs = MainButtonsCache.AllButtonsInOrderNoDMMBInspectButton;
+            cachedMenuDefs = cachedDefs
+                .Where(def => !ModSettings.IsBlacklistedFromMenu(def))
+                .ToList();
+        }
+
+        private void AlignWindowToRightIfNeeded()
+        {
+            if (!ModSettings.pinMainButtonsMenuWindowRight)
+            {
+                return;
+            }
+
+            float width = windowRect.width > 0f ? windowRect.width : RequestedTabSize.x;
+            windowRect.x = Mathf.Max(0f, UI.screenWidth - width);
+        }
+
+        private List<MainButtonDef> GetVisibleMenuDefs()
+        {
+            List<MainButtonDef> visible = new List<MainButtonDef>();
+            for (int i = 0; i < cachedMenuDefs.Count; i++)
+            {
+                MainButtonDef def = cachedMenuDefs[i];
+                if (def == null)
+                {
+                    continue;
+                }
+
+                if (!ModSettings.ShouldDisplayMainButton(def) || def.Worker.Disabled)
+                {
+                    continue;
+                }
+
+                visible.Add(def);
+            }
+
+            return visible;
+        }
+    }
+}

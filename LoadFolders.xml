@@ -5,4 +5,9 @@
     <li IfModActive="brrainz.visualexceptions">1.6/VisualExceptions</li>
     <li>/</li>
   </v1.6>
+  <v1.7>
+    <li>1.7/Base</li>
+    <li IfModActive="brrainz.visualexceptions">1.7/VisualExceptions</li>
+    <li>/</li>
+  </v1.7>
 </loadFolders>
